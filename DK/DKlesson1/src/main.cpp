@@ -1,13 +1,17 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       VEX                                                       */
-/*    Created:      Thu Sep 26 2019                                           */
-/*    Description:  Competition Template                                      */
+/*    Author:       Rolling Robots                                                      */
+/*    Created:      May 8 2021                                          */
+/*    Description:  Competition Lesson1                                    */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
 // ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// LeftMotor            motor         1               
+// RightMotor           motor         2               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -18,7 +22,12 @@ using namespace vex;
 competition Competition;
 
 // define your global instances of motors and other devices here
-
+void drive(int lspeed, int rspeed, int wt)
+{
+  LeftMotor.spin(forward, lspeed, percent);
+   RightMotor.spin(forward, rspeed, percent); 
+   wait(wt,msec);
+}
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -32,9 +41,14 @@ competition Competition;
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
-
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
+float turns=0.0;
+Brain.Screen.printAt(0, 20, "Pre auton is running");
+turns=LeftMotor.position(rev);
+Brain.Screen.printAt(0, 40, "Turns = %0.3f",turns);
+drive(50, 50, 1000);
+drive(0,0,0);
+turns=LeftMotor.position(rev);
+Brain.Screen.printAt(0, 60, "Turns = %f",turns);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -90,7 +104,8 @@ int main() {
 
   // Run the pre-autonomous function.
   pre_auton();
-
+Brain.Screen.clearScreen();
+Brain.Screen.printAt(0, 20, "Back to Main");
   // Prevent main from exiting with an infinite loop.
   while (true) {
     wait(100, msec);
