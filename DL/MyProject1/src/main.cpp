@@ -1,24 +1,34 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       VEX                                                       */
-/*    Created:      Thu Sep 26 2019                                           */
-/*    Description:  Competition Template                                      */
+/*    Author:       Rolling Robots                                                       */
+/*    Created:      May 8 2021                                           */
+/*    Description:  Competition Lesson 1                                      */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
 // ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// MiddleMotor          motor         16              
+// RightMotor           motor         1               
+// LeftMotor            motor         14              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
 
-using namespace vex;
+using namespace vex; /* we're using methods in this name space called vex and it enables us to type less stuff. don't need to put vex.___ */
 
 // A global instance of competition
 competition Competition;
 
 // define your global instances of motors and other devices here
-
+void drive(int lspeed, int rspeed, int wt)
+{
+  LeftMotor.spin(forward, lspeed, percent);
+  RightMotor.spin(forward, rspeed, percent);
+  wait(wt, msec);
+}
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -32,6 +42,16 @@ competition Competition;
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
+float turns=0.0;
+Brain.Screen.printAt(0 , 20, "Pre auton is running. Hi Kevin hows it going");
+turns=LeftMotor.position(rev);
+Brain.Screen.printAt(0 , 40, "Turns = %0.3f",turns);
+wait(2000, msec);
+drive(100, 100, 1000);
+drive(0, 0, 0);
+turns=LeftMotor.position(rev);
+Brain.Screen.printAt(0 , 60, "Turns = %0.3f",turns);
+wait(2000, msec);
 
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
@@ -81,7 +101,7 @@ void usercontrol(void) {
 }
 
 //
-// Main will set up the competition functions and callbacks.
+// Main will set up the competition functions and callbacks. Directs traffic for rest of the code
 //
 int main() {
   // Set up callbacks for autonomous and driver control periods.
@@ -90,7 +110,7 @@ int main() {
 
   // Run the pre-autonomous function.
   pre_auton();
-
+Brain.Screen.printAt(0, 80, "Back to Main");
   // Prevent main from exiting with an infinite loop.
   while (true) {
     wait(100, msec);
