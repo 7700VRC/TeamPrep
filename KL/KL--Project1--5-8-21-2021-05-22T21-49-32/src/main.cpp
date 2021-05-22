@@ -21,7 +21,8 @@ using namespace vex; //methods in this namespace enables us to type less stuff
 
 // A global instance of competition
 competition Competition; //setting up competition mode
-
+float d=3.25; //diameter of wheel in inches
+float pi=3.14;
 // define your global instances of motors and other devices here
 
 void drive(int lspeed, int rspeed, int wt) // Function
@@ -29,6 +30,31 @@ void drive(int lspeed, int rspeed, int wt) // Function
   LeftMotor.spin(forward, lspeed, percent);
   RightMotor.spin(forward, rspeed, percent);
   wait(wt, msec);
+}
+
+
+void inchDrive(float target)
+{
+  float inches=0.0;
+  RightMotor.setPosition(0, rev);
+  while(inches<=target)
+  {
+    drive(50,50,10);
+    inches=RightMotor.position(rev)*pi*d;
+  }
+  drive(0,0,0);
+}
+
+void inchTurn(float target)
+{
+  float theta=0.0;
+  RightMotor.setPosition(0, rev);
+  while(theta<=target)
+  {
+    drive(-50,50,10);
+    theta=24*RightMotor.position(rev)*pi*d/pi;
+  }
+  drive(0,0,0);
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -68,6 +94,11 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
+  RightMotor.setBrake(brake);
+  LeftMotor.setBrake(brake);
+  wait(1000, msec);
+  inchDrive(0);
+  inchTurn(90);
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
@@ -84,6 +115,8 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
+  RightMotor.setBrake(coast);
+  LeftMotor.setBrake(coast);
   int lspeed=0;
   int rspeed=0;
   // User control code here, inside the loop
@@ -106,7 +139,7 @@ void usercontrol(void) {
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
-                    // vex brain very fast, nanno seconds. hand move at miliseconds.
+                    // vex brain very fast, nano seconds.
   }
 }
 
