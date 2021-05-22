@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       Rolling Robots                                                      */
+/*    Author:       Rolling Robots */
 /*    Created:      May 8 2021                                          */
 /*    Description:  Competition Lesson1                                    */
 /*                                                                            */
@@ -10,8 +10,9 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// LeftMotor            motor         1               
-// RightMotor           motor         2               
+// LeftMotor            motor         1
+// RightMotor           motor         2
+// Controller1          controller
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -20,14 +21,28 @@ using namespace vex;
 
 // A global instance of competition
 competition Competition;
-
+float d=3.25;  // diameter of wheel in inches
+float pi=3.14;
 // define your global instances of motors and other devices here
-void drive(int lspeed, int rspeed, int wt)
-{
+void drive(int lspeed, int rspeed, int wt) {
   LeftMotor.spin(forward, lspeed, percent);
-   RightMotor.spin(forward, rspeed, percent); 
-   wait(wt,msec);
+  RightMotor.spin(forward, rspeed, percent);
+  wait(wt, msec);
 }
+
+void inchDrive(float target)
+{
+  float inches=0.0;
+  RightMotor.setPosition(0, rev);
+
+  while(inches<=target)
+  {
+drive(50,50,10);
+inches=RightMotor.position(rev)*pi*d;
+  }
+  drive(0,0,0);
+}
+
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -41,14 +56,14 @@ void drive(int lspeed, int rspeed, int wt)
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
-float turns=0.0;
-Brain.Screen.printAt(0, 20, "Pre auton is running");
-turns=LeftMotor.position(rev);
-Brain.Screen.printAt(0, 40, "Turns = %0.3f",turns);
-drive(50, 50, 1000);
-drive(0,0,0);
-turns=LeftMotor.position(rev);
-Brain.Screen.printAt(0, 60, "Turns = %f",turns);
+  float turns = 0.0;
+  Brain.Screen.printAt(0, 20, "Pre auton is running");
+  turns = LeftMotor.position(rev);
+  Brain.Screen.printAt(0, 40, "Turns = %0.3f", turns);
+  drive(50, 50, 1000);
+  drive(0, 0, 0);
+  turns = LeftMotor.position(rev);
+  Brain.Screen.printAt(0, 60, "Turns = %f", turns);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -62,6 +77,8 @@ Brain.Screen.printAt(0, 60, "Turns = %f",turns);
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
+wait(1000, msec);
+  inchDrive(27);
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
@@ -78,18 +95,17 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
+  int lspeed = 0;
+  int rspeed = 0;
   // User control code here, inside the loop
   while (1) {
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
-
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
-    // ........................................................................
-
-    wait(20, msec); // Sleep the task for a short amount of time to
+    /*
+    lspeed = Controller1.Axis3.position();
+    rspeed = Controller1.Axis2.position();
+    drive(lspeed, rspeed, 10);
+    */
+    drive(Controller1.Axis3.position(),Controller1.Axis2.position(),10);
+    wait(10, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
 }
@@ -104,8 +120,8 @@ int main() {
 
   // Run the pre-autonomous function.
   pre_auton();
-Brain.Screen.clearScreen();
-Brain.Screen.printAt(0, 20, "Back to Main");
+  Brain.Screen.clearScreen();
+  Brain.Screen.printAt(0, 20, "Back to Main");
   // Prevent main from exiting with an infinite loop.
   while (true) {
     wait(100, msec);
