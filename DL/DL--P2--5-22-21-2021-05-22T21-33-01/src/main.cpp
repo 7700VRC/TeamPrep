@@ -10,9 +10,8 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// MiddleMotor          motor         16              
-// RightMotor           motor         1               
-// LeftMotor            motor         14              
+// RightMotor           motor         20              
+// LeftMotor            motor         11              
 // Controller1          controller                    
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
@@ -22,6 +21,8 @@ using namespace vex; /* we're using methods in this name space called vex and it
 
 // A global instance of competition
 competition Competition;
+float D=3.25; //diameter of wheel in inches
+float PI=3.14;
 
 // define your global instances of motors and other devices here
 void drive(int lspeed, int rspeed, int wt)
@@ -29,6 +30,37 @@ void drive(int lspeed, int rspeed, int wt)
   LeftMotor.spin(forward, lspeed, percent);
   RightMotor.spin(forward, rspeed, percent);
   wait(wt, msec);
+}
+
+void inchDrive(float target)
+{
+  float inches=0.0;
+  RightMotor.setPosition(0, rev);
+
+
+  while(inches<=target)
+  {
+drive(50,50,10);
+inches=RightMotor.position(rev)*PI*D;
+  }
+
+  drive(0,0,0);
+}
+
+void inchTurn(float target)
+{
+  float inches=0.0;
+  float theta=0.0;
+  RightMotor.setPosition(0, rev);
+  while (theta<target)
+  {
+    drive(-50,50,10);
+    inches=RightMotor.position(rev)*PI*D;
+    theta=inches*24/PI;
+  }
+  drive(0,0,0);
+
+  
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -69,6 +101,11 @@ wait(2000, msec);
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
+  RightMotor.setBrake(brake);
+  LeftMotor.setBrake(brake);
+wait(1000,msec);
+  inchTurn(90);
+  inchDrive(27);
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
@@ -85,6 +122,8 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
+  RightMotor.setBrake(coast);
+  LeftMotor.setBrake(coast);
   int lspeed=0;
   int rspeed=0;
 
@@ -95,7 +134,12 @@ void usercontrol(void) {
     // values based on feedback from the joysticks.
 
     // ........................................................................
-    lspeed=
+    lspeed=Controller1.Axis3.position();
+    rspeed=Controller1.Axis2.position();
+    drive(lspeed, rspeed, 10);
+    /* 
+    if done in 1 line: drive(Controller1.Axis3.position(),Controller1.Axis2.position(),10);
+    */
     // ........................................................................
 
     wait(20, msec); // Sleep the task for a short amount of time to
@@ -115,6 +159,8 @@ int main() {
   pre_auton();
 Brain.Screen.printAt(0, 80, "Back to Main");
   // Prevent main from exiting with an infinite loop.
+
+
   while (true) {
     wait(100, msec);
   }
