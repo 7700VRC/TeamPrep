@@ -6,6 +6,7 @@ extern brain Brain;
 extern motor RightMotor;
 extern motor LeftMotor;
 extern controller Controller1;
+extern inertial myGyro;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
