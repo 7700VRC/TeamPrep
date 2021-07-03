@@ -1,13 +1,17 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       VEX                                                       */
-/*    Created:      Thu Sep 26 2019                                           */
+/*    Author:       Nikhil Ramanuja                                           */
+/*    Created:      Fri Jul 2 2021                                            */
 /*    Description:  Competition Template                                      */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
 // ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// leftMotor            motor         1               
+// rightMotor           motor         10              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -17,6 +21,12 @@ using namespace vex;
 // A global instance of competition
 competition Competition;
 
+void drive(int lspeed, int rspeed, int waitTime)
+{
+leftMotor.spin(forward, lspeed, percent);
+rightMotor.spin(forward, rspeed, percent);
+wait(waitTime, msec);
+}
 // define your global instances of motors and other devices here
 
 /*---------------------------------------------------------------------------*/
@@ -32,9 +42,8 @@ competition Competition;
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
-
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
+  Brain.Screen.printAt(1, 40, "Running Pre Auton");
+  
 }
 
 /*---------------------------------------------------------------------------*/
@@ -48,9 +57,11 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  // ..........................................................................
-  // Insert autonomous user code here.
-  // ..........................................................................
+  Brain.Screen.printAt(1, 40, "Running Auton                ");
+  drive(50,50,1000);
+  drive(0,0,0);
+
+
 }
 
 /*---------------------------------------------------------------------------*/
@@ -64,7 +75,7 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-  // User control code here, inside the loop
+  Brain.Screen.printAt(1, 40, "Running Driver      ");
   while (1) {
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
