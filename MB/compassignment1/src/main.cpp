@@ -8,6 +8,10 @@
 /*----------------------------------------------------------------------------*/
 
 // ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// leftMotor            motor         1               
+// rightMotor           motor         10              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -16,6 +20,14 @@ using namespace vex;
 
 // A global instance of competition
 competition Competition;
+
+void drive(int Lspeed, int Rspeed, int waitTime)
+{
+  leftMotor.spin(forward, Lspeed, percent);
+  rightMotor.spin(forward, Rspeed, percent);
+  wait(waitTime, msec);
+
+}
 
 // define your global instances of motors and other devices here
 
@@ -48,6 +60,9 @@ void pre_auton(void) {
 
 void autonomous(void) {
   Brain.Screen.printAt(1, 40, "Running auton              ");
+  
+  drive(50, 50, 1000);
+  drive(0, 0, 0);
 }
 
 /*---------------------------------------------------------------------------*/
