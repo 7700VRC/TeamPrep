@@ -33,8 +33,7 @@ void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
 
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
+  Brain.Screen.printAt(1, 40, "Running Pre Auton");
 }
 
 /*---------------------------------------------------------------------------*/
@@ -48,9 +47,7 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  // ..........................................................................
-  // Insert autonomous user code here.
-  // ..........................................................................
+  Brain.Screen.printAt(1, 40, "Running Auton        ");
 }
 
 /*---------------------------------------------------------------------------*/
@@ -64,7 +61,9 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-  // User control code here, inside the loop
+ Brain.Screen.clearScreen();
+ Brain.Screen.printAt(1, 40, "       Running Driver");
+
   while (1) {
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
