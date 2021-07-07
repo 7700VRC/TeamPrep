@@ -10,8 +10,9 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// LeftMotor            motor         1               
-// RightMotor           motor         11              
+// LeftMotor            motor         11              
+// RightMotor           motor         20              
+// Controller1          controller                    
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -83,19 +84,29 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
+  int lspeed=0;
+  int rspeed=0;
   // User control code here, inside the loop
-  while (1) { // 1 = true; 0 = false.
+  while (1) { // 1 = true; 0 = false. Or while (true), or while (2==2).
+
+  //usercontrol, need to repeatedly check
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
     // values based on feedback from the joysticks.
 
     // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
+    /*lspeed=Controller1.Axis3.position();
+    rspeed=Controller1.Axis2.position();
+    drive(lspeed, rspeed, 10);
+    */
+    drive(Controller1.Axis3.position(), Controller1.Axis2.position(), 10);
+
+
     // ........................................................................
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
+                    // vex brain very fast, nanno seconds. hand move at miliseconds.
   }
 }
 
@@ -116,3 +127,4 @@ Brain.Screen.printAt(0, 20, "Back to main");
     wait(100, msec);
   }
 }
+//function = block of code in brackets that can be reused

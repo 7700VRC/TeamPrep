@@ -13,6 +13,7 @@
 // MiddleMotor          motor         16              
 // RightMotor           motor         1               
 // LeftMotor            motor         14              
+// Controller1          controller                    
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -84,6 +85,9 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
+  int lspeed=0;
+  int rspeed=0;
+
   // User control code here, inside the loop
   while (1) {
     // This is the main execution loop for the user control program.
@@ -91,8 +95,7 @@ void usercontrol(void) {
     // values based on feedback from the joysticks.
 
     // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
+    lspeed=
     // ........................................................................
 
     wait(20, msec); // Sleep the task for a short amount of time to
