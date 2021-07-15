@@ -66,6 +66,7 @@ void pre_auton(void) {
 void autonomous(void) {
   Brain.Screen.printAt(1, 40, "Running Auton                ");
   drive(50,50,25);
+  
   drive(50,-50,25);
   drive(0, 0, 0);
 
