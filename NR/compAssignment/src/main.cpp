@@ -1,3 +1,66 @@
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// LB                   motor         1               
+// RB                   motor         10              
+// claw                 motor         2               
+// Controller1          controller                    
+// LF                   motor         3               
+// RF                   motor         4               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// LB                   motor         1               
+// RB                   motor         10              
+// claw                 motor         2               
+// Controller1          controller                    
+// LF                   motor         3               
+// RF                   motor         4               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// LB                   motor         1               
+// RB                   motor         10              
+// claw                 motor         2               
+// Controller1          controller                    
+// LF                   motor         3               
+// RF                   motor         4               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// LB                   motor         1               
+// RB                   motor         10              
+// claw                 motor         2               
+// Controller1          controller                    
+// LF                   motor         3               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// LB                   motor         1               
+// RB                   motor         10              
+// claw                 motor         2               
+// Controller1          controller                    
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// LB                   motor         1               
+// rightMotor           motor         10              
+// claw                 motor         2               
+// Controller1          controller                    
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// leftMotor            motor         1               
+// rightMotor           motor         10              
+// claw                 motor         2               
+// Controller1          controller                    
+// ---- END VEXCODE CONFIGURED DEVICES ----
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
@@ -24,8 +87,10 @@ competition Competition;
 
 void drive(int lspeed, int rspeed, int waitTime)
 {
-leftMotor.spin(forward, lspeed, percent);
-rightMotor.spin(forward, rspeed, percent);
+RB.spin(forward, rspeed, percent);
+RF.spin(forward, rspeed, percent);
+LB.spin(forward, lspeed, percent);
+LF.spin(forward, lspeed, percent);
 wait(waitTime, msec);
 
 }
@@ -82,14 +147,8 @@ You must modify the code to add your own robot specific commands here.
 void usercontrol(void) {
   Brain.Screen.printAt(1, 40, "Running Driver      ");
   while (1) {
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
+    
 
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
-    // ........................................................................
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
@@ -112,3 +171,74 @@ int main() {
     wait(100, msec);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
