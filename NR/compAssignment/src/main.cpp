@@ -1,13 +1,4 @@
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// LB                   motor         1               
-// RB                   motor         10              
-// claw                 motor         2               
-// Controller1          controller                    
-// LF                   motor         3               
-// RF                   motor         4               
-// ---- END VEXCODE CONFIGURED DEVICES ----
+
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
@@ -95,9 +86,9 @@ wait(waitTime, msec);
 
 }
 
-void clawOpen(int speed, bool openClaw)
+void clawOpen(bool openClaw)
 {
-  claw.setVelocity(speed, percent);
+  claw.setVelocity(75, percent);
    if (openClaw==true)
 claw.spinFor(forward,.75, rev);
 else
@@ -129,11 +120,12 @@ void pre_auton(void) {
 */
 
 void autonomous(void) {
-  Brain.Screen.printAt(1, 40, "Running Auton                ");
-  drive(50,50,25);
   
-  drive(50,-50,25);
-  drive(0, 0, 0);
+  Brain.Screen.printAt(1, 40, "Running Auton                ");
+  //drive forward
+  drive(100,100,2000);
+  clawOpen(false); //close claw
+  drive(-100, -100, 1000); //drive back
 
 
 }
