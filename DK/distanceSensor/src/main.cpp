@@ -32,22 +32,30 @@ void drive(int lspeed, int rspeed, int wt) {
 }
 
 void seekObject() {
-  float d = 3.0;
-  float kp=2.0;
+  float d = 0.5;
+  float kb = 2.0;
   float L = 0.0;
   float C = 0.0;
   float R = 0.0;
-  float lsp=0.0;
-  float rsp=0.0;
-  while (true) {
+  float lsp = 0.0;
+  float rsp = 0.0;
+  L = LDist.objectDistance(inches);
+  C = CDist.objectDistance(inches);
+  R = RDist.objectDistance(inches);
+  while (fabs(R - L) > d) {
     L = LDist.objectDistance(inches);
     C = CDist.objectDistance(inches);
     R = RDist.objectDistance(inches);
     Brain.Screen.printAt(1, 40, "L,C,R  %.1f   %.1f   %.1f", L, C, R);
-    lsp=kp*(R-C);
-    rsp=kp*(L-C);
+    lsp = kb * (L-R);
+    rsp = kb * (R-L);
     drive(lsp, rsp, 10);
   }
+  while (C > d) {
+    C = CDist.objectDistance(inches);
+    drive(30, 30, 10);
+  }
+  drive(0, 0, 0);
 }
 
 void pre_auton(void) {
@@ -84,13 +92,19 @@ void usercontrol(void) {
   float L = 0.0;
   float C = 0.0;
   float R = 0.0;
-  seekObject();
+
   while (1) {
     L = LDist.objectDistance(inches);
     C = CDist.objectDistance(inches);
     R = RDist.objectDistance(inches);
     Brain.Screen.printAt(1, 40, "L,C,R  %.1f   %.1f   %.1f", L, C, R);
-    wait(20, msec);
+    //wait(2000, msec);
+
+      //seekObject();
+
+      int lstick=Controller1.Axis3.position(percent);
+      int rstick=Controller1.Axis2.position(percent);
+      drive(lstick, rstick, 10);
   }
 }
 

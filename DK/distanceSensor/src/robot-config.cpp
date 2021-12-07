@@ -9,11 +9,11 @@ brain  Brain;
 
 // VEXcode device constructors
 controller Controller1 = controller(primary);
-motor LDriveMotorA = motor(PORT1, ratio18_1, false);
-motor LDriveMotorB = motor(PORT2, ratio18_1, false);
+motor LDriveMotorA = motor(PORT1, ratio18_1, true);
+motor LDriveMotorB = motor(PORT2, ratio18_1, true);
 motor_group LDrive = motor_group(LDriveMotorA, LDriveMotorB);
-motor RDriveMotorA = motor(PORT9, ratio18_1, true);
-motor RDriveMotorB = motor(PORT10, ratio18_1, true);
+motor RDriveMotorA = motor(PORT9, ratio18_1, false);
+motor RDriveMotorB = motor(PORT10, ratio18_1, false);
 motor_group RDrive = motor_group(RDriveMotorA, RDriveMotorB);
 distance LDist = distance(PORT11);
 distance CDist = distance(PORT12);
