@@ -23,37 +23,51 @@ using namespace vex;
 competition Competition;
 
 // define your global instances of motors and other devices here
-double OldError=0.0;
-double TBHval=0.0;
-double FWDrive=0.0;
+double OldError = 0.0;
+double TBHval = 0.0;
+double FWDrive = 0.0;
 
-void spinFlywheel(double speed)
-{
-  speed=speed*120;  //speed is in percentage so convert to mV 100% = 12000 mV
+void spinFlywheel(double speed) {
+  speed = speed * 120; // speed is in percentage so convert to mV 100% = 12000
+                       // mV
   F1.spin(forward, speed, voltageUnits::mV);
   F2.spin(forward, speed, voltageUnits::mV);
 }
 
-void controlFlywheelSpeed(double target)
-{
-  double kI=.0025;
+void controlFlywheelSpeed(double target) {
+  double kI = .0025;
   double speed = F1.velocity(percent);
-  double error=target-speed;
-  double fwDrive=FWDrive+kI*error;
-  //Keep drive between 0 to 100%
-  if(fwDrive>100) fwDrive=100;
-  if(fwDrive<0) fwDrive=0;
-  //Check for zero crossing
-  if (error*OldError<0)
-  {
-    fwDrive=0.5*(fwDrive+TBHval);
-    TBHval=fwDrive;
+  double error = target - speed;
+  double fwDrive = FWDrive + kI * error;
+
+   Brain.Screen.printAt(1, 40, " speed = %.2f ", speed);
+  // Keep drive between 0 to 100%
+  if (fwDrive > 100)
+    fwDrive = 100;
+  if (fwDrive < 0)
+    fwDrive = 0;
+  // Check for zero crossing
+  if (error * OldError < 0) {
+    fwDrive = 0.5 * (fwDrive + TBHval);
+    TBHval = fwDrive;
   }
+  
+
+  Brain.Screen.printAt(180, 40, "fwdrive %.1f  ", fwDrive);
   spinFlywheel(fwDrive);
 
-  FWDrive=fwDrive;
-  OldError=error;
+  FWDrive = fwDrive;
+  OldError = error;
+}
 
+void flywheelMonitor() {
+  double current1 = F1.current();
+  double current2 = F2.current();
+  double t1 = F1.temperature(celsius);
+  double t2 = F2.temperature(celsius);
+
+  Brain.Screen.printAt(1, 60, "F1 current = %.1f   Temp = %.1f   ", current1, t1);
+  Brain.Screen.printAt(1, 80, "F2 current = %.1f   Temp = %.1f   ", current2, t2);
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -83,9 +97,7 @@ void pre_auton(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
-void autonomous(void) {
-  
-}
+void autonomous(void) {}
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -98,8 +110,26 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-  // User control code here, inside the loop
-  while (1) {
+
+  double targetSpeed = 0.0;
+
+  while (true) {
+
+    if (Controller1.ButtonA.pressing())
+      targetSpeed = 0;
+
+    if (Controller1.ButtonB.pressing())
+      targetSpeed = 100;
+
+    if (Controller1.ButtonY.pressing())
+      targetSpeed = 200;
+    if (Controller1.ButtonX.pressing())
+      targetSpeed = 400;
+    if (Controller1.ButtonUp.pressing())
+      targetSpeed = 600;
+    Brain.Screen.printAt(1, 20, " %.2f ", targetSpeed);
+   controlFlywheelSpeed(targetSpeed);
+    flywheelMonitor();
     
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
