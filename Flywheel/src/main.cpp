@@ -69,6 +69,8 @@ void flywheelMonitor() {
   Brain.Screen.printAt(1, 60, "F1 current = %.1f   Temp = %.1f   ", current1, t1);
   Brain.Screen.printAt(1, 80, "F2 current = %.1f   Temp = %.1f   ", current2, t2);
 }
+
+
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -112,7 +114,8 @@ void autonomous(void) {}
 void usercontrol(void) {
 
   double targetSpeed = 0.0;
-
+  bool alg = true;
+  bool flag = true;
   while (true) {
 
     if (Controller1.ButtonA.pressing())
@@ -128,7 +131,24 @@ void usercontrol(void) {
     if (Controller1.ButtonUp.pressing())
       targetSpeed = 100;
     Brain.Screen.printAt(1, 20, "target speed = %.2f ", targetSpeed);
-  controlFlywheelSpeed(targetSpeed);
+    if(Controller1.ButtonDown.pressing() && flag){
+      flag = false;
+      alg = !alg;
+    }
+    if (!Controller1.ButtonDown.pressing()){
+      flag = true;
+    }
+    if (alg){
+      controlFlywheelSpeed(targetSpeed);
+      Brain.Screen.printAt(1, 120, "controlled speed    ");
+    }
+    else {
+      spinFlywheel(targetSpeed);
+      Brain.Screen.printAt(1, 120, "not controlled     ");
+    }
+
+    
+      
   //targetSpeed = targetSpeed / 6.0;
   // ew
   // help 
