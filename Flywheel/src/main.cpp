@@ -35,11 +35,11 @@ void spinFlywheel(double speed) {
 }
 
 void controlFlywheelSpeed(double target) {
-  double kI = .0025;
+  double kI = .025;
   double speed = F1.velocity(percent);
   double error = target - speed;
   double fwDrive = FWDrive + kI * error;
-
+// :D
    Brain.Screen.printAt(1, 40, " speed = %.2f ", speed);
   // Keep drive between 0 to 100%
   if (fwDrive > 100)
@@ -119,16 +119,31 @@ void usercontrol(void) {
       targetSpeed = 0;
 
     if (Controller1.ButtonB.pressing())
-      targetSpeed = 100;
+      targetSpeed = 17;
 
     if (Controller1.ButtonY.pressing())
-      targetSpeed = 200;
+      targetSpeed = 34;
     if (Controller1.ButtonX.pressing())
-      targetSpeed = 400;
+      targetSpeed = 68;
     if (Controller1.ButtonUp.pressing())
-      targetSpeed = 600;
-    Brain.Screen.printAt(1, 20, " %.2f ", targetSpeed);
-   controlFlywheelSpeed(targetSpeed);
+      targetSpeed = 100;
+    Brain.Screen.printAt(1, 20, "target speed = %.2f ", targetSpeed);
+  controlFlywheelSpeed(targetSpeed);
+  //targetSpeed = targetSpeed / 6.0;
+  // ew
+  // help 
+  // currently suffering from secondhand smoking
+  // i am now a potted potato
+  // "secondhand potato" - aidan 
+ // h
+ // the mitochondria is the powerhouse of the cell losers
+ //  
+   //spinFlywheel(targetSpeed);
+   // pogchamp
+   // ur mom
+   // deez nuts
+   // lmao
+   // hkgtckutxkrtyghv
     flywheelMonitor();
     
     wait(20, msec); // Sleep the task for a short amount of time to
