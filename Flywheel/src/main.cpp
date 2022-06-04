@@ -184,7 +184,7 @@ int main() {
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
-  Controller1.ButtonDown.pressed(pistonToggle);
+  Controller1.ButtonLeft.pressed(pistonToggle);
   // Run the pre-autonomous function.
   pre_auton();
 
