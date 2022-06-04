@@ -11,8 +11,9 @@
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
 // Controller1          controller                    
-// F1                   motor         1               
-// F2                   motor         2               
+// F1                   motor         21              
+// F2                   motor         12              
+// Injector             digital_out   A               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -65,12 +66,15 @@ void flywheelMonitor() {
   double current2 = F2.current();
   double t1 = F1.temperature(celsius);
   double t2 = F2.temperature(celsius);
-
+  double b = Brain.Battery.capacity();
   Brain.Screen.printAt(1, 60, "F1 current = %.1f   Temp = %.1f   ", current1, t1);
   Brain.Screen.printAt(1, 80, "F2 current = %.1f   Temp = %.1f   ", current2, t2);
+  Brain.Screen.printAt(1, 100, "Battery Capacity  = %.1f      ",b);
 }
 
-
+void pistonToggle(){
+  Injector.set(!Injector.value());
+}
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -85,8 +89,10 @@ void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
 
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
+  Brain.Screen.drawRectangle(60, 210, 120 ,40) ;
+  int x=Brain.Screen.xPosition();
+  int y=Brain.Screen.yPosition();
+
 }
 
 /*---------------------------------------------------------------------------*/
@@ -117,7 +123,7 @@ void usercontrol(void) {
   bool alg = true;
   bool flag = true;
   while (true) {
-
+    
     if (Controller1.ButtonA.pressing())
       targetSpeed = 0;
 
@@ -178,7 +184,7 @@ int main() {
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
-
+  Controller1.ButtonDown.pressed(pistonToggle);
   // Run the pre-autonomous function.
   pre_auton();
 
