@@ -4,15 +4,15 @@
 /*    Author:       DK 7700                                                   */
 /*    Created:      May 13, 2022                                              */
 /*    Description:  Speed Control for 2 motor Flywheel testing                */
-/*                                                                            */
+/*     many update by hc team  6/5/22                                                                       */
 /*----------------------------------------------------------------------------*/
 
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
 // Controller1          controller                    
-// F1                   motor         21              
-// F2                   motor         12              
+// F1                   motor         1               
+// F2                   motor         7               
 // Injector             digital_out   A               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
@@ -40,8 +40,8 @@ void controlFlywheelSpeed(double target) {
   double speed = F1.velocity(percent);
   double error = target - speed;
   double fwDrive = FWDrive + kI * error;
-// :D
-   Brain.Screen.printAt(1, 40, " speed = %.2f ", speed);
+  // :D
+  Brain.Screen.printAt(1, 40, " speed = %.2f ", speed);
   // Keep drive between 0 to 100%
   if (fwDrive > 100)
     fwDrive = 100;
@@ -52,7 +52,6 @@ void controlFlywheelSpeed(double target) {
     fwDrive = 0.5 * (fwDrive + TBHval);
     TBHval = fwDrive;
   }
-  
 
   Brain.Screen.printAt(180, 40, "fwdrive %.1f  ", fwDrive);
   spinFlywheel(fwDrive);
@@ -67,13 +66,18 @@ void flywheelMonitor() {
   double t1 = F1.temperature(celsius);
   double t2 = F2.temperature(celsius);
   double b = Brain.Battery.capacity();
-  Brain.Screen.printAt(1, 60, "F1 current = %.1f   Temp = %.1f   ", current1, t1);
-  Brain.Screen.printAt(1, 80, "F2 current = %.1f   Temp = %.1f   ", current2, t2);
-  Brain.Screen.printAt(1, 100, "Battery Capacity  = %.1f      ",b);
+  Brain.Screen.printAt(1, 60, "F1 current = %.1f   Temp = %.1f   ", current1,
+                       t1);
+  Brain.Screen.printAt(1, 80, "F2 current = %.1f   Temp = %.1f   ", current2,
+                       t2);
+  Brain.Screen.printAt(1, 100, "Battery Capacity  = %.1f      ", b);
 }
 
-void pistonToggle(){
-  Injector.set(!Injector.value());
+void pistonToggle() {
+
+  Injector.set(false);
+  wait(.5, sec);
+  Injector.set(true);
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -89,10 +93,9 @@ void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
 
-  Brain.Screen.drawRectangle(60, 210, 120 ,40) ;
-  int x=Brain.Screen.xPosition();
-  int y=Brain.Screen.yPosition();
-
+  Brain.Screen.drawRectangle(60, 210, 120, 40);
+  int x = Brain.Screen.xPosition();
+  int y = Brain.Screen.yPosition();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -123,7 +126,7 @@ void usercontrol(void) {
   bool alg = true;
   bool flag = true;
   while (true) {
-    
+
     if (Controller1.ButtonA.pressing())
       targetSpeed = 0;
 
@@ -135,43 +138,48 @@ void usercontrol(void) {
     if (Controller1.ButtonX.pressing())
       targetSpeed = 68;
     if (Controller1.ButtonUp.pressing())
-      targetSpeed = 100;
+      targetSpeed = 90;
     Brain.Screen.printAt(1, 20, "target speed = %.2f ", targetSpeed);
-    if(Controller1.ButtonDown.pressing() && flag){
+    if (Controller1.ButtonDown.pressing() && flag) {
       flag = false;
       alg = !alg;
     }
-    if (!Controller1.ButtonDown.pressing()){
+    if (!Controller1.ButtonDown.pressing()) {
       flag = true;
     }
-    if (alg){
+    if (alg) {
       controlFlywheelSpeed(targetSpeed);
       Brain.Screen.printAt(1, 120, "controlled speed    ");
-    }
-    else {
+    } else {
       spinFlywheel(targetSpeed);
       Brain.Screen.printAt(1, 120, "not controlled     ");
     }
+    if (Controller1.ButtonR1.pressing() && targetSpeed < 100) {
+      targetSpeed++;
+      wait(100, msec);
+    }
+    if (Controller1.ButtonL1.pressing() && targetSpeed > 0) {
+      targetSpeed--;
+      wait(100, msec);
+    }
 
-    
-      
-  //targetSpeed = targetSpeed / 6.0;
-  // ew
-  // help 
-  // currently suffering from secondhand smoking
-  // i am now a potted potato
-  // "secondhand potato" - aidan 
- // h
- // the mitochondria is the powerhouse of the cell losers
- //  
-   //spinFlywheel(targetSpeed);
-   // pogchamp
-   // ur mom
-   // deez nuts
-   // lmao
-   // hkgtckutxkrtyghv
+    // targetSpeed = targetSpeed / 6.0;
+    // ew
+    // help
+    // currently suffering from secondhand smoking
+    // i am now a potted potato
+    // "secondhand potato" - aidan
+    // h
+    // the mitochondria is the powerhouse of the cell losers
+    //
+    // spinFlywheel(targetSpeed);
+    // pogchamp
+    // ur mom
+    // deez nuts
+    // lmao
+    // hkgtckutxkrtyghv
     flywheelMonitor();
-    
+
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
