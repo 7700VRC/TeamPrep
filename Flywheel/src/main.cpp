@@ -11,8 +11,8 @@
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
 // Controller1          controller                    
-// F1                   motor         1               
-// F2                   motor         7               
+// F1                   motor         2               
+// F2                   motor         3               
 // Injector             digital_out   A               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
@@ -22,18 +22,14 @@ using namespace vex;
 
 // A global instance of competition
 competition Competition;
-
+void flywheelMonitor();
+void spinFlywheel(double);
 // define your global instances of motors and other devices here
 double OldError = 0.0;
 double TBHval = 0.0;
 double FWDrive = 0.0;
 
-void spinFlywheel(double speed) {
-  speed = speed * 120; // speed is in percentage so convert to mV 100% = 12000
-                       // mV
-  F1.spin(forward, speed, voltageUnits::mV);
-  F2.spin(forward, speed, voltageUnits::mV);
-}
+
 
 void controlFlywheelSpeed(double target) {
   double kI = .025;
@@ -58,6 +54,13 @@ void controlFlywheelSpeed(double target) {
 
   FWDrive = fwDrive;
   OldError = error;
+}
+
+void spinFlywheel(double speed) {
+  speed = speed * 120; // speed is in percentage so convert to mV 100% = 12000
+                       // mV
+  F1.spin(forward, speed, voltageUnits::mV);
+  F2.spin(forward, speed, voltageUnits::mV);
 }
 
 void flywheelMonitor() {

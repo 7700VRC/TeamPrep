@@ -963,7 +963,7 @@ Discarded input sections
                 0x0000000000000000        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
  .rodata._ZN3vex3fwdE
                 0x0000000000000000        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
- .rodata._ZN3vex5PORT3E
+ .rodata._ZN3vex5PORT1E
                 0x0000000000000000        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
  .rodata._ZN3vex7monoXXLE
                 0x0000000000000000        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
@@ -1025,8 +1025,6 @@ Discarded input sections
                 0x0000000000000000        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
  .rodata._ZN3vex6mono20E
                 0x0000000000000000        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
- .rodata._ZN3vex5PORT2E
-                0x0000000000000000        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
  .rodata._ZN3vex23__sdk_cpp_version_majorE
                 0x0000000000000000        0x1 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
  .rodata._ZN3vex3dpsE
@@ -1086,6 +1084,8 @@ Discarded input sections
  .rodata._ZN3vex6PORT12E
                 0x0000000000000000        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
  .rodata._ZN3vex2mVE
+                0x0000000000000000        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
+ .rodata._ZN3vex5PORT7E
                 0x0000000000000000        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
  .rodata._ZN3vex23__sdk_cpp_version_minorE
                 0x0000000000000000        0x1 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
@@ -2475,12 +2475,12 @@ Linker script and memory map
  *(.freertos_vectors)
  *(.text)
  *(.text.*)
- .text._Z12spinFlywheeld
-                0x0000000003800100       0x78 build/src/main.o
-                0x0000000003800100                spinFlywheel(double)
  .text._Z20controlFlywheelSpeedd
-                0x0000000003800178      0x118 build/src/main.o
-                0x0000000003800178                controlFlywheelSpeed(double)
+                0x0000000003800100      0x118 build/src/main.o
+                0x0000000003800100                controlFlywheelSpeed(double)
+ .text._Z12spinFlywheeld
+                0x0000000003800218       0x78 build/src/main.o
+                0x0000000003800218                spinFlywheel(double)
  .text._Z15flywheelMonitorv
                 0x0000000003800290      0x10c build/src/main.o
                 0x0000000003800290                flywheelMonitor()
@@ -3022,9 +3022,9 @@ Linker script and memory map
                                          0xc1 (size before relaxing)
  .rodata.str1.1
                 0x0000000003802b62       0x2e /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(v5_startup.c.obj)
- .rodata._ZN3vex5PORT1E
+ .rodata._ZN3vex5PORT3E
                 0x0000000003802b90        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
-                0x0000000003802b90                vex::PORT1
+                0x0000000003802b90                vex::PORT3
  .rodata._ZN3vex7forwardE
                 0x0000000003802b94        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
                 0x0000000003802b94                vex::forward
@@ -3034,21 +3034,21 @@ Linker script and memory map
  .rodata._ZN3vex4msecE
                 0x0000000003802b9c        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
                 0x0000000003802b9c                vex::msec
- .rodata._ZN3vex7primaryE
+ .rodata._ZN3vex5PORT2E
                 0x0000000003802ba0        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
-                0x0000000003802ba0                vex::primary
- .rodata._ZN3vex7percentE
+                0x0000000003802ba0                vex::PORT2
+ .rodata._ZN3vex7primaryE
                 0x0000000003802ba4        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
-                0x0000000003802ba4                vex::percent
- .rodata._ZN3vex6PORT22E
+                0x0000000003802ba4                vex::primary
+ .rodata._ZN3vex7percentE
                 0x0000000003802ba8        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
-                0x0000000003802ba8                vex::PORT22
- .rodata._ZN3vex7celsiusE
+                0x0000000003802ba8                vex::percent
+ .rodata._ZN3vex6PORT22E
                 0x0000000003802bac        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
-                0x0000000003802bac                vex::celsius
- .rodata._ZN3vex5PORT7E
+                0x0000000003802bac                vex::PORT22
+ .rodata._ZN3vex7celsiusE
                 0x0000000003802bb0        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
-                0x0000000003802bb0                vex::PORT7
+                0x0000000003802bb0                vex::celsius
  .rodata._ZN3vex8ratio6_1E
                 0x0000000003802bb4        0x4 /Applications/VEXcode Pro V5.app/Contents/Resources/sdk/vexv5/libv5rt.a(vex_global.cpp.obj)
                 0x0000000003802bb4                vex::ratio6_1
@@ -3182,9 +3182,9 @@ Linker script and memory map
 .ARM.exidx      0x00000000038030bc        0x8
                 0x00000000038030bc                __exidx_start = .
  *(.ARM.exidx*)
- .ARM.exidx.text._Z12spinFlywheeld
-                0x00000000038030bc        0x8 build/src/main.o
  .ARM.exidx.text._Z20controlFlywheelSpeedd
+                0x00000000038030bc        0x8 build/src/main.o
+ .ARM.exidx.text._Z12spinFlywheeld
                 0x00000000038030c4        0x0 build/src/main.o
                                           0x8 (size before relaxing)
  .ARM.exidx.text._Z15flywheelMonitorv
