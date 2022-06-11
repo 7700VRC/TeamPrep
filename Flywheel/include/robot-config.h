@@ -7,6 +7,7 @@ extern controller Controller1;
 extern motor F1;
 extern motor F2;
 extern digital_out Injector;
+extern motor pigeon;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

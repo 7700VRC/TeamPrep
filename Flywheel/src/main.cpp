@@ -11,9 +11,10 @@
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
 // Controller1          controller                    
-// F1                   motor         2               
-// F2                   motor         3               
+// F1                   motor         6               
+// F2                   motor         9               
 // Injector             digital_out   A               
+// pigeon               motor         7               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -165,6 +166,12 @@ void usercontrol(void) {
       targetSpeed--;
       wait(100, msec);
     }
+    if(Controller1.ButtonRight.pressing()){
+      pigeon.spin(forward, 69, percent);
+    } 
+    else if (Controller1.ButtonLeft.pressing()) {
+      pigeon.stop();
+    }
 
     // targetSpeed = targetSpeed / 6.0;
     // ew
@@ -174,7 +181,8 @@ void usercontrol(void) {
     // "secondhand potato" - aidan
     // h
     // the mitochondria is the powerhouse of the cell losers
-    //
+    // maddie uwu is depresso espresso emo baddie bestie kawaii
+    // omg guys i have anxiety and youll just never understand me omg just give it up boomer omgomgomg
     // spinFlywheel(targetSpeed);
     // pogchamp
     // ur mom
