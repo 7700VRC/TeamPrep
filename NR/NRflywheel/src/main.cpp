@@ -10,10 +10,10 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// Controller1          controller
-// F1                   motor         12
-// F2                   motor         21
-// Injector             digital_out   A
+// Controller1          controller                    
+// F1                   motor         12              
+// F2                   motor         21              
+// Injector             digital_out   A               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -166,8 +166,10 @@ void usercontrol(void) {
 
     if (F1.velocity(percent) < targetSpeed+1 && F1.velocity(percent) > targetSpeed-1) {
       Brain.Screen.drawRectangle(60, 210, 120, 40, green);
+      Brain.Screen.setFillColor(green);
     } else {
       Brain.Screen.drawRectangle(60, 210, 120, 40, red);
+      Brain.Screen.setFillColor(red);
     }
     flywheelMonitor();
 
