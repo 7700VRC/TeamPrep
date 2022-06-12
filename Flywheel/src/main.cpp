@@ -25,6 +25,7 @@ using namespace vex;
 competition Competition;
 void flywheelMonitor();
 void spinFlywheel(double);
+
 // define your global instances of motors and other devices here
 double OldError = 0.0;
 double TBHval = 0.0;

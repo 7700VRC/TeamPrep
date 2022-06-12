@@ -83,7 +83,7 @@ void pistonToggle() {
 }
 void pistonToggleReady() {
 Brain.Screen.drawRectangle(120, 190, 60, 60, orange);
- waitUntil(F1.velocity(percent) < targetSpeed+1 && F1.velocity(percent) > targetSpeed-1);
+ waitUntil(F1.velocity(percent) < targetSpeed+.5 && F1.velocity(percent) > targetSpeed-.5);
     Brain.Screen.drawRectangle(120, 190, 60, 60, black);
 
     Injector.set(true);
@@ -107,7 +107,7 @@ Brain.Screen.drawRectangle(120, 190, 60, 60, orange);
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
-  Brain.Screen.drawRectangle(120, 190, 60, 40, black);
+  Brain.Screen.drawRectangle(120, 190, 60, 60, black);
 
 }
 
