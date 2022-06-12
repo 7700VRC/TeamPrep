@@ -17,7 +17,7 @@
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
-
+double targetSpeed = 0.0;
 using namespace vex;
 
 // A global instance of competition
@@ -74,11 +74,13 @@ void flywheelMonitor() {
   Brain.Screen.printAt(1, 100, "Battery Capacity  = %.1f      ", b);
 }
 
-void pistonToggle() {
-
-  Injector.set(false);
+void pistonToggleReady() {
+ if (F1.velocity(percent) < targetSpeed+1 && F1.velocity(percent) > targetSpeed-1) {
+    Injector.set(false);
   wait(.2, sec);
   Injector.set(true);
+    }
+  
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -123,7 +125,7 @@ void autonomous(void) {}
 
 void usercontrol(void) {
 
-  double targetSpeed = 0.0;
+  
   bool alg = true;
   bool flag = true;
   while (true) {
@@ -185,7 +187,7 @@ int main() {
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
-  Controller1.ButtonLeft.pressed(pistonToggle);
+  Controller1.ButtonLeft.pressed(pistonToggleReady);
   // Run the pre-autonomous function.
   pre_auton();
 
