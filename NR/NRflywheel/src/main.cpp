@@ -76,9 +76,9 @@ void flywheelMonitor() {
 
 void pistonToggleReady() {
  if (F1.velocity(percent) < targetSpeed+1 && F1.velocity(percent) > targetSpeed-1) {
-    Injector.set(false);
-  wait(.2, sec);
-  Injector.set(true);
+    Injector.set(true);
+  wait(.5, sec);
+  Injector.set(false);
     }
   
 }
@@ -167,11 +167,10 @@ void usercontrol(void) {
     }
 
     if (F1.velocity(percent) < targetSpeed+1 && F1.velocity(percent) > targetSpeed-1) {
-      Brain.Screen.drawRectangle(60, 210, 120, 40, green);
-      Brain.Screen.setFillColor(green);
+      Brain.Screen.drawRectangle(60, 120, 120, 40, green);
+     
     } else {
-      Brain.Screen.drawRectangle(60, 210, 120, 40, red);
-      Brain.Screen.setFillColor(red);
+      Brain.Screen.drawRectangle(60, 120, 120, 40, red);
     }
     flywheelMonitor();
 
