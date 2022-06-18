@@ -11,8 +11,8 @@
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
 // Controller1          controller                    
-// F1                   motor         1               
-// F2                   motor         2               
+// F1                   motor         12              
+// F2                   motor         21              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -144,7 +144,10 @@ void usercontrol(void) {
     }
     else {
       spinFlywheel(targetSpeed);
+        double speed = F1.velocity(percent);
+
       Brain.Screen.printAt(1, 120, "not controlled     ");
+      Brain.Screen.printAt(1, 40, " speed = %.2f ", speed);
     }
 
     
