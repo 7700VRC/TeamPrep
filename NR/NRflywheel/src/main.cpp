@@ -29,6 +29,14 @@ double OldError = 0.0;
 double TBHval = 0.0;
 double FWDrive = 0.0;
 
+void controlFlywheel1(double target){
+    double speed = F1.velocity(percent);
+
+spinFlywheel((target-speed)+target);  Brain.Screen.printAt(180, 40, "fwdrive %.1f  ", target);
+
+ Brain.Screen.printAt(1, 40, " speed = %.2f ", speed);
+}
+
 void controlFlywheelSpeed(double target) {
   double kI = .025;
   double speed = F1.velocity(percent);
@@ -164,7 +172,7 @@ void usercontrol(void) {
       controlFlywheelSpeed(targetSpeed);
       Brain.Screen.printAt(1, 120, "controlled speed    ");
     } else {
-      spinFlywheel(targetSpeed);
+      controlFlywheel1(targetSpeed);
       Brain.Screen.printAt(1, 120, "not controlled     ");
     }
     if (Controller1.ButtonR1.pressing() && targetSpeed < 100) {
