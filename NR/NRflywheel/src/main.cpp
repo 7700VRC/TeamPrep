@@ -14,6 +14,10 @@
 // F1                   motor         12              
 // F2                   motor         21              
 // Injector             digital_out   A               
+// LF                   motor         18              
+// LB                   motor         19              
+// RF                   motor         16              
+// RB                   motor         17              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -102,6 +106,15 @@ Brain.Screen.drawRectangle(120, 190, 60, 60, orange);
     
   
 }
+
+void meccDrive(int ax1, int ax2, int ax4, int wt)
+{
+  LF.spin(forward, ax2-ax1+ax4, percent);
+  LB.spin(forward, ax2+ax1+ax4, percent);
+  RF.spin(forward, ax2+ax1-ax4, percent);
+  RB.spin(forward, ax2-ax1-ax4, percent);
+  wait(wt, msec);
+}
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -147,7 +160,9 @@ void usercontrol(void) {
   bool alg = true;
   bool flag = true;
   while (true) {
-
+    int ax1=Controller1.Axis1.position();
+    int ax2=Controller1.Axis2.position();
+    int ax4=Controller1.Axis4.position();
     if (Controller1.ButtonA.pressing())
       targetSpeed = 0;
 
@@ -192,8 +207,7 @@ void usercontrol(void) {
     }
     flywheelMonitor();
 
-    wait(20, msec); // Sleep the task for a short amount of time to
-                    // prevent wasted resources.
+    meccDrive(ax1, ax2, ax4, 10);
   }
 }
 
