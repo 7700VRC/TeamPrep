@@ -16,6 +16,8 @@ motor LF = motor(PORT18, ratio18_1, false);
 motor LB = motor(PORT19, ratio18_1, false);
 motor RF = motor(PORT16, ratio18_1, true);
 motor RB = motor(PORT17, ratio18_1, true);
+motor Intake1 = motor(PORT9, ratio18_1, false);
+motor Intake2 = motor(PORT10, ratio18_1, true);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

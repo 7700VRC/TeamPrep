@@ -18,6 +18,8 @@
 // LB                   motor         19              
 // RF                   motor         16              
 // RB                   motor         17              
+// Intake1              motor         9               
+// Intake2              motor         10              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -163,12 +165,12 @@ void usercontrol(void) {
     int ax1=Controller1.Axis1.position();
     int ax2=Controller1.Axis2.position();
     int ax4=Controller1.Axis4.position();
+    bool intakeOn=false;
     if (Controller1.ButtonA.pressing())
       targetSpeed = 0;
 
     if (Controller1.ButtonB.pressing())
-      targetSpeed = 17;
-
+     intakeOn=!intakeOn;
     if (Controller1.ButtonY.pressing())
       targetSpeed = 34;
     if (Controller1.ButtonX.pressing())
@@ -198,7 +200,15 @@ void usercontrol(void) {
       targetSpeed--;
       wait(100, msec);
     }
+    if(intakeOn){
+      Intake1.spin(forward, 100, percent);
+      Intake2.spin(forward, 100, percent);
 
+    }
+    else {
+    Intake1.stop(coast);
+    Intake1.stop(coast);
+    }
     if (F1.velocity(percent) < targetSpeed+1 && F1.velocity(percent) > targetSpeed-1) {
       Brain.Screen.drawRectangle(60, 190, 60, 60, green);
      
