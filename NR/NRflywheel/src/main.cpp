@@ -1,157 +1,4 @@
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// F1                   motor         12              
-// F2                   motor         21              
-// Injector             digital_out   A               
-// LF                   motor         18              
-// LB                   motor         19              
-// RF                   motor         16              
-// RB                   motor         17              
-// Intake1              motor         9               
-// Intake2              motor         10              
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// F1                   motor         12              
-// F2                   motor         21              
-// Injector             digital_out   A               
-// LF                   motor         18              
-// LB                   motor         19              
-// RF                   motor         16              
-// RB                   motor         17              
-// Intake1              motor         9               
-// Intake2              motor         10              
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// F1                   motor         12              
-// F2                   motor         21              
-// Injector             digital_out   A               
-// LF                   motor         18              
-// LB                   motor         19              
-// RF                   motor         16              
-// RB                   motor         17              
-// Intake1              motor         9               
-// Intake2              motor         10              
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// F1                   motor         12              
-// F2                   motor         21              
-// Injector             digital_out   A               
-// LF                   motor         18              
-// LB                   motor         19              
-// RF                   motor         16              
-// RB                   motor         17              
-// Intake1              motor         9               
-// Intake2              motor         10              
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// F1                   motor         12              
-// F2                   motor         21              
-// Injector             digital_out   A               
-// LF                   motor         18              
-// LB                   motor         19              
-// RF                   motor         16              
-// RB                   motor         17              
-// Intake1              motor         9               
-// Intake2              motor         10              
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// F1                   motor         12              
-// F2                   motor         21              
-// Injector             digital_out   A               
-// LF                   motor         18              
-// LB                   motor         19              
-// RF                   motor         16              
-// RB                   motor         17              
-// Intake1              motor         9               
-// Intake2              motor         10              
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// F1                   motor         12              
-// F2                   motor         21              
-// Injector             digital_out   A               
-// LF                   motor         18              
-// LB                   motor         19              
-// RF                   motor         16              
-// RB                   motor         17              
-// Intake1              motor         9               
-// Intake2              motor         10              
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// F1                   motor         12              
-// F2                   motor         21              
-// Injector             digital_out   A               
-// LF                   motor         18              
-// LB                   motor         19              
-// RF                   motor         16              
-// RB                   motor         17              
-// Intake1              motor         9               
-// Intake2              motor         10              
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// F1                   motor         12              
-// F2                   motor         21              
-// Injector             digital_out   A               
-// LF                   motor         18              
-// LB                   motor         19              
-// RF                   motor         16              
-// RB                   motor         17              
-// Intake1              motor         9               
-// Intake2              motor         10              
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// F1                   motor         12              
-// F2                   motor         21              
-// Injector             digital_out   A               
-// LF                   motor         18              
-// LB                   motor         19              
-// RF                   motor         16              
-// RB                   motor         17              
-// Intake1              motor         9               
-// Intake2              motor         10              
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// F1                   motor         12              
-// F2                   motor         21              
-// Injector             digital_out   A               
-// LF                   motor         18              
-// LB                   motor         19              
-// RF                   motor         16              
-// RB                   motor         17              
-// Intake1              motor         9               
-// Intake2              motor         10              
-// ---- END VEXCODE CONFIGURED DEVICES ----
+
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
@@ -311,7 +158,7 @@ void usercontrol(void) {
   while (true) {
     
     int ax1=Controller1.Axis1.position();
-    int ax3=Controller1.Axis3.position();
+    int ax2=Controller1.Axis2.position();
     int ax4=Controller1.Axis4.position();
     bool intakeOn=false;
     if (Controller1.ButtonA.pressing())
@@ -364,10 +211,10 @@ void usercontrol(void) {
     }
     flywheelMonitor();
     //x drive code
-    LF.spin(forward, ax3+ax4+.5*ax1, percent);
-    RF.spin(forward, -ax3+ax4+.5*ax1, percent);
-    LB.spin(forward, -ax3-ax4+.5*ax1, percent);
-    RB.spin(forward, ax3-ax4+.5*ax1, percent);
+    LF.spin(forward, ax2+ax1+.5*ax4, percent);
+    RF.spin(forward, -ax2+ax1+.5*ax4, percent);
+    LB.spin(forward, -ax2-ax1+.5*ax4, percent);
+    RB.spin(forward, ax2-ax1+.5*ax4, percent);
     
   }
 }
