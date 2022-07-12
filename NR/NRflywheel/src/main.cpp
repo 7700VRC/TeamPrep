@@ -109,7 +109,10 @@ Brain.Screen.drawRectangle(120, 190, 60, 60, orange);
     
   
 }
-
+bool intakeOn=false;
+void toggleIntake(){
+  intakeOn=!intakeOn;
+}
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -160,7 +163,7 @@ void usercontrol(void) {
     int ax1=Controller1.Axis1.position();
     int ax2=Controller1.Axis2.position();
     int ax4=Controller1.Axis4.position();
-    bool intakeOn=false;
+    
     if (Controller1.ButtonA.pressing())
       targetSpeed = 0;
 
@@ -226,8 +229,9 @@ int main() {
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
-  Controller1.ButtonLeft.pressed(pistonToggle);
+  Controller1.ButtonL2.pressed(pistonToggle);
    Controller1.ButtonRight.pressed(pistonToggleReady);
+  Controller1.ButtonL2.pressed(toggleIntake);
   // Run the pre-autonomous function.
   pre_auton();
 
