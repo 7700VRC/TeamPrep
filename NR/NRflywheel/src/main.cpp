@@ -82,6 +82,7 @@ void flywheelMonitor() {
   double t1 = F1.temperature(celsius);
   double t2 = F2.temperature(celsius);
   double b = Brain.Battery.capacity();
+  Brain.Screen.setFillColor(white);
   Brain.Screen.printAt(1, 60, "F1 current = %.1f   Temp = %.1f   ", current1,
                        t1);
   Brain.Screen.printAt(1, 80, "F2 current = %.1f   Temp = %.1f   ", current2,
@@ -121,7 +122,7 @@ void toggleIntake() { intakeOn = !intakeOn; }
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
-  Brain.Screen.drawRectangle(120, 190, 60, 60, black);
+ 
 }
 
 /*---------------------------------------------------------------------------*/
@@ -151,7 +152,7 @@ void usercontrol(void) {
   bool alg = true;
   bool flag = true;
   while (true) {
-
+    
     int ax1 = Controller1.Axis1.position();
     int ax2 = Controller1.Axis2.position();
     int ax4 = Controller1.Axis4.position();
@@ -206,7 +207,7 @@ void usercontrol(void) {
     RF.spin(forward, -ax2 + ax1 + .5 * ax4, percent);
     LB.spin(forward, -ax2 - ax1 + .5 * ax4, percent);
     RB.spin(forward, ax2 - ax1 + .5 * ax4, percent);
-    if (ax1 && ax2 && ax2 == 0) {
+    if (ax1 && ax2 && ax4 == 0) {
       LF.stop(hold);
       RF.stop(hold);
       LB.stop(hold);
@@ -214,7 +215,7 @@ void usercontrol(void) {
     }
   }
 }
-//
+
 // Main will set up the competition functions and callbacks.
 //
 int main() {
@@ -226,7 +227,7 @@ int main() {
   Controller1.ButtonL2.pressed(toggleIntake);
   // Run the pre-autonomous function.
   pre_auton();
-
+  
   // Prevent main from exiting with an infinite loop.
   while (true) {
     wait(100, msec);
