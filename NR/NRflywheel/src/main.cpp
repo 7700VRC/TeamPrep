@@ -10,16 +10,17 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// Controller1          controller
-// F1                   motor         12
-// F2                   motor         21
-// Injector             digital_out   A
-// LF                   motor         18
-// LB                   motor         19
-// RF                   motor         16
-// RB                   motor         17
-// Intake1              motor         9
-// Intake2              motor         10
+// Controller1          controller                    
+// F1                   motor         12              
+// F2                   motor         21              
+// Injector             digital_out   A               
+// LF                   motor         18              
+// LB                   motor         19              
+// RF                   motor         16              
+// RB                   motor         17              
+// Intake1              motor         9               
+// Intake2              motor         10              
+// Inertial             inertial      1               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -89,6 +90,13 @@ void flywheelMonitor() {
                        t2);
   Brain.Screen.printAt(1, 100, "Battery Capacity  = %.1f      ", b);
 }
+
+double convert(double Gs){
+double inchesPerSecond;
+inchesPerSecond=386.088582677*Gs;
+  return(inchesPerSecond);
+}
+
 void pistonToggle() {
 
   Injector.set(true);
@@ -151,6 +159,7 @@ void usercontrol(void) {
 
   bool alg = true;
   bool flag = true;
+  double totaldistance=0;
   while (true) {
     
     int ax1 = Controller1.Axis1.position();
@@ -213,6 +222,11 @@ void usercontrol(void) {
       LB.stop(hold);
       RB.stop(hold);
     }
+    //INERTIAL odometry test
+    
+    totaldistance=totaldistance+(convert(Inertial.acceleration(xaxis)/100));
+
+    wait(10, msec);
   }
 }
 

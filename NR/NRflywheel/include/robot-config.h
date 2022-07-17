@@ -13,6 +13,7 @@ extern motor RF;
 extern motor RB;
 extern motor Intake1;
 extern motor Intake2;
+extern inertial Inertial;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
