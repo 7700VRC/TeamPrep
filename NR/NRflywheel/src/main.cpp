@@ -46,7 +46,7 @@ void controlFlywheel1(double target) {
 }
 
 // printstuff to controller
-void ControllerPrint() {
+int ControllerPrint() {
   Brain.resetTimer();
   while (1) {
     Controller1.Screen.setCursor(1, 1);
@@ -58,8 +58,10 @@ void ControllerPrint() {
     if(Brain.timer(sec)==45){Controller1.rumble("..");}//1:30 mark
     if(Brain.timer(sec)==75){Controller1.rumble("...");}//1 minute mark
     if(Brain.timer(sec)==105){Controller1.rumble("....");}//30 second mark
-    wait(25, msec);
+   this_thread::sleep_for(25);
+   
   }
+  return(0);
 }
 
 void controlFlywheelSpeed(double target) {
@@ -172,7 +174,7 @@ void autonomous(void) {}
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-
+thread ControllerPrinting = thread(ControllerPrint);
   bool alg = true;
   bool flag = true;
   double totaldistance = 0;
@@ -250,10 +252,11 @@ void usercontrol(void) {
 // Main will set up the competition functions and callbacks.
 //
 int main() {
+  
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
-  Competition.drivercontrol(ControllerPrint);//run another thread for printing to brain
+  
   Controller1.ButtonL1.pressed(pistonToggle);
   Controller1.ButtonRight.pressed(pistonToggleReady);
   Controller1.ButtonL2.pressed(toggleIntake);
