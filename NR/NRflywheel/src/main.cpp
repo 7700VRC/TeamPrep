@@ -10,17 +10,17 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// Controller1          controller
-// F1                   motor         12
-// F2                   motor         21
-// Injector             digital_out   A
-// LF                   motor         18
-// LB                   motor         19
-// RF                   motor         16
-// RB                   motor         17
-// Intake1              motor         9
-// Intake2              motor         10
-// Inertial             inertial      1
+// Controller1          controller                    
+// F1                   motor         12              
+// F2                   motor         21              
+// Injector             digital_out   A               
+// LF                   motor         18              
+// LB                   motor         19              
+// RF                   motor         16              
+// RB                   motor         17              
+// Intake1              motor         9               
+// Intake2              motor         10              
+// Inertial             inertial      1               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -180,9 +180,6 @@ thread ControllerPrinting = thread(ControllerPrint);
   double totaldistance = 0;
   while (true) {
 
-    int ax1 = Controller1.Axis1.position();
-    int ax2 = Controller1.Axis2.position();
-    int ax4 = Controller1.Axis4.position();
 
     if (Controller1.ButtonA.pressing())
       targetSpeed = 0;
@@ -230,20 +227,17 @@ thread ControllerPrinting = thread(ControllerPrint);
     }
     flywheelMonitor();
     // x drive code
-    LF.spin(forward, ax2 + ax1 + .5 * ax4, percent);
-    RF.spin(forward, -ax2 + ax1 + .5 * ax4, percent);
-    LB.spin(forward, -ax2 - ax1 + .5 * ax4, percent);
-    RB.spin(forward, ax2 - ax1 + .5 * ax4, percent);
-    if (ax1 && ax2 && ax4 == 0) {
+    LF.spin(forward,Controller1.Axis3.position(), percent);
+    RF.spin(forward,Controller1.Axis2.position(), percent);
+    LB.spin(forward,Controller1.Axis3.position(), percent);
+    RB.spin(forward,Controller1.Axis2.position(), percent);
+    if (Controller1.Axis2.position()==0 &&Controller1.Axis3.position() == 0) {
       LF.stop(hold);
       RF.stop(hold);
       LB.stop(hold);
       RB.stop(hold);
     }
-    // INERTIAL odometry test
-
-    totaldistance =
-        totaldistance + (convert(Inertial.acceleration(xaxis) / 100));
+    
 
     wait(10, msec);
   }
