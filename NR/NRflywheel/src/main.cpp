@@ -10,17 +10,17 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// F1                   motor         12              
-// F2                   motor         21              
-// Injector             digital_out   A               
-// LF                   motor         18              
-// LB                   motor         19              
-// RF                   motor         16              
-// RB                   motor         17              
-// Intake1              motor         9               
-// Intake2              motor         10              
-// Inertial             inertial      1               
+// Controller1          controller
+// F1                   motor         12
+// F2                   motor         21
+// Injector             digital_out   A
+// LF                   motor         18
+// LB                   motor         19
+// RF                   motor         16
+// RB                   motor         17
+// Intake1              motor         9
+// Intake2              motor         10
+// Inertial             inertial      1
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -43,6 +43,23 @@ void controlFlywheel1(double target) {
   Brain.Screen.printAt(180, 40, "fwdrive %.1f  ", target);
 
   Brain.Screen.printAt(1, 40, " speed = %.2f ", speed);
+}
+
+// printstuff to controller
+void ControllerPrint() {
+  Brain.resetTimer();
+  while (1) {
+    Controller1.Screen.setCursor(1, 1);
+    double speed = F1.velocity(percent);
+    Controller1.Screen.print("speed=.1%f   ", speed);
+    Controller1.Screen.setCursor(2, 1);
+    Controller1.Screen.print("tSpeed=.1%f  ", targetSpeed);
+    if(Brain.timer(sec)==15){Controller1.rumble(".");}//2 minute mark
+    if(Brain.timer(sec)==45){Controller1.rumble("..");}//1:30 mark
+    if(Brain.timer(sec)==75){Controller1.rumble("...");}//1 minute mark
+    if(Brain.timer(sec)==105){Controller1.rumble("....");}//30 second mark
+    wait(25, msec);
+  }
 }
 
 void controlFlywheelSpeed(double target) {
@@ -91,10 +108,10 @@ void flywheelMonitor() {
   Brain.Screen.printAt(1, 100, "Battery Capacity  = %.1f      ", b);
 }
 
-double convert(double Gs){
-double inchesPerSecond;
-inchesPerSecond=386.088582677*Gs;
-  return(inchesPerSecond);
+double convert(double Gs) {
+  double inchesPerSecond;
+  inchesPerSecond = 386.088582677 * Gs;
+  return (inchesPerSecond);
 }
 
 void pistonToggle() {
@@ -130,7 +147,6 @@ void toggleIntake() { intakeOn = !intakeOn; }
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
- 
 }
 
 /*---------------------------------------------------------------------------*/
@@ -159,9 +175,9 @@ void usercontrol(void) {
 
   bool alg = true;
   bool flag = true;
-  double totaldistance=0;
+  double totaldistance = 0;
   while (true) {
-    
+
     int ax1 = Controller1.Axis1.position();
     int ax2 = Controller1.Axis2.position();
     int ax4 = Controller1.Axis4.position();
@@ -222,9 +238,10 @@ void usercontrol(void) {
       LB.stop(hold);
       RB.stop(hold);
     }
-    //INERTIAL odometry test
-    
-    totaldistance=totaldistance+(convert(Inertial.acceleration(xaxis)/100));
+    // INERTIAL odometry test
+
+    totaldistance =
+        totaldistance + (convert(Inertial.acceleration(xaxis) / 100));
 
     wait(10, msec);
   }
@@ -236,12 +253,13 @@ int main() {
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
+  Competition.drivercontrol(ControllerPrint);//run another thread for printing to brain
   Controller1.ButtonL1.pressed(pistonToggle);
   Controller1.ButtonRight.pressed(pistonToggleReady);
   Controller1.ButtonL2.pressed(toggleIntake);
   // Run the pre-autonomous function.
   pre_auton();
-  
+
   // Prevent main from exiting with an infinite loop.
   while (true) {
     wait(100, msec);
