@@ -47,7 +47,8 @@ void controlFlywheel1(double target) {
 
 // printstuff to controller
 int ControllerPrint() {
-  Brain.resetTimer();
+  Brain.Timer.reset();
+  
   while (1) {
     Controller1.Screen.setCursor(1, 1);
     double speed = F1.velocity(percent);
@@ -110,11 +111,7 @@ void flywheelMonitor() {
   Brain.Screen.printAt(1, 100, "Battery Capacity  = %.1f      ", b);
 }
 
-double convert(double Gs) {
-  double inchesPerSecond;
-  inchesPerSecond = 386.088582677 * Gs;
-  return (inchesPerSecond);
-}
+
 
 void pistonToggle() {
 
@@ -177,7 +174,7 @@ void usercontrol(void) {
 thread ControllerPrinting = thread(ControllerPrint);
   bool alg = true;
   bool flag = true;
-  double totaldistance = 0;
+
   while (true) {
 
 
@@ -257,7 +254,7 @@ int main() {
   // Run the pre-autonomous function.
   pre_auton();
 
-  // Prevent main from exiting with an infinite loop.
+ // Prevent main from exiting with an infinite loop.
   while (true) {
     wait(100, msec);
   }
