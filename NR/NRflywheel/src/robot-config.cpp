@@ -17,8 +17,10 @@ motor LB = motor(PORT19, ratio18_1, false);
 motor RF = motor(PORT16, ratio18_1, false);
 motor RB = motor(PORT17, ratio18_1, false);
 motor Intake1 = motor(PORT9, ratio18_1, false);
-motor Intake2 = motor(PORT10, ratio18_1, true);
-inertial Inertial = inertial(PORT1);
+motor turret = motor(PORT10, ratio18_1, true);
+inertial gyro1 = inertial(PORT1);
+rotation RotationL = rotation(PORT2, false);
+rotation RotationB = rotation(PORT3, false);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

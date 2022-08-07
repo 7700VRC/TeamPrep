@@ -19,14 +19,18 @@
 // RF                   motor         16              
 // RB                   motor         17              
 // Intake1              motor         9               
-// Intake2              motor         10              
-// Inertial             inertial      1               
+// turret               motor         10              
+// gyro1                inertial      1               
+// RotationL            rotation      2               
+// RotationB            rotation      3               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
+#include <math.h>
 double targetSpeed = 0.0;
 using namespace vex;
-
+//100 digits of pi because I like Pi𝝿
+long double pi=3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679;
 // A global instance of competition
 competition Competition;
 void flywheelMonitor();
@@ -44,6 +48,34 @@ void controlFlywheel1(double target) {
 
   Brain.Screen.printAt(1, 40, " speed = %.2f ", speed);
 }
+//ODOMETERY
+
+double x,y;
+
+int odometery (){
+double lRad = 1.375; //radius of tracking wheel
+double bRad = 1.375; //radius of tracking wheel
+double Sr = 4.5; //disatnce of right wheel to tracking center
+double Sb=3;
+double lEncoder=0;
+double bEncoder=0;
+x=0;
+y=0;
+double headingDeg = gyro1.heading();
+double headingRad = headingDeg*pi/180;
+while(1){
+double prevLE=lEncoder;
+double prevBE=bEncoder;
+lEncoder=RotationL.angle();
+bEncoder=RotationB.angle();
+
+  this_thread::sleep_for(5);
+}
+  return 0;
+}
+
+
+
 
 // printstuff to controller
 int ControllerPrint() {
@@ -145,6 +177,7 @@ void toggleIntake() { intakeOn = !intakeOn; }
 
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
+
   vexcodeInit();
 }
 
@@ -158,7 +191,9 @@ void pre_auton(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
-void autonomous(void) {}
+void autonomous(void) {
+thread odometeryTracking =thread(odometery);
+}
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -209,10 +244,8 @@ thread ControllerPrinting = thread(ControllerPrint);
 
     if (intakeOn) {
       Intake1.spin(forward, 100, percent);
-      Intake2.spin(forward, 100, percent);
 
     } else {
-      Intake1.stop(coast);
       Intake1.stop(coast);
     }
     if (F1.velocity(percent) < targetSpeed + 1 &&
@@ -223,7 +256,7 @@ thread ControllerPrinting = thread(ControllerPrint);
       Brain.Screen.drawRectangle(60, 190, 60, 60, red);
     }
     flywheelMonitor();
-    // x drive code
+    // tank drive code
     LF.spin(forward,Controller1.Axis3.position(), percent);
     RF.spin(forward,Controller1.Axis2.position(), percent);
     LB.spin(forward,Controller1.Axis3.position(), percent);
