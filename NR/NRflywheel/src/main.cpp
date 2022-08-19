@@ -10,27 +10,28 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// F1                   motor         12              
-// F2                   motor         21              
-// Injector             digital_out   A               
-// LF                   motor         18              
-// LB                   motor         19              
-// RF                   motor         16              
-// RB                   motor         17              
-// Intake1              motor         9               
-// turret               motor         10              
-// gyro1                inertial      1               
-// RotationL            rotation      2               
-// RotationB            rotation      3               
+// Controller1          controller
+// F1                   motor         12
+// F2                   motor         21
+// Injector             digital_out   A
+// LF                   motor         18
+// LB                   motor         19
+// RF                   motor         16
+// RB                   motor         17
+// Intake1              motor         9
+// turret               motor         10
+// gyro1                inertial      1
+// RotationL            rotation      2
+// RotationB            rotation      3
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
 #include <math.h>
 double targetSpeed = 0.0;
 using namespace vex;
-//100 digits of pi because I like Pi𝝿
-long double pi=3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679;
+// 100 digits of pi because I like Pi𝝿
+long double pi =
+    3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679;
 // A global instance of competition
 competition Competition;
 void flywheelMonitor();
@@ -48,53 +49,63 @@ void controlFlywheel1(double target) {
 
   Brain.Screen.printAt(1, 40, " speed = %.2f ", speed);
 }
-//ODOMETERY
+// ODOMETERY
 
-double x,y;
+double x=0, y=0;//declare blobal x and y
 
-int odometery (){
-double lRad = 1.375; //radius of tracking wheel
-double bRad = 1.375; //radius of tracking wheel
-double Sr = 4.5; //disatnce of right wheel to tracking center
-double Sb=3;
-double lEncoder=0;
-double bEncoder=0;
-x=0;
-y=0;
-double headingDeg = gyro1.heading();
-double headingRad = headingDeg*pi/180;
-while(1){
-double prevLE=lEncoder;
-double prevBE=bEncoder;
-lEncoder=RotationL.angle();
-bEncoder=RotationB.angle();
+int odometery() {
+  double lRad = 1.375; // radius of tracking wheel
+  double bRad = 1.375; // radius of tracking wheel
+  double Sl = 4.5;     // disatnce of left wheel to tracking center
+  double Sb = 3;       // disatnce of back wheel to tracking center
+  double lEncoder = 0; //declaring encoder variable left
+  double bEncoder = 0; //declaring encoder variable back
+  double distL=0;//distance left encoder has traveled
+  double distB=0;//distance back encoder has traveled
+  double headingDeg = gyro1.heading(); //create variable for gyro
+  double headingRad = headingDeg * pi / 180;//convert to radians
 
-  this_thread::sleep_for(5);
-}
+  while (1) {
+    double prevLE = lEncoder;//create prevois encoder value left
+    double prevBE = bEncoder;//create prevois encoder value back
+    lEncoder = RotationL.angle();
+    bEncoder = RotationB.angle();
+distL=((lEncoder-prevLE)*pi/180)*lRad;//convert encoder distance into disntace traveled
+distB=((bEncoder-prevBE)*pi/180)*bRad;//convert encoder distance into disntace traveled
+
+
+
+
+    this_thread::sleep_for(5);
+  }
   return 0;
 }
-
-
-
 
 // printstuff to controller
 int ControllerPrint() {
   Brain.Timer.reset();
-  
+
   while (1) {
     Controller1.Screen.setCursor(1, 1);
     double speed = F1.velocity(percent);
     Controller1.Screen.print("speed=.1%f   ", speed);
     Controller1.Screen.setCursor(2, 1);
     Controller1.Screen.print("tSpeed=.1%f  ", targetSpeed);
-    if(Brain.timer(sec)==15){Controller1.rumble(".");}//2 minute mark
-    if(Brain.timer(sec)==45){Controller1.rumble("..");}//1:30 mark
-    if(Brain.timer(sec)==75){Controller1.rumble("...");}//1 minute mark
-    if(Brain.timer(sec)==105){Controller1.rumble("....");}//30 second mark
-   this_thread::sleep_for(25);
-   
+    if (Brain.timer(sec) == 15) {
+      Controller1.rumble(".");
+    } // 2 minute mark
+    if (Brain.timer(sec) == 45) {
+      Controller1.rumble("..");
+    } // 1:30 mark
+    if (Brain.timer(sec) == 75) {
+      Controller1.rumble("...");
+    } // 1 minute mark
+    if (Brain.timer(sec) == 105) {
+      Controller1.rumble("....");
+    } // 30 second mark
+    this_thread::sleep_for(25);
   }
-  return(0);
+  return (0);
 }
 
 void controlFlywheelSpeed(double target) {
@@ -143,8 +154,6 @@ void flywheelMonitor() {
   Brain.Screen.printAt(1, 100, "Battery Capacity  = %.1f      ", b);
 }
 
-
-
 void pistonToggle() {
 
   Injector.set(true);
@@ -191,9 +200,7 @@ void pre_auton(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
-void autonomous(void) {
-thread odometeryTracking =thread(odometery);
-}
+void autonomous(void) { thread odometeryTracking = thread(odometery); }
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -206,12 +213,11 @@ thread odometeryTracking =thread(odometery);
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-thread ControllerPrinting = thread(ControllerPrint);
+  thread ControllerPrinting = thread(ControllerPrint);
   bool alg = true;
   bool flag = true;
 
   while (true) {
-
 
     if (Controller1.ButtonA.pressing())
       targetSpeed = 0;
@@ -257,17 +263,17 @@ thread ControllerPrinting = thread(ControllerPrint);
     }
     flywheelMonitor();
     // tank drive code
-    LF.spin(forward,Controller1.Axis3.position(), percent);
-    RF.spin(forward,Controller1.Axis2.position(), percent);
-    LB.spin(forward,Controller1.Axis3.position(), percent);
-    RB.spin(forward,Controller1.Axis2.position(), percent);
-    if (Controller1.Axis2.position()==0 &&Controller1.Axis3.position() == 0) {
+    LF.spin(forward, Controller1.Axis3.position(), percent);
+    RF.spin(forward, Controller1.Axis2.position(), percent);
+    LB.spin(forward, Controller1.Axis3.position(), percent);
+    RB.spin(forward, Controller1.Axis2.position(), percent);
+    if (Controller1.Axis2.position() == 0 &&
+        Controller1.Axis3.position() == 0) {
       LF.stop(hold);
       RF.stop(hold);
       LB.stop(hold);
       RB.stop(hold);
     }
-    
 
     wait(10, msec);
   }
@@ -276,18 +282,18 @@ thread ControllerPrinting = thread(ControllerPrint);
 // Main will set up the competition functions and callbacks.
 //
 int main() {
-  
+
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
-  
+
   Controller1.ButtonL1.pressed(pistonToggle);
   Controller1.ButtonRight.pressed(pistonToggleReady);
   Controller1.ButtonL2.pressed(toggleIntake);
   // Run the pre-autonomous function.
   pre_auton();
 
- // Prevent main from exiting with an infinite loop.
+  // Prevent main from exiting with an infinite loop.
   while (true) {
     wait(100, msec);
   }
