@@ -51,30 +51,31 @@ void controlFlywheel1(double target) {
 }
 // ODOMETERY
 
-double x=0, y=0;//declare blobal x and y
+double x = 0, y = 0; // declare blobal x and y
 
 int odometery() {
-  double lRad = 1.375; // radius of tracking wheel
-  double bRad = 1.375; // radius of tracking wheel
-  double Sl = 4.5;     // disatnce of left wheel to tracking center
-  double Sb = 3;       // disatnce of back wheel to tracking center
-  double lEncoder = 0; //declaring encoder variable left
-  double bEncoder = 0; //declaring encoder variable back
-  double distL=0;//distance left encoder has traveled
-  double distB=0;//distance back encoder has traveled
-  double headingDeg = gyro1.heading(); //create variable for gyro
-  double headingRad = headingDeg * pi / 180;//convert to radians
-
+  double absoluteOrientation=pi;
+  double lRad = 1.375;      // radius of tracking wheel
+  double bRad = 1.375;      // radius of tracking wheel
+  double Sl = 4.5;          // disatnce of left wheel to tracking center
+  double Sb = 3;            // disatnce of back wheel to tracking center
+  double lEncoder = 0;      // declaring encoder variable left
+  double bEncoder = 0;      // declaring encoder variable back
+  double distL = 0;         // distance left encoder has traveled
+  double distB = 0;         // distance back encoder has traveled
+  double prevLE = lEncoder; // create prevois encoder value left
+  double prevBE = bEncoder; // create prevois encoder value back
   while (1) {
-    double prevLE = lEncoder;//create prevois encoder value left
-    double prevBE = bEncoder;//create prevois encoder value back
-    lEncoder = RotationL.angle();
-    bEncoder = RotationB.angle();
-distL=((lEncoder-prevLE)*pi/180)*lRad;//convert encoder distance into disntace traveled
-distB=((bEncoder-prevBE)*pi/180)*bRad;//convert encoder distance into disntace traveled
 
-
-
+    lEncoder = RotationL.position(degrees);
+    bEncoder = RotationB.position(degrees);
+    distL = ((lEncoder - prevLE) * pi / 180) *
+            lRad; // convert encoder distance into disntace traveled
+    distB = ((bEncoder - prevBE) * pi / 180) *
+            bRad;      // convert encoder distance into disntace traveled
+    prevLE = lEncoder; // create prevois encoder value left
+    prevBE = bEncoder; // create prevois encoder value back
+   absoluteOrientation= (360 - gyro1.heading(rotationUnits::deg)) * M_PI / 180.0;
 
     this_thread::sleep_for(5);
   }
