@@ -54,7 +54,11 @@ void controlFlywheel1(double target) {
 double x = 0, y = 0; // declare blobal x and y
 
 int odometery() {
-  double absoluteOrientation=pi;
+  double prevHeading = gyro1.heading();
+  double deltaHeading = 0; // change in heading
+  double absoluteOrientation = pi;
+  double localX;//local x to use in loop
+  double localY;//local y to use in loop
   double lRad = 1.375;      // radius of tracking wheel
   double bRad = 1.375;      // radius of tracking wheel
   double Sl = 4.5;          // disatnce of left wheel to tracking center
@@ -75,8 +79,15 @@ int odometery() {
             bRad;      // convert encoder distance into disntace traveled
     prevLE = lEncoder; // create prevois encoder value left
     prevBE = bEncoder; // create prevois encoder value back
-   absoluteOrientation= (360 - gyro1.heading(rotationUnits::deg)) * M_PI / 180.0;
+    absoluteOrientation =
+        (360 - gyro1.heading(rotationUnits::deg)) * M_PI / 180.0;
+    deltaHeading =
+        absoluteOrientation - prevHeading; // calculate change in heading
 
+    if(deltaHeading==0){
+      localX=distL;
+      localY=distB;
+    }
     this_thread::sleep_for(5);
   }
   return 0;
