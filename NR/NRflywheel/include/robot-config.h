@@ -16,6 +16,7 @@ extern motor turret;
 extern inertial gyro1;
 extern rotation RotationL;
 extern rotation RotationB;
+extern inertial turretG;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

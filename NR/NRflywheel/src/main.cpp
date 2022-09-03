@@ -23,6 +23,7 @@
 // gyro1                inertial      1
 // RotationL            rotation      2
 // RotationB            rotation      3
+// turretG              inertial      4
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -40,7 +41,41 @@ void spinFlywheel(double);
 double OldError = 0.0;
 double TBHval = 0.0;
 double FWDrive = 0.0;
+/*void inchDrive(double dist, double Speed = 1,double stopTime=99999999999999999,
+               double accuracy = 0.5) {
+  LeftBack.setRotation(0, rev);
+  RightBack.setRotation(0, rev);
 
+  dist = -dist;
+
+  double currDist = 0;
+  double speed;
+  double error = dist;
+  double prevError = error;
+  double Kp = 16.667;   // Porportional
+  double Ki = 0.5;      // Integral
+  double Kd = 13.33336; // Derivative
+  double sum = 0;
+  Brain.Timer.reset();
+  while ((abs(error) > accuracy ||
+          abs(speed) > 10)) {  
+  float Time = Brain.timer(msec);
+  // && !(wallStop && errors[0] == errors[1] &&
+                               // errors[1] == errors[2] && errors[2] ==
+                              //  errors[3] && errors[0] != dist)) {
+    currDist = LeftBack.rotation(rev) * pi * diameter;
+    error = dist - currDist;
+    sum = sum * 0.8 + error;
+    speed = Kp * error + Ki * sum + Kd * (error - prevError);
+    
+    drive(speed * Speed, speed * Speed, 10);
+    
+    prevError = error;
+    if(Time>stopTime){
+      break;
+    }
+  }
+               }*/
 void controlFlywheel1(double target) {
   double speed = F1.velocity(percent);
 
@@ -57,8 +92,8 @@ int odometery() {
   double prevHeading = gyro1.heading();
   double deltaHeading = 0; // change in heading
   double absoluteOrientation = pi;
-  double localX;//local x to use in loop
-  double localY;//local y to use in loop
+  double localX;            // local x to use in loop
+  double localY;            // local y to use in loop
   double lRad = 1.375;      // radius of tracking wheel
   double bRad = 1.375;      // radius of tracking wheel
   double Sl = 4.5;          // disatnce of left wheel to tracking center
@@ -84,9 +119,9 @@ int odometery() {
     deltaHeading =
         absoluteOrientation - prevHeading; // calculate change in heading
 
-    if(deltaHeading==0){
-      localX=distL;
-      localY=distB;
+    if (deltaHeading == 0) {
+      localX = distL;
+      localY = distB;
     }
     this_thread::sleep_for(5);
   }
@@ -165,6 +200,13 @@ void flywheelMonitor() {
                        t2);
   Brain.Screen.printAt(1, 100, "Battery Capacity  = %.1f      ", b);
 }
+void turretSpinTo(int targetAngle){
+  double kp=1;
+  while(turretG.orientation(yaw,degrees)!=targetAngle){
+    double error=targetAngle-turretG.orientation(yaw, degrees);
+    turret.spin(forward, error*kp , percent);
+  }
+}
 
 void pistonToggle() {
 
@@ -236,16 +278,17 @@ void usercontrol(void) {
 
     if (Controller1.ButtonB.pressing()) {
       intakeOn = !intakeOn;
-      wait(10, msec);}
-
-      int turretSpeed = 30 * (Controller1.ButtonL2.pressing() -
-                                Controller1.ButtonR2.pressing());
+      wait(10, msec);
+    }
+/*
+    int turretSpeed = 30 * (Controller1.ButtonL2.pressing() -
+                            Controller1.ButtonR2.pressing());
 
     turret.spin(forward, turretSpeed, percent);
 
     if (turretSpeed == 0)
       turret.stop(hold);
-
+*/
     if (Controller1.ButtonY.pressing())
       targetSpeed = 34;
     if (Controller1.ButtonX.pressing())
@@ -293,7 +336,19 @@ void usercontrol(void) {
       RF.stop(hold);
       LB.stop(hold);
       RB.stop(hold);
+    } double offset;
+    double turretAngle = turretG.orientation(yaw, degrees);
+    double targetAngle = -1 * gyro1.orientation(yaw, degrees);
+    if (targetAngle != turretAngle) {
+      if (targetAngle > 95) {
+        targetAngle = 95;
+      }
+      if (targetAngle < -75) {
+        targetAngle = 75;
+      }
+      turretSpinTo(targetAngle);
     }
+    turretG.orientation(yaw, degrees);
 
     wait(10, msec);
   }
