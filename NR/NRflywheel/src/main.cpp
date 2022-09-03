@@ -236,8 +236,16 @@ void usercontrol(void) {
 
     if (Controller1.ButtonB.pressing()) {
       intakeOn = !intakeOn;
-      wait(100, msec);
-    }
+      wait(10, msec);}
+
+      int turretSpeed = 30 * (Controller1.ButtonL2.pressing() -
+                                Controller1.ButtonR2.pressing());
+
+    turret.spin(forward, turretSpeed, percent);
+
+    if (turretSpeed == 0)
+      turret.stop(hold);
+
     if (Controller1.ButtonY.pressing())
       targetSpeed = 34;
     if (Controller1.ButtonX.pressing())
