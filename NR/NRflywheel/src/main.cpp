@@ -10,20 +10,20 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// Controller1          controller
-// F1                   motor         12
-// F2                   motor         21
-// Injector             digital_out   A
-// LF                   motor         18
-// LB                   motor         19
-// RF                   motor         16
-// RB                   motor         17
-// Intake1              motor         9
-// turret               motor         10
-// gyro1                inertial      1
-// RotationL            rotation      2
-// RotationB            rotation      3
-// turretG              inertial      4
+// Controller1          controller                    
+// F1                   motor         2               
+// F2                   motor         5               
+// Injector             digital_out   A               
+// LF                   motor         21              
+// LB                   motor         12              
+// RF                   motor         20              
+// RB                   motor         4               
+// Intake1              motor         1               
+// turret               motor         10              
+// gyro1                inertial      14              
+// RotationL            rotation      9               
+// RotationB            rotation      3               
+// turretG              inertial      13              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
