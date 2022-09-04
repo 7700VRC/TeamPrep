@@ -9,15 +9,15 @@ brain  Brain;
 
 // VEXcode device constructors
 controller Controller1 = controller(primary);
-motor F1 = motor(PORT2, ratio6_1, false);
-motor F2 = motor(PORT5, ratio6_1, true);
+motor F1 = motor(PORT2, ratio6_1, true);
+motor F2 = motor(PORT5, ratio6_1, false);
 digital_out Injector = digital_out(Brain.ThreeWirePort.A);
 motor LF = motor(PORT21, ratio18_1, false);
 motor LB = motor(PORT12, ratio18_1, false);
-motor RF = motor(PORT20, ratio18_1, false);
+motor RF = motor(PORT20, ratio18_1, true);
 motor RB = motor(PORT4, ratio18_1, false);
-motor Intake1 = motor(PORT1, ratio18_1, false);
-motor turret = motor(PORT10, ratio18_1, false);
+motor Intake1 = motor(PORT1, ratio18_1, true);
+motor turret = motor(PORT19, ratio18_1, false);
 inertial gyro1 = inertial(PORT14);
 rotation RotationL = rotation(PORT9, false);
 rotation RotationB = rotation(PORT3, false);

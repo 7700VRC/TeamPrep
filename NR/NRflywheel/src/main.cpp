@@ -19,7 +19,7 @@
 // RF                   motor         20              
 // RB                   motor         4               
 // Intake1              motor         1               
-// turret               motor         10              
+// turret               motor         19              
 // gyro1                inertial      14              
 // RotationL            rotation      9               
 // RotationB            rotation      3               
@@ -151,9 +151,9 @@ int ControllerPrint() {
   while (1) {
     Controller1.Screen.setCursor(1, 1);
     double speed = F1.velocity(percent);
-    Controller1.Screen.print("speed=.1%f   ", speed);
+    Controller1.Screen.print("speed= %.2f   ", speed);
     Controller1.Screen.setCursor(2, 1);
-    Controller1.Screen.print("tSpeed=.1%f  ", targetSpeed);
+    Controller1.Screen.print("tSpeed= %.2f  ", targetSpeed);
     if (Brain.timer(sec) == 15) {
       Controller1.rumble(".");
     } // 2 minute mark
@@ -166,7 +166,7 @@ int ControllerPrint() {
     if (Brain.timer(sec) == 105) {
       Controller1.rumble("....");
     } // 30 second mark
-    this_thread::sleep_for(25);
+    this_thread::sleep_for(50);
   }
   return (0);
 }
@@ -286,29 +286,44 @@ void usercontrol(void) {
   thread ControllerPrinting = thread(ControllerPrint);
   bool alg = true;
   bool flag = true;
-      
-double offset=0;
+
+  double offset = 0;
   while (true) {
 
-    if (Controller1.ButtonA.pressing())
+    if (Controller1.ButtonA.pressing()) {
       targetSpeed = 0;
+    }
 
-    if (Controller1.ButtonB.pressing()) {
-      intakeOn = !intakeOn;
+    if (Controller1.ButtonL2.pressing()) {
+      // offset++;
+turret.spin(reverse, 30, pct);
       wait(10, msec);
     }
-    
-      if(Controller1.ButtonL2.pressing()){
-        offset++;
-        wait(10, msec);
-      }
-      if(Controller1.ButtonR2.pressing()){
-        offset--;
-        wait(10, msec);
-      }
+    if (Controller1.ButtonR2.pressing()) {
+      // offset--;
+      turret.spin(fwd, 30, pct);
+      wait(10, msec);
+    }
+    if(!Controller1.ButtonR2.pressing()&&!Controller1.ButtonL2.pressing()){turret.stop(brake);
+    }
+/*
+    int turretSpeed = 30 * (Controller1.ButtonL2.pressing() -
+                            Controller1.ButtonR2.pressing());
 
-        
-    
+    turret.spin(forward, turretSpeed, percent);
+
+    if (turretSpeed == 0)
+      turret.stop(hold);
+*/
+    if (Controller1.ButtonL1.pressing()) {
+      targetSpeed = targetSpeed - 0.5;
+      wait(10, msec);
+    }
+    if (Controller1.ButtonR1.pressing()) {
+      targetSpeed = targetSpeed + 0.5;
+      wait(10, msec);
+    }
+
     if (Controller1.ButtonY.pressing())
       targetSpeed = 34;
     if (Controller1.ButtonX.pressing())
@@ -358,8 +373,8 @@ double offset=0;
       RB.stop(hold);
     }
     double turretAngle = turretG.orientation(yaw, degrees);
-    double targetAngle = (-1 * gyro1.orientation(yaw, degrees))+offset;
-    if (targetAngle != turretAngle) {
+    double targetAngle = (-1 * gyro1.orientation(yaw, degrees)) + offset;
+    /*if (targetAngle != turretAngle) {
       if (targetAngle > 95) {
         targetAngle = 95;
       }
@@ -368,7 +383,7 @@ double offset=0;
       }
       turretSpinTo(targetAngle);
     }
-    turretG.orientation(yaw, degrees);
+    turretG.orientation(yaw, degrees);*/
 
     wait(10, msec);
   }
@@ -381,10 +396,9 @@ int main() {
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
-
-  Controller1.ButtonL1.pressed(pistonToggle);
+  Controller1.ButtonB.pressed(toggleIntake);
+  Controller1.ButtonLeft.pressed(pistonToggle);
   Controller1.ButtonRight.pressed(pistonToggleReady);
-  Controller1.ButtonL2.pressed(toggleIntake);
 
   // Run the pre-autonomous function.
   pre_auton();
