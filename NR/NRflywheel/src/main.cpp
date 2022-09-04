@@ -301,7 +301,7 @@ turret.spin(reverse, 30, pct);
     }
     if (Controller1.ButtonR2.pressing()) {
       // offset--;
-      turret.spin(fwd, 30, pct);
+      turret.spin(forward, 30, pct);
       wait(10, msec);
     }
     if(!Controller1.ButtonR2.pressing()&&!Controller1.ButtonL2.pressing()){turret.stop(brake);
