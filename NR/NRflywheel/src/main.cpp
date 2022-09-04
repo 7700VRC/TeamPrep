@@ -286,7 +286,8 @@ void usercontrol(void) {
   thread ControllerPrinting = thread(ControllerPrint);
   bool alg = true;
   bool flag = true;
-
+      
+double offset;
   while (true) {
 
     if (Controller1.ButtonA.pressing())
@@ -296,15 +297,18 @@ void usercontrol(void) {
       intakeOn = !intakeOn;
       wait(10, msec);
     }
-    /*
-        int turretSpeed = 30 * (Controller1.ButtonL2.pressing() -
-                                Controller1.ButtonR2.pressing());
+    
+      if(Controller1.ButtonL2.pressing()){
+        offset++;
+        wait(10, msec);
+      }
+      if(Controller1.ButtonR2.pressing()){
+        offset--;
+        wait(10, msec);
+      }
 
-        turret.spin(forward, turretSpeed, percent);
-
-        if (turretSpeed == 0)
-          turret.stop(hold);
-    */
+        
+    
     if (Controller1.ButtonY.pressing())
       targetSpeed = 34;
     if (Controller1.ButtonX.pressing())
@@ -353,9 +357,8 @@ void usercontrol(void) {
       LB.stop(hold);
       RB.stop(hold);
     }
-    double offset;
     double turretAngle = turretG.orientation(yaw, degrees);
-    double targetAngle = -1 * gyro1.orientation(yaw, degrees);
+    double targetAngle = (-1 * gyro1.orientation(yaw, degrees))+offset;
     if (targetAngle != turretAngle) {
       if (targetAngle > 95) {
         targetAngle = 95;
