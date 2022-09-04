@@ -41,10 +41,9 @@ void spinFlywheel(double);
 double OldError = 0.0;
 double TBHval = 0.0;
 double FWDrive = 0.0;
-/*void inchDrive(double dist, double Speed = 1,double stopTime=99999999999999999,
-               double accuracy = 0.5) {
-  LeftBack.setRotation(0, rev);
-  RightBack.setRotation(0, rev);
+/*void inchDrive(double dist, double Speed = 1,double
+  stopTime=99999999999999999, double accuracy = 0.5) { LeftBack.setRotation(0,
+  rev); RightBack.setRotation(0, rev);
 
   dist = -dist;
 
@@ -58,7 +57,7 @@ double FWDrive = 0.0;
   double sum = 0;
   Brain.Timer.reset();
   while ((abs(error) > accuracy ||
-          abs(speed) > 10)) {  
+          abs(speed) > 10)) {
   float Time = Brain.timer(msec);
   // && !(wallStop && errors[0] == errors[1] &&
                                // errors[1] == errors[2] && errors[2] ==
@@ -67,9 +66,9 @@ double FWDrive = 0.0;
     error = dist - currDist;
     sum = sum * 0.8 + error;
     speed = Kp * error + Ki * sum + Kd * (error - prevError);
-    
+
     drive(speed * Speed, speed * Speed, 10);
-    
+
     prevError = error;
     if(Time>stopTime){
       break;
@@ -86,7 +85,7 @@ void controlFlywheel1(double target) {
 }
 // ODOMETERY
 
-double x = 0, y = 0; // declare blobal x and y
+double x = 0, y = 0; // declare global x and y
 
 int odometery() {
   double prevHeading = gyro1.heading();
@@ -96,28 +95,30 @@ int odometery() {
   double localY;            // local y to use in loop
   double lRad = 1.375;      // radius of tracking wheel
   double bRad = 1.375;      // radius of tracking wheel
-  double Sl = 4.5;          // disatnce of left wheel to tracking center
-  double Sb = 3;            // disatnce of back wheel to tracking center
+  double Sl = 4.5;          // distance of left wheel to tracking center
+  double Sb = 3;            // distance of back wheel to tracking center
   double lEncoder = 0;      // declaring encoder variable left
   double bEncoder = 0;      // declaring encoder variable back
   double distL = 0;         // distance left encoder has traveled
   double distB = 0;         // distance back encoder has traveled
-  double prevLE = lEncoder; // create prevois encoder value left
-  double prevBE = bEncoder; // create prevois encoder value back
+  double prevLE = lEncoder; // create previous encoder value left
+  double prevBE = bEncoder; // create previous encoder value back
   while (1) {
 
     lEncoder = RotationL.position(degrees);
     bEncoder = RotationB.position(degrees);
-    distL = ((lEncoder - prevLE) * pi / 180) *
-            lRad; // convert encoder distance into disntace traveled
-    distB = ((bEncoder - prevBE) * pi / 180) *
-            bRad;      // convert encoder distance into disntace traveled
-    prevLE = lEncoder; // create prevois encoder value left
-    prevBE = bEncoder; // create prevois encoder value back
-    absoluteOrientation =
-        (360 - gyro1.heading(rotationUnits::deg)) * M_PI / 180.0;
-    deltaHeading =
-        absoluteOrientation - prevHeading; // calculate change in heading
+
+    distL = ((lEncoder - prevLE) * pi / 180) * lRad;
+    // convert encoder distance into distance traveled
+    distB = ((bEncoder - prevBE) * pi / 180) * bRad;     
+    // convert encoder distance into disntancee traveled
+
+    prevLE = lEncoder; // create previous encoder value left
+    prevBE = bEncoder; // create previous encoder value back
+
+    absoluteOrientation = (360 - gyro1.heading(rotationUnits::deg)) * M_PI / 180.0;
+    deltaHeading = absoluteOrientation - prevHeading; // calculate change in heading
+    prevHeading = absoluteOrientation;
 
     if (deltaHeading == 0) {
       localX = distL;
@@ -200,11 +201,11 @@ void flywheelMonitor() {
                        t2);
   Brain.Screen.printAt(1, 100, "Battery Capacity  = %.1f      ", b);
 }
-void turretSpinTo(int targetAngle){
-  double kp=1;
-  while(turretG.orientation(yaw,degrees)!=targetAngle){
-    double error=targetAngle-turretG.orientation(yaw, degrees);
-    turret.spin(forward, error*kp , percent);
+void turretSpinTo(int targetAngle) {
+  double kp = 1;
+  while (turretG.orientation(yaw, degrees) != targetAngle) {
+    double error = targetAngle - turretG.orientation(yaw, degrees);
+    turret.spin(forward, error * kp, percent);
   }
 }
 
@@ -280,15 +281,15 @@ void usercontrol(void) {
       intakeOn = !intakeOn;
       wait(10, msec);
     }
-/*
-    int turretSpeed = 30 * (Controller1.ButtonL2.pressing() -
-                            Controller1.ButtonR2.pressing());
+    /*
+        int turretSpeed = 30 * (Controller1.ButtonL2.pressing() -
+                                Controller1.ButtonR2.pressing());
 
-    turret.spin(forward, turretSpeed, percent);
+        turret.spin(forward, turretSpeed, percent);
 
-    if (turretSpeed == 0)
-      turret.stop(hold);
-*/
+        if (turretSpeed == 0)
+          turret.stop(hold);
+    */
     if (Controller1.ButtonY.pressing())
       targetSpeed = 34;
     if (Controller1.ButtonX.pressing())
@@ -336,7 +337,8 @@ void usercontrol(void) {
       RF.stop(hold);
       LB.stop(hold);
       RB.stop(hold);
-    } double offset;
+    }
+    double offset;
     double turretAngle = turretG.orientation(yaw, degrees);
     double targetAngle = -1 * gyro1.orientation(yaw, degrees);
     if (targetAngle != turretAngle) {
@@ -365,6 +367,7 @@ int main() {
   Controller1.ButtonL1.pressed(pistonToggle);
   Controller1.ButtonRight.pressed(pistonToggleReady);
   Controller1.ButtonL2.pressed(toggleIntake);
+
   // Run the pre-autonomous function.
   pre_auton();
 
