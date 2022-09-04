@@ -28,6 +28,8 @@
 
 #include "vex.h"
 #include <math.h>
+
+double absV(double input) { return (sqrt(input * input)); }
 double targetSpeed = 0.0;
 using namespace vex;
 // 100 digits of pi because I like Pi𝝿
@@ -110,20 +112,33 @@ int odometery() {
 
     distL = ((lEncoder - prevLE) * pi / 180) * lRad;
     // convert encoder distance into distance traveled
-    distB = ((bEncoder - prevBE) * pi / 180) * bRad;     
-    // convert encoder distance into disntancee traveled
+    distB = ((bEncoder - prevBE) * pi / 180) * bRad;
+    // convert encoder distance into disntance traveled
 
     prevLE = lEncoder; // create previous encoder value left
     prevBE = bEncoder; // create previous encoder value back
 
-    absoluteOrientation = (360 - gyro1.heading(rotationUnits::deg)) * M_PI / 180.0;
-    deltaHeading = absoluteOrientation - prevHeading; // calculate change in heading
+    absoluteOrientation = (360 - gyro1.heading(degrees)) * pi / 180.0;
+    deltaHeading =
+        absoluteOrientation - prevHeading; // calculate change in heading
+    double averageHeading = prevHeading + deltaHeading / 2;
     prevHeading = absoluteOrientation;
 
     if (deltaHeading == 0) {
       localX = distL;
       localY = distB;
+    } else {
+      localX = 2.0 * sin(deltaHeading / 2.0) * (distB / deltaHeading + Sb);
+      localY = 2.0 * sin(deltaHeading / 2.0) * (distL / deltaHeading + Sl);
     }
+    double globalDist = sqrt(localX * localX + localY * localY);
+
+    double globalAngle =
+        averageHeading +
+        ((absV(localX) < .001) ? pi / 2 : atan(localY / localX)) +
+        ((localX < 0) ? pi : 0);
+    x = x + globalDist * cos(globalAngle);
+    y = y + globalDist * sin(globalAngle);
     this_thread::sleep_for(5);
   }
   return 0;
@@ -313,7 +328,7 @@ void usercontrol(void) {
     }
 
     if (intakeOn) {
-      Intake1.spin(forward, 100, percent);
+      Intake1.spin(forward, 130, rpm);
 
     } else {
       Intake1.stop(coast);
