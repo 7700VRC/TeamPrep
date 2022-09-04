@@ -287,7 +287,7 @@ void usercontrol(void) {
   bool alg = true;
   bool flag = true;
       
-double offset;
+double offset=0;
   while (true) {
 
     if (Controller1.ButtonA.pressing())
