@@ -10,20 +10,20 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// F1                   motor         2               
-// F2                   motor         5               
-// Injector             digital_out   A               
-// LF                   motor         21              
-// LB                   motor         12              
-// RF                   motor         20              
-// RB                   motor         4               
-// Intake1              motor         1               
-// turret               motor         19              
-// gyro1                inertial      14              
-// RotationL            rotation      9               
-// RotationB            rotation      3               
-// turretG              inertial      13              
+// Controller1          controller
+// F1                   motor         2
+// F2                   motor         5
+// Injector             digital_out   A
+// LF                   motor         21
+// LB                   motor         12
+// RF                   motor         20
+// RB                   motor         4
+// Intake1              motor         1
+// turret               motor         19
+// gyro1                inertial      14
+// RotationL            rotation      9
+// RotationB            rotation      3
+// turretG              inertial      13
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -216,11 +216,19 @@ void flywheelMonitor() {
                        t2);
   Brain.Screen.printAt(1, 100, "Battery Capacity  = %.1f      ", b);
 }
+//turret Pid spin to with gyro angle
 void turretSpinTo(int targetAngle) {
   double kp = 1;
+  double ki = 0.1;
+  double kd = 0.1;
+  double sum = 0;
+  double prevError =0;
+   double error;
   while (turretG.orientation(yaw, degrees) != targetAngle) {
-    double error = targetAngle - turretG.orientation(yaw, degrees);
-    turret.spin(forward, error * kp, percent);
+   error = targetAngle - turretG.orientation(yaw, degrees);
+    sum = sum + error;
+    turret.spin(forward, error * kp + ki * sum+kd*(error-prevError), percent);
+    prevError=error;
   }
 }
 
@@ -296,7 +304,7 @@ void usercontrol(void) {
 
     if (Controller1.ButtonL2.pressing()) {
       // offset++;
-turret.spin(reverse, 30, pct);
+      turret.spin(reverse, 30, pct);
       wait(10, msec);
     }
     if (Controller1.ButtonR2.pressing()) {
@@ -304,17 +312,18 @@ turret.spin(reverse, 30, pct);
       turret.spin(forward, 30, pct);
       wait(10, msec);
     }
-    if(!Controller1.ButtonR2.pressing()&&!Controller1.ButtonL2.pressing()){turret.stop(brake);
+    if (!Controller1.ButtonR2.pressing() && !Controller1.ButtonL2.pressing()) {
+      turret.stop(brake);
     }
-/*
-    int turretSpeed = 30 * (Controller1.ButtonL2.pressing() -
-                            Controller1.ButtonR2.pressing());
+    /*
+        int turretSpeed = 30 * (Controller1.ButtonL2.pressing() -
+                                Controller1.ButtonR2.pressing());
 
-    turret.spin(forward, turretSpeed, percent);
+        turret.spin(forward, turretSpeed, percent);
 
-    if (turretSpeed == 0)
-      turret.stop(hold);
-*/
+        if (turretSpeed == 0)
+          turret.stop(hold);
+    */
     if (Controller1.ButtonL1.pressing()) {
       targetSpeed = targetSpeed - 0.5;
       wait(10, msec);
