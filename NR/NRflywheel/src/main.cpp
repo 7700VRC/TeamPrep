@@ -301,7 +301,7 @@ void usercontrol(void) {
     if (Controller1.ButtonA.pressing()) {
       targetSpeed = 0;
     }
-
+/*
     if (Controller1.ButtonL2.pressing()) {
       // offset++;
       turret.spin(reverse, 30, pct);
@@ -315,7 +315,7 @@ void usercontrol(void) {
     if (!Controller1.ButtonR2.pressing() && !Controller1.ButtonL2.pressing()) {
       turret.stop(brake);
     }
-    /*
+    */
         int turretSpeed = 30 * (Controller1.ButtonL2.pressing() -
                                 Controller1.ButtonR2.pressing());
 
@@ -323,7 +323,7 @@ void usercontrol(void) {
 
         if (turretSpeed == 0)
           turret.stop(hold);
-    */
+    
     if (Controller1.ButtonL1.pressing()) {
       targetSpeed = targetSpeed - 0.5;
       wait(10, msec);
@@ -383,6 +383,7 @@ void usercontrol(void) {
     }
     double turretAngle = turretG.orientation(yaw, degrees);
     double targetAngle = (-1 * gyro1.orientation(yaw, degrees)) + offset;
+   
     /*if (targetAngle != turretAngle) {
       if (targetAngle > 95) {
         targetAngle = 95;
