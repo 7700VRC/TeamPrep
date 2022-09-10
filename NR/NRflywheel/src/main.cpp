@@ -43,6 +43,7 @@ void spinFlywheel(double);
 double OldError = 0.0;
 double TBHval = 0.0;
 double FWDrive = 0.0;
+bool turretToggle = false;
 /*void inchDrive(double dist, double Speed = 1,double
   stopTime=99999999999999999, double accuracy = 0.5) { LeftBack.setRotation(0,
   rev); RightBack.setRotation(0, rev);
@@ -77,6 +78,11 @@ double FWDrive = 0.0;
     }
   }
                }*/
+
+  void toggleTurret(){
+    turretToggle=!turretToggle;
+ 
+  }
 void controlFlywheel1(double target) {
   double speed = F1.velocity(percent);
 
@@ -295,7 +301,7 @@ void usercontrol(void) {
   thread ControllerPrinting = thread(ControllerPrint);
   bool alg = true;
   bool flag = true;
-  bool turretToggle = false;
+  
   int offset = 0;
   while (true) {
 
@@ -338,13 +344,7 @@ void usercontrol(void) {
     if (Controller1.ButtonUp.pressing())
       targetSpeed = 90;
     Brain.Screen.printAt(1, 20, "target speed = %.2f ", targetSpeed);
-    if (Controller1.ButtonDown.pressing() && flag) {
-      flag = false;
-      alg = !alg;
-    }
-    if (!Controller1.ButtonDown.pressing()) {
-      flag = true;
-    }
+   
     if (alg) {
       controlFlywheelSpeed(targetSpeed);
       Brain.Screen.printAt(1, 120, "controlled speed    ");
@@ -420,6 +420,7 @@ int main() {
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
+  Controller1.ButtonDown.pressed(toggleTurret);
   Controller1.ButtonB.pressed(toggleIntake);
   Controller1.ButtonLeft.pressed(pistonToggle);
   Controller1.ButtonRight.pressed(pistonToggleReady);
