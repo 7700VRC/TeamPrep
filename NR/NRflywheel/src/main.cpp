@@ -216,19 +216,20 @@ void flywheelMonitor() {
                        t2);
   Brain.Screen.printAt(1, 100, "Battery Capacity  = %.1f      ", b);
 }
-//turret Pid spin to with gyro angle
+// turret Pid spin to with gyro angle
 void turretSpinTo(int targetAngle) {
   double kp = 1;
   double ki = 0.1;
   double kd = 0.1;
   double sum = 0;
-  double prevError =0;
-   double error;
+  double prevError = 0;
+  double error;
   while (turretG.orientation(yaw, degrees) != targetAngle) {
-   error = targetAngle - turretG.orientation(yaw, degrees);
+    error = targetAngle - turretG.orientation(yaw, degrees);
     sum = sum + error;
-    turret.spin(forward, error * kp + ki * sum+kd*(error-prevError), percent);
-    prevError=error;
+    turret.spin(forward, error * kp + ki * sum + kd * (error - prevError),
+                percent);
+    prevError = error;
   }
 }
 
@@ -294,8 +295,8 @@ void usercontrol(void) {
   thread ControllerPrinting = thread(ControllerPrint);
   bool alg = true;
   bool flag = true;
-
-  double offset = 0;
+  bool turretToggle = false;
+  int offset = 0;
   while (true) {
 
     if (Controller1.ButtonA.pressing()) {
@@ -315,15 +316,12 @@ void usercontrol(void) {
     if (!Controller1.ButtonR2.pressing() && !Controller1.ButtonL2.pressing()) {
       turret.stop(brake);
     }
-    */
-        int turretSpeed = 30 * (Controller1.ButtonL2.pressing() -
-                                Controller1.ButtonR2.pressing());
+*/
+     offset = offset + .5 * (Controller1.ButtonL2.pressing() -
+                            Controller1.ButtonR2.pressing());
 
-        turret.spin(forward, turretSpeed, percent);
 
-        if (turretSpeed == 0)
-          turret.stop(hold);
-    
+
     if (Controller1.ButtonL1.pressing()) {
       targetSpeed = targetSpeed - 0.5;
       wait(10, msec);
@@ -381,9 +379,25 @@ void usercontrol(void) {
       LB.stop(hold);
       RB.stop(hold);
     }
-    double turretAngle = turretG.orientation(yaw, degrees);
-    double targetAngle = (-1 * gyro1.orientation(yaw, degrees)) + offset;
-   
+    if (turretToggle == false) {
+
+      if (gyro1.heading() - turretG.heading() > 90 &&
+          gyro1.heading() - turretG.heading() < 270) {
+        turretSpinTo(offset);
+      } else if (gyro1.heading() - turretG.heading() > 90) {
+        turretSpinTo(gyro1.heading() + 90);
+      } else if (gyro1.heading() - turretG.heading() < 270) {
+        turretSpinTo(gyro1.heading() - 90);
+      }
+    } else {
+
+      if (gyro1.heading() < turretG.heading() + 1 &&
+          gyro1.heading() > turretG.heading() + 1) {
+        turret.stop(hold);
+      } else {
+        turretSpinTo(gyro1.heading());
+      }
+    }
     /*if (targetAngle != turretAngle) {
       if (targetAngle > 95) {
         targetAngle = 95;
