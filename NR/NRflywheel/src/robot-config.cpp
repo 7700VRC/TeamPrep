@@ -22,6 +22,7 @@ inertial gyro1 = inertial(PORT14);
 rotation RotationL = rotation(PORT9, false);
 rotation RotationB = rotation(PORT3, false);
 inertial turretG = inertial(PORT13);
+optical Color = optical(PORT7);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

@@ -10,20 +10,21 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// Controller1          controller
-// F1                   motor         2
-// F2                   motor         5
-// Injector             digital_out   A
-// LF                   motor         21
-// LB                   motor         12
-// RF                   motor         20
-// RB                   motor         4
-// Intake1              motor         1
-// turret               motor         19
-// gyro1                inertial      14
-// RotationL            rotation      9
-// RotationB            rotation      3
-// turretG              inertial      13
+// Controller1          controller                    
+// F1                   motor         2               
+// F2                   motor         5               
+// Injector             digital_out   A               
+// LF                   motor         21              
+// LB                   motor         12              
+// RF                   motor         20              
+// RB                   motor         4               
+// Intake1              motor         1               
+// turret               motor         19              
+// gyro1                inertial      14              
+// RotationL            rotation      9               
+// RotationB            rotation      3               
+// turretG              inertial      13              
+// Color                optical       7               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -78,7 +79,15 @@ bool turretToggle = false;
     }
   }
                }*/
-
+  void roller (){
+    if(Color.isNearObject()){
+      if(Color.color()==red){
+        Intake1.spin(forward, 50, percent);
+        waitUntil(Color.color()==blue);
+        Intake1.stop();
+      }
+    }
+  }
   void toggleTurret(){
     turretToggle=!turretToggle;
  
@@ -300,15 +309,17 @@ void autonomous(void) { thread odometeryTracking = thread(odometery); }
 void usercontrol(void) {
   thread ControllerPrinting = thread(ControllerPrint);
   bool alg = true;
-  bool flag = true;
-  
   int offset = 0;
+  
   while (true) {
-
+   // if(Color.isNearObject()){
+      
+    
+ //   }
     if (Controller1.ButtonA.pressing()) {
       targetSpeed = 0;
     }
-/*
+
     if (Controller1.ButtonL2.pressing()) {
       // offset++;
       turret.spin(reverse, 30, pct);
@@ -322,11 +333,11 @@ void usercontrol(void) {
     if (!Controller1.ButtonR2.pressing() && !Controller1.ButtonL2.pressing()) {
       turret.stop(brake);
     }
-*/
+/*
      offset = offset + .5 * (Controller1.ButtonL2.pressing() -
                             Controller1.ButtonR2.pressing());
 
-
+*/
 
     if (Controller1.ButtonL1.pressing()) {
       targetSpeed = targetSpeed - 0.5;
@@ -356,9 +367,18 @@ void usercontrol(void) {
     if (intakeOn) {
       Intake1.spin(forward, 130, rpm);
 
-    } else {
-      Intake1.stop(coast);
+    } 
+    if(!intakeOn){
+      if(Color.color()==red&&Color.isNearObject()){
+              Intake1.spin(forward, 130, rpm);
+      } 
+      else {
+      
+      
+      Intake1.stop();}
     }
+      
+    
     if (F1.velocity(percent) < targetSpeed + 1 &&
         F1.velocity(percent) > targetSpeed - 1) {
       Brain.Screen.drawRectangle(60, 190, 60, 60, green);
@@ -379,6 +399,7 @@ void usercontrol(void) {
       LB.stop(hold);
       RB.stop(hold);
     }
+    /*
     if (turretToggle == false) {
 
       if (gyro1.heading() - turretG.heading() > 90 &&
@@ -397,7 +418,7 @@ void usercontrol(void) {
       } else {
         turretSpinTo(gyro1.heading());
       }
-    }
+    }*/
     /*if (targetAngle != turretAngle) {
       if (targetAngle > 95) {
         targetAngle = 95;
@@ -424,7 +445,8 @@ int main() {
   Controller1.ButtonB.pressed(toggleIntake);
   Controller1.ButtonLeft.pressed(pistonToggle);
   Controller1.ButtonRight.pressed(pistonToggleReady);
-
+  Color.objectDetected(roller);
+  
   // Run the pre-autonomous function.
   pre_auton();
 
