@@ -20,10 +20,10 @@
 // RB                   motor         4               
 // Intake1              motor         1               
 // turret               motor         19              
-// gyro1                inertial      14              
+// gyro1                inertial      6               
 // RotationL            rotation      9               
 // RotationB            rotation      3               
-// turretG              inertial      13              
+// turretG              inertial      14              
 // Color                optical       7               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
@@ -79,15 +79,7 @@ bool turretToggle = false;
     }
   }
                }*/
-  void roller (){
-    if(Color.isNearObject()){
-      if(Color.color()==red){
-        Intake1.spin(forward, 50, percent);
-        waitUntil(Color.color()==blue);
-        Intake1.stop();
-      }
-    }
-  }
+
   void toggleTurret(){
     turretToggle=!turretToggle;
  
@@ -233,19 +225,23 @@ void flywheelMonitor() {
 }
 // turret Pid spin to with gyro angle
 void turretSpinTo(int targetAngle) {
-  double kp = 1;
-  double ki = 0.1;
-  double kd = 0.1;
+  double kp = .00001;
+  double ki = .00000;
+  double kd = .00000;
   double sum = 0;
   double prevError = 0;
-  double error;
-  while (turretG.orientation(yaw, degrees) != targetAngle) {
+  double error=targetAngle;
+  double accuracy=1;
+  while (fabs(error)>accuracy) {
     error = targetAngle - turretG.orientation(yaw, degrees);
-    sum = sum + error;
-    turret.spin(forward, error * kp + ki * sum + kd * (error - prevError),
+    turret.spin(fwd, (error * kp) + (ki * sum) + (kd * (error - prevError)),
                 percent);
+    
+    wait(10, msec);
     prevError = error;
+    sum = sum * 0.5 + error;
   }
+  turret.stop();
 }
 
 void pistonToggle() {
@@ -310,10 +306,12 @@ void usercontrol(void) {
   thread ControllerPrinting = thread(ControllerPrint);
   bool alg = true;
   int offset = 0;
-  
+  gyro1.calibrate();
+  turretG.calibrate();
+  waitUntil(!gyro1.isCalibrating()&&!turretG.isCalibrating());
   while (true) {
    // if(Color.isNearObject()){
-      
+  //    turretSpinTo(0);
     
  //   }
     if (Controller1.ButtonA.pressing()) {
@@ -445,7 +443,7 @@ int main() {
   Controller1.ButtonB.pressed(toggleIntake);
   Controller1.ButtonLeft.pressed(pistonToggle);
   Controller1.ButtonRight.pressed(pistonToggleReady);
-  Color.objectDetected(roller);
+  
   
   // Run the pre-autonomous function.
   pre_auton();

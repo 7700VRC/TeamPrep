@@ -18,10 +18,10 @@ motor RF = motor(PORT20, ratio18_1, true);
 motor RB = motor(PORT4, ratio18_1, false);
 motor Intake1 = motor(PORT1, ratio18_1, true);
 motor turret = motor(PORT19, ratio18_1, false);
-inertial gyro1 = inertial(PORT14);
+inertial gyro1 = inertial(PORT6);
 rotation RotationL = rotation(PORT9, false);
 rotation RotationB = rotation(PORT3, false);
-inertial turretG = inertial(PORT13);
+inertial turretG = inertial(PORT14);
 optical Color = optical(PORT7);
 
 // VEXcode generated functions
