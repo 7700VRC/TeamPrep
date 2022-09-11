@@ -259,6 +259,8 @@ void pistonToggle() {
 void pistonToggleReady() {
   Brain.Screen.drawRectangle(120, 190, 60, 60, orange);
   waitUntil(F1.velocity(percent) < targetSpeed + .25 && F1.velocity(percent) > targetSpeed - .25);
+  wait(10, msec);
+  waitUntil(F1.velocity(percent) < targetSpeed + .25 && F1.velocity(percent) > targetSpeed - .25);
   Brain.Screen.drawRectangle(120, 190, 60, 60, black);
 
   Injector.set(true);
