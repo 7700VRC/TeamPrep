@@ -72,13 +72,15 @@ Discarded input sections
                 0x0000000000000000       0x98 build/src/main.o
  .ARM.exidx.text._Z16controlFlywheel1d
                 0x0000000000000000        0x8 build/src/main.o
- .text._Z12turretSpinToi
-                0x0000000000000000      0x120 build/src/main.o
- .ARM.exidx.text._Z12turretSpinToi
+ .text._Z12turretSpinTov
+                0x0000000000000000      0x140 build/src/main.o
+ .ARM.exidx.text._Z12turretSpinTov
                 0x0000000000000000        0x8 build/src/main.o
  .text._Z9pre_autonv
                 0x0000000000000000        0x4 build/src/main.o
  .ARM.exidx.text._Z9pre_autonv
+                0x0000000000000000        0x8 build/src/main.o
+ .bss.targetAngle
                 0x0000000000000000        0x8 build/src/main.o
  .llvm_addrsig  0x0000000000000000       0x1f build/src/main.o
  .text          0x0000000000000000        0x0 build/src/robot-config.o
@@ -2543,15 +2545,14 @@ Linker script and memory map
                 0x00000000038007ac       0x44 build/src/main.o
                 0x00000000038007ac                pistonToggle()
  .text._Z17pistonToggleReadyv
-                0x00000000038007f0      0x164 build/src/main.o
+                0x00000000038007f0      0x168 build/src/main.o
                 0x00000000038007f0                pistonToggleReady()
  .text._Z12toggleIntakev
-                0x0000000003800954       0x18 build/src/main.o
-                0x0000000003800954                toggleIntake()
+                0x0000000003800958       0x18 build/src/main.o
+                0x0000000003800958                toggleIntake()
  .text._Z10autonomousv
-                0x000000000380096c       0x28 build/src/main.o
-                0x000000000380096c                autonomous()
- *fill*         0x0000000003800994        0x4 
+                0x0000000003800970       0x28 build/src/main.o
+                0x0000000003800970                autonomous()
  .text._Z11usercontrolv
                 0x0000000003800998      0x5dc build/src/main.o
                 0x0000000003800998                usercontrol()

@@ -223,8 +223,9 @@ void flywheelMonitor() {
                        t2);
   Brain.Screen.printAt(1, 100, "Battery Capacity  = %.1f      ", b);
 }
+double targetAngle;
 // turret Pid spin to with gyro angle
-void turretSpinTo(int targetAngle) {
+int turretSpinTo() {
   double kp = .00001;
   double ki = .00000;
   double kd = .00000;
@@ -232,6 +233,8 @@ void turretSpinTo(int targetAngle) {
   double prevError = 0;
   double error=targetAngle;
   double accuracy=1;
+  while(true){
+  
   while (fabs(error)>accuracy) {
     error = targetAngle - turretG.orientation(yaw, degrees);
     turret.spin(fwd, (error * kp) + (ki * sum) + (kd * (error - prevError)),
@@ -241,7 +244,10 @@ void turretSpinTo(int targetAngle) {
     prevError = error;
     sum = sum * 0.5 + error;
   }
-  turret.stop();
+  if(fabs(error)<accuracy){turret.stop(); }
+  }
+  
+  return 0;
 }
 
 void pistonToggle() {
@@ -252,8 +258,7 @@ void pistonToggle() {
 }
 void pistonToggleReady() {
   Brain.Screen.drawRectangle(120, 190, 60, 60, orange);
-  waitUntil(F1.velocity(percent) < targetSpeed + .5 &&
-            F1.velocity(percent) > targetSpeed - .5);
+  waitUntil(F1.velocity(percent) < targetSpeed + .25 && F1.velocity(percent) > targetSpeed - .25);
   Brain.Screen.drawRectangle(120, 190, 60, 60, black);
 
   Injector.set(true);
