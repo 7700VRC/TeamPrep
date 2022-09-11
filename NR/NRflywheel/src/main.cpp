@@ -25,6 +25,7 @@
 // RotationB            rotation      3               
 // turretG              inertial      14              
 // Color                optical       7               
+// BumperL              bumper        B               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
