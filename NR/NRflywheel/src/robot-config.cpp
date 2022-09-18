@@ -24,6 +24,7 @@ rotation RotationB = rotation(PORT3, false);
 inertial turretG = inertial(PORT14);
 optical Color = optical(PORT7);
 bumper BumperL = bumper(Brain.ThreeWirePort.B);
+bumper BumperR = bumper(Brain.ThreeWirePort.C);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

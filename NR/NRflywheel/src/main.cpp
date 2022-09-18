@@ -26,6 +26,7 @@
 // turretG              inertial      14              
 // Color                optical       7               
 // BumperL              bumper        B               
+// BumperR              bumper        C               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -226,15 +227,15 @@ void flywheelMonitor() {
 }
 double targetAngle;
 // turret Pid spin to with gyro angle
-int turretSpinTo() {
-  double kp = .00001;
+int turretSpinTo(double targetAngle) {
+  double kp = 1;
   double ki = .00000;
-  double kd = .00000;
+  double kd = .5;
   double sum = 0;
   double prevError = 0;
   double error=targetAngle;
   double accuracy=1;
-  while(true){
+ // while(true){
   
   while (fabs(error)>accuracy) {
     error = targetAngle - turretG.orientation(yaw, degrees);
@@ -243,10 +244,13 @@ int turretSpinTo() {
     
     wait(10, msec);
     prevError = error;
-    sum = sum * 0.5 + error;
+    sum = sum + error;
+    if(BumperL.pressing()||BumperR.pressing()){turret.stop();
+    break;
+    }
   }
-  if(fabs(error)<accuracy){turret.stop(); }
-  }
+ if(fabs(error)<accuracy){turret.stop(); }
+//  }
   
   return 0;
 }
@@ -298,7 +302,11 @@ void pre_auton(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
-void autonomous(void) { thread odometeryTracking = thread(odometery); }
+void autonomous(void) { thread odometeryTracking = thread(odometery); 
+turretSpinTo(45);
+wait(1, sec);
+turretSpinTo(-45);
+}
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -326,12 +334,12 @@ void usercontrol(void) {
       targetSpeed = 0;
     }
 
-    if (Controller1.ButtonL2.pressing()) {
+    if (Controller1.ButtonL2.pressing()&&!BumperL.pressing()) {
       // offset++;
       turret.spin(reverse, 30, pct);
       wait(10, msec);
     }
-    if (Controller1.ButtonR2.pressing()) {
+    if (Controller1.ButtonR2.pressing()&&!BumperR.pressing()) {
       // offset--;
       turret.spin(forward, 30, pct);
       wait(10, msec);

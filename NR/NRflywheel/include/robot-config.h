@@ -19,6 +19,7 @@ extern rotation RotationB;
 extern inertial turretG;
 extern optical Color;
 extern bumper BumperL;
+extern bumper BumperR;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
