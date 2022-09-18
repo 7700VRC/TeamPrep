@@ -12,7 +12,7 @@
 // [Name]               [Type]        [Port(s)]
 // Controller1          controller                    
 // F1                   motor         2               
-// F2                   motor         5               
+// F2                   motor         15              
 // Injector             digital_out   A               
 // LF                   motor         21              
 // LB                   motor         12              
@@ -20,7 +20,7 @@
 // RB                   motor         4               
 // Intake1              motor         1               
 // turret               motor         19              
-// gyro1                inertial      6               
+// gyro1                inertial      13              
 // RotationL            rotation      9               
 // RotationB            rotation      3               
 // turretG              inertial      14              
