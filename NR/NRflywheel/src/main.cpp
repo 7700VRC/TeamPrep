@@ -44,13 +44,15 @@ void controlFlywheel1(double target) {
   double speed = F1.velocity(percent);
 
   spinFlywheel((target - speed) + target);
-  Brain.Screen.printAt(180, 40, "fwdrive %.1f  ", target);
+  Brain.Screen.printAt(180, 40, "fwdrive %.1f   ", target);
 
-  Brain.Screen.printAt(1, 40, " speed = %.2f ", speed);
+  Brain.Screen.printAt(1, 40, " speed = %.2f    ", speed);
 }
 //ODOMETERY
-
+//global odom variables
 double x,y;
+double headingDeg = gyro1.heading();
+double headingRad = headingDeg*pi/180;
 
 int odometery (){
 double lRad = 1.375; //radius of tracking wheel
@@ -61,9 +63,10 @@ double lEncoder=0;
 double bEncoder=0;
 x=0;
 y=0;
-double headingDeg = gyro1.heading();
-double headingRad = headingDeg*pi/180;
+
 while(1){
+headingDeg = gyro1.heading();
+headingRad = headingDeg*pi/180;
 double prevLE=lEncoder;
 double prevBE=bEncoder;
 lEncoder=RotationL.angle();
@@ -84,9 +87,9 @@ int ControllerPrint() {
   while (1) {
     Controller1.Screen.setCursor(1, 1);
     double speed = F1.velocity(percent);
-    Controller1.Screen.print("speed=.1%f   ", speed);
+    Controller1.Screen.print("speed=%.2f   ", speed);
     Controller1.Screen.setCursor(2, 1);
-    Controller1.Screen.print("tSpeed=.1%f  ", targetSpeed);
+    Controller1.Screen.print("targetSpeed=%.2f  ", targetSpeed);
     if(Brain.timer(sec)==15){Controller1.rumble(".");}//2 minute mark
     if(Brain.timer(sec)==45){Controller1.rumble("..");}//1:30 mark
     if(Brain.timer(sec)==75){Controller1.rumble("...");}//1 minute mark
@@ -233,6 +236,12 @@ thread ControllerPrinting = thread(ControllerPrint);
     }
     if (!Controller1.ButtonDown.pressing()) {
       flag = true;
+    }
+    if(Controller1.ButtonR1.pressing()){
+      targetSpeed++;
+    }
+     if(Controller1.ButtonL1.pressing()){
+      targetSpeed--;
     }
     if (alg) {
       controlFlywheelSpeed(targetSpeed);
