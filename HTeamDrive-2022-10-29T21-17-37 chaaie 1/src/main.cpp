@@ -10,12 +10,13 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// FR                   motor         4               
-// BL                   motor         12              
-// BR                   motor         21              
-// FL                   motor         20              
+// FR                   motor         6               
+// BL                   motor         1               
+// BR                   motor         4               
+// FL                   motor         7               
 // Controller1          controller                    
 // intake               motor         2               
+// Indexer              motor         10              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -120,10 +121,10 @@ void usercontrol(void) {
   // User control code here, inside the loop
   while (1) {
     
-    FR.spin(forward, Controller1.Axis2.position(percent), pct); 
-    BR.spin(forward, Controller1.Axis2.position(percent), pct); 
-    BL.spin(forward, Controller1.Axis3.position(percent), pct); 
-    FL.spin(forward, Controller1.Axis3.position(percent), pct);   
+    FR.spin(forward, Controller1.Axis3.position(percent)-Controller1.Axis4.position(percent), pct); 
+    BR.spin(forward, Controller1.Axis3.position(percent)-Controller1.Axis4.position(percent), pct); 
+    BL.spin(forward, Controller1.Axis3.position(percent)+Controller1.Axis4.position(percent), pct); 
+    FL.spin(forward, Controller1.Axis3.position(percent)+Controller1.Axis4.position(percent), pct);   
 
     
    

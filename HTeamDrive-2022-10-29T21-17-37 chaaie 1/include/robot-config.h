@@ -9,6 +9,7 @@ extern motor BR;
 extern motor FL;
 extern controller Controller1;
 extern motor intake;
+extern motor Indexer;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
