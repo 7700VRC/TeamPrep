@@ -120,7 +120,7 @@ void autonomous(void) {
 void usercontrol(void) {
   // User control code here, inside the loop
   while (1) {
-    
+    //left joystick drive
     FR.spin(forward, Controller1.Axis3.position(percent)-Controller1.Axis4.position(percent), pct); 
     BR.spin(forward, Controller1.Axis3.position(percent)-Controller1.Axis4.position(percent), pct); 
     BL.spin(forward, Controller1.Axis3.position(percent)+Controller1.Axis4.position(percent), pct); 
