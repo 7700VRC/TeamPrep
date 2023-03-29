@@ -21,13 +21,34 @@ using namespace vex;
 
 // A global instance of competition
 competition Competition;
-
+float D = 4.0; //Wheel diameter
+float G = 1.0; //Outside gear ratio
+float Pi = 3.14; 
 // define your global instances of motors and other devices here
 void drive(int lspeed, int rspeed, int wt){
 LeftMotor.spin(forward, lspeed, pct);
 RightMotor.spin(forward, rspeed, pct);
 wait(wt, msec);
 }
+
+void DriveBrake(){
+LeftMotor.stop(brake);
+RightMotor.stop(brake);
+}
+
+void InchDrive(float target, float speed = 50){
+LeftMotor.setRotation(0, rev);
+float x = 0;
+float error = target - x;
+float accuracy =  0.2;
+while(fabs(error) > accuracy){
+drive(speed, speed, 10);
+x = LeftMotor.rotation(rev)*Pi*D*G;
+error=target-x;
+}
+DriveBrake();
+}
+//Borange Bugatti fire
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -57,9 +78,16 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  // ..........................................................................
-  // Insert autonomous user code here.
-  // ..........................................................................
+wait(500, msec);
+InchDrive(24);
+drive(50, -50, 660);
+InchDrive(24);
+drive(50, -50, 660);
+InchDrive(24);
+drive(50, -50, 660);
+InchDrive(24);
+drive(50, -50, 660);
+DriveBrake();
 }
 
 /*---------------------------------------------------------------------------*/
