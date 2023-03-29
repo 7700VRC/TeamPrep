@@ -56,10 +56,21 @@ __vex_critical_section
 Discarded input sections
 
  .text          0x0000000000000000        0x0 build/src/main.o
+ .text._Z10driveBrakev
+                0x0000000000000000       0x38 build/src/main.o
+ .ARM.exidx.text._Z10driveBrakev
+                0x0000000000000000        0x8 build/src/main.o
+ .text._Z9inchDriveff
+                0x0000000000000000      0x118 build/src/main.o
+ .ARM.exidx.text._Z9inchDriveff
+                0x0000000000000000        0x8 build/src/main.o
  .text._Z9pre_autonv
                 0x0000000000000000        0x4 build/src/main.o
  .ARM.exidx.text._Z9pre_autonv
                 0x0000000000000000        0x8 build/src/main.o
+ .data.D        0x0000000000000000        0x4 build/src/main.o
+ .data.G        0x0000000000000000        0x4 build/src/main.o
+ .data.Pi       0x0000000000000000        0x4 build/src/main.o
  .llvm_addrsig  0x0000000000000000        0x7 build/src/main.o
  .text          0x0000000000000000        0x0 build/src/robot-config.o
  .data.RemoteControlCodeEnabled

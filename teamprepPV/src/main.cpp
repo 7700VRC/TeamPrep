@@ -23,10 +23,32 @@ using namespace vex;
 competition Competition;
 
 // define your global instances of motors and other devices here
+float D = 4.0; //wheel diameter
+float G=1.0; // outside gear ratio
+float Pi=3.14; 
+
 void drive(int lspeed, int rspeed, int wt){
 LeftMotor.spin(forward, lspeed, pct);
 RightMotor.spin(forward, rspeed, pct);
 wait(wt, msec);
+}
+
+void driveBrake(){
+  LeftMotor.stop(brake);
+  RightMotor.stop(brake);
+}
+
+void inchDrive(float target, float speed=50){
+LeftMotor.setRotation(0, rev);
+float x=0;
+float error=target -x;
+float accuracy=0.2;
+while(fabs(error)>accuracy){
+drive(speed, speed, 10);
+x=LeftMotor.rotation(rev)*Pi*D*G;
+error=target-x;
+}
+driveBrake();
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
