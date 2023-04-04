@@ -10,13 +10,13 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// RMmotor              motor         18              
-// LMmotor              motor         19              
-// RFmotor              motor         17              
-// LBmotor              motor         16              
-// RBmotor              motor         15              
-// LFmotor              motor         2               
+// Controller1          controller
+// RMmotor              motor         2
+// LMmotor              motor         1
+// RFmotor              motor         17
+// LBmotor              motor         16
+// RBmotor              motor         15
+// LFmotor              motor         19
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -27,26 +27,26 @@ using namespace vex;
 competition Competition;
 
 // define your global instances of motors and other devices here
-float D=4.0;
-float G=1.0;
-float Pi=3.14159;
+float D = 4.0;
+float G = 1.0;
+float Pi = 3.14;
 
-int AutonSelected=0;
-int AutonMin=0;
-int AutonMax=4;
+int AutonSelected = 0;
+int AutonMin = 0;
+int AutonMax = 4;
 
-void drawGUI(){
+void drawGUI() {
   Brain.Screen.clearScreen();
-  Brain.Screen.printAt(1, 40, "Select Auton and then press Go..... Also have you ever wondered waht the meaning of life is?");
-  Brain.Screen.printAt(1, 200, "Auton selected=%d  ", AutonSelected);
+  Brain.Screen.printAt(1, 40, "Select Auton then press Go");
+  Brain.Screen.printAt(1, 200, "Auton Selected = %d  ", AutonSelected);
   Brain.Screen.setFillColor(red);
   Brain.Screen.drawRectangle(20, 50, 100, 100);
   Brain.Screen.drawCircle(300, 75, 25);
-  Brain.Screen.printAt(25, 75 , "select");
-
-
-
-Brain.Screen.setFillColor(black);
+  Brain.Screen.printAt(25, 75, "Select");
+  Brain.Screen.setFillColor(green);
+  Brain.Screen.drawRectangle(170, 50, 100, 100);
+  Brain.Screen.printAt(175, 75, "GO");
+  Brain.Screen.setFillColor(black);
 }
 
 void selectAuton() {
@@ -77,10 +77,7 @@ void selectAuton() {
   Brain.Screen.setFillColor(black);
 }
 
-
-
-
-void drive(int lspeed, int rspeed, int wt){
+void drive(int lspeed, int rspeed, int wt) {
   LMmotor.spin(forward, lspeed, pct);
   LFmotor.spin(forward, lspeed, pct);
   LBmotor.spin(forward, lspeed, pct);
@@ -89,35 +86,29 @@ void drive(int lspeed, int rspeed, int wt){
   RBmotor.spin(forward, rspeed, pct);
   wait(wt, msec);
 }
-void driveBrake(){
-LMmotor.stop(brake);
-LFmotor.stop(brake);
-LBmotor.stop(brake);
-RMmotor.stop(brake);
-RFmotor.stop(brake);
-RBmotor.stop(brake);
+void driveBrake() {
+  LMmotor.stop(brake);
+  LFmotor.stop(brake);
+  LBmotor.stop(brake);
+  RMmotor.stop(brake);
+  RFmotor.stop(brake);
+  RBmotor.stop(brake);
 }
 
-
-
-
-
-
-void inchDrive(float target, float speed=50) {
-  float accuracy=0.2;
-  float x=0.0;
-  float error=target-x;
+void inchDrive(float target, float speed = 50) {
+  float accuracy = 0.2;
+  float x = 0.0;
+  float error = target - x;
 
   LMmotor.setRotation(0, rev);
-  while(fabs(error)>accuracy){
-    speed=fabs(speed)*fabs(error)/error;
+  while (fabs(error) > accuracy) {
+    speed = fabs(speed) * fabs(error) / error;
     drive(speed, speed, 10);
-    x=G*LMmotor.rotation(rev)*Pi*D;
-    error=target-x;
+    x = G * LMmotor.rotation(rev) * Pi * D;
+    error = target - x;
   }
   driveBrake();
 }
-
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -133,6 +124,8 @@ void pre_auton(void) {
   vexcodeInit();
   drawGUI();
   Brain.Screen.pressed(selectAuton);
+
+
 }
 
 /*---------------------------------------------------------------------------*/
@@ -147,54 +140,52 @@ void pre_auton(void) {
 
 void autonomous(void) {
 
-switch (AutonSelected) {
+ switch (AutonSelected) {
   case 0:
- wait (1000, msec);
+  //code 0  do Nothing
+  wait(1000, msec);
   break;
     case 1:
+  //code 1
   inchDrive(24);
-wait(1, seconds);
-inchDrive(-24);
+  wait(1, seconds);
+  inchDrive(-24);
   break;
     case 2:
+  //code 2
    inchDrive(48);
-wait(1, seconds);
-inchDrive(-24);
+  wait(1, seconds);
+  inchDrive(-24);
   break;
     case 3:
   //code 3
   break;
-    case 4:
-  //code 4
+   case 4:
+  //code 3
   break;
   }
 
+  
 
-inchDrive(24);
-wait(1, seconds);
-inchDrive(-24);
-
-
-/*
-drive(50, 50, 800);
-driveBrake();
-drive(50, -50, 500);
-driveBrake();
-drive(50, 50, 1000);
-driveBrake();
-drive(-50, 50, 500);
-driveBrake();
-drive(50, 50, 800);
-driveBrake();
-drive(30, -30, 500);
-driveBrake();
-drive (50, 50, 800);
-driveBrake();
-drive(50, 50, 3000);
-driveBrake();
-*/
-
-Brain.Screen.printAt(1, 20, "never gonna give you up never gonna let you down");
+  /*drive(50, 50, 800);
+  driveBrake();
+  drive(50, -50, 500);
+  driveBrake();
+  drive(50, 50, 1000);
+  driveBrake();
+  drive(-50, 50, 500);
+  driveBrake();
+  drive(50, 50, 800);
+  driveBrake();
+  drive(30, -30, 500);
+  driveBrake();
+  drive (50, 50, 800);
+  driveBrake();
+  drive(50, 50, 3000);
+  driveBrake();
+  */
+  Brain.Screen.printAt(1, 20,
+                       "never gonna give you up never gonna let you down");
 }
 
 /*---------------------------------------------------------------------------*/
@@ -210,8 +201,8 @@ Brain.Screen.printAt(1, 20, "never gonna give you up never gonna let you down");
 void usercontrol(void) {
   // User control code here, inside the loop
   while (true) {
-    int lstick=Controller1.Axis3.position(pct);
-    int rstick=Controller1.Axis2.position(pct);
+    int lstick = Controller1.Axis3.position(pct);
+    int rstick = Controller1.Axis2.position(pct);
     drive(lstick, rstick, 10);
   }
 }
@@ -232,4 +223,4 @@ int main() {
     wait(100, msec);
   }
 }
-//where did they all go? all of them?
+// where did they all go? all of them?
