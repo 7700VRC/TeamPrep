@@ -11,6 +11,7 @@ extern motor LB;
 extern motor RB;
 extern motor LF;
 extern motor Intake;
+extern inertial Gyro;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

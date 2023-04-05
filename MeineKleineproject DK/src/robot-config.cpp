@@ -15,6 +15,7 @@ motor RFmotor = motor(PORT17, ratio18_1, true);
 motor LBmotor = motor(PORT16, ratio18_1, true);
 motor RBmotor = motor(PORT15, ratio18_1, false);
 motor LFmotor = motor(PORT19, ratio18_1, false);
+inertial Gyro = inertial(PORT3);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

@@ -10,13 +10,14 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// Controller1          controller
-// RMmotor              motor         2
-// LMmotor              motor         1
-// RFmotor              motor         17
-// LBmotor              motor         16
-// RBmotor              motor         15
-// LFmotor              motor         19
+// Controller1          controller                    
+// RMmotor              motor         2               
+// LMmotor              motor         1               
+// RFmotor              motor         17              
+// LBmotor              motor         16              
+// RBmotor              motor         15              
+// LFmotor              motor         19              
+// Gyro                 inertial      3               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -31,7 +32,7 @@ float D = 4.0;
 float G = 1.0;
 float Pi = 3.14;
 
-int AutonSelected = 0;
+int AutonSelected = 1;
 int AutonMin = 0;
 int AutonMax = 4;
 
@@ -109,6 +110,25 @@ void inchDrive(float target, float speed = 50) {
   }
   driveBrake();
 }
+
+void gyroTurn(float target){
+  Gyro.setRotation(0.0, deg);
+  float heading=0.0;
+  float error=target-heading;
+  float accuracy=1.0;
+  float speed=50;
+  float kp=3.0;
+  float b=5;
+  while(true){//fabs(error)>accuracy){
+    speed=kp*error+b*fabs(error)/error;
+    drive(speed, -speed, 10);
+    heading=Gyro.rotation(deg);
+    error=target-heading;
+    Brain.Screen.printAt(1, 160, "heading = %.2f   deg",heading);
+  }
+  driveBrake();
+  
+}
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -148,8 +168,13 @@ void autonomous(void) {
     case 1:
   //code 1
   inchDrive(24);
-  wait(1, seconds);
-  inchDrive(-24);
+  wait(300,msec);
+  gyroTurn(90);
+while(true){
+  Brain.Screen.printAt(1, 180, "heading = %.2f   deg",Gyro.rotation(deg));
+wait(50, msec);
+}
+  //inchDrive(-24);
   break;
     case 2:
   //code 2

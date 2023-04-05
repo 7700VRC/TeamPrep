@@ -11,12 +11,13 @@
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
 // Controller1          controller                    
-// RMmotor              motor         18              
-// LMmotor              motor         19              
+// RMmotor              motor         2               
+// LMmotor              motor         1               
 // RFmotor              motor         17              
 // LBmotor              motor         16              
 // RBmotor              motor         15              
-// LFmotor              motor         2               
+// LFmotor              motor         19              
+// Gyroscopy            inertial      3               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -31,13 +32,13 @@ float D=4.0;
 float G=1.0;
 float Pi=3.14159;
 
-int AutonSelected=0;
+int AutonSelected=1;
 int AutonMin=0;
 int AutonMax=4;
 
 void drawGUI(){
   Brain.Screen.clearScreen();
-  Brain.Screen.printAt(1, 40, "Select Auton and then press Go..... Also have you ever wondered waht the meaning of life is?");
+  Brain.Screen.printAt(1, 40, "Select Auton and then press Go..... Also have you ever wondered what the meaning of life is?");
   Brain.Screen.printAt(1, 200, "Auton selected=%d  ", AutonSelected);
   Brain.Screen.setFillColor(red);
   Brain.Screen.drawRectangle(20, 50, 100, 100);
@@ -118,6 +119,28 @@ void inchDrive(float target, float speed=50) {
   driveBrake();
 }
 
+void gyroTurn(float target){
+  Gyroscopy.setRotation(0.0, deg);
+  float heading=0.0;
+  float error= target-heading;
+  float accuracy=1.0;
+  float speed=50;
+  float kp=1;
+  float b=5;
+  while(true)//fabs(error)>accuracy)
+  {
+    speed=kp*error+b*fabs(error)/error;
+    drive(speed, -speed, 10);
+    heading=Gyroscopy.rotation(deg);
+    error=target-heading;
+    Brain.Screen.printAt(1, 160, "heading=%.2f     deg", heading);
+  }
+  driveBrake();
+
+}
+
+
+
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -153,8 +176,13 @@ switch (AutonSelected) {
   break;
     case 1:
   inchDrive(24);
-wait(1, seconds);
-inchDrive(-24);
+wait(300, msec);
+gyroTurn(90);
+while(true) {
+Brain.Screen.printAt(1, 180, "heading=%.2f     deg", Gyroscopy.rotation(deg));
+wait(50, msec);
+}
+//inchDrive(-24);
   break;
     case 2:
    inchDrive(48);
@@ -162,7 +190,11 @@ wait(1, seconds);
 inchDrive(-24);
   break;
     case 3:
-  //code 3
+  inchDrive(2);
+  gyroTurn(45);
+  inchDrive(40);
+  gyroTurn(135);
+  inchDrive(2);
   break;
     case 4:
   //code 4

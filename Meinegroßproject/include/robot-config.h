@@ -10,6 +10,7 @@ extern motor RFmotor;
 extern motor LBmotor;
 extern motor RBmotor;
 extern motor LFmotor;
+extern inertial Gyroscopy;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
