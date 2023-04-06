@@ -11,13 +11,15 @@
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
 // Controller1          controller                    
-// RMmotor              motor         2               
-// LMmotor              motor         1               
+// RMmotor              motor         19              
+// LMmotor              motor         18              
 // RFmotor              motor         17              
 // LBmotor              motor         16              
 // RBmotor              motor         15              
-// LFmotor              motor         19              
+// LFmotor              motor         1               
 // Gyroscopy            inertial      3               
+// Color                optical       4               
+// Distan               distance      5               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -140,7 +142,24 @@ void gyroTurn(float target){
 }
 
 
+void getColor(){
+  Color.setLightPower(100);
+  int color= Color.value();
+  Brain.Screen.printAt(1,180, "Color   %d", color);
+  Color.setLightPower(0);
+  }
 
+
+  
+
+void getDistance(){
+  int x=Distan.objectDistance(inches);
+  Brain.Screen.printAt(1, 220, "Distance = %d", x );
+  if(x<7){
+    drive(-50, -50, 1000);
+  }
+
+}
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -245,6 +264,12 @@ void usercontrol(void) {
     int lstick=Controller1.Axis3.position(pct);
     int rstick=Controller1.Axis2.position(pct);
     drive(lstick, rstick, 10);
+    getColor();
+    getDistance();
+
+  
+
+    
   }
 }
 

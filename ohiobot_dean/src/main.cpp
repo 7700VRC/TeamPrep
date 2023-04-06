@@ -1,23 +1,32 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       VEX                                                       */
-/*    Created:      Thu Sep 26 2019                                           */
-/*    Description:  Competition Template                                      */
+/*    Author:       James                                                     */
+/*    Created:      Thu Mar 21 2019                                           */
+/*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
+#include "vex.h"
 
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// LM                   motor         19              
-// RM                   motor         18              
+// LF                   motor         9               
+// LM                   motor         2               
+// LB                   motor         7               
+// RF                   motor         10              
+// RM                   motor         1               
+// RB                   motor         8               
+// Shooter              motor         5               
+// Intake               motor         21              
+// Indexer              digital_out   A               
+// Gyro                 inertial      11              
 // Controller1          controller                    
-// Gyro                 inertial      3               
+// Color                optical       3               
+// Dist                 distance      4               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
-#include "vex.h"
-
+#include "gifclass.h"
 using namespace vex;
 
 // A global instance of competition
@@ -38,6 +47,7 @@ using namespace vex;
 void drawGUI(std::string screen) {
   if (screen == "menu") {
     autonRoutine = "null";
+
 
     Controller1.Screen.clearScreen();
     Controller1.Screen.setCursor(1, 1);
@@ -292,6 +302,17 @@ void drawGUI(std::string screen) {
         wait(0.025, seconds);
       }
     }
+  } else if (screen == "welcome") {
+    Brain.Screen.clearScreen();
+    Brain.Screen.setPenColor(white);
+    Brain.Screen.drawRectangle(200, 185, 102, 48);
+    Brain.Screen.setCursor(11, 22);
+    Brain.Screen.print("Continue");
+    while (true) {
+        if (Brain.Screen.pressing()) {
+          drawGUI("menu");
+      }
+    }
   } else if (screen == "autonRun") {
     Brain.Screen.clearScreen();
     Brain.Screen.setFont(propM);
@@ -309,8 +330,12 @@ void drawGUI(std::string screen) {
 }
 
 void drive(int lspeed, int rspeed, int wt) {
+  LF.spin(forward, lspeed, percent);
   LM.spin(forward, lspeed, percent);
+  LB.spin(forward, lspeed, percent);
+  RF.spin(forward, rspeed, percent);
   RM.spin(forward, rspeed, percent);
+  RB.spin(forward, rspeed, percent);
   wait(wt, msec);
 }
 
@@ -342,7 +367,7 @@ void gyroTurn(float target) {
   float accuracy = 1.0;
   float speed = 30;
   float kp = 1.0;
-  float b = 5;
+  float b = 1.0;
   while (fabs(error) > accuracy) {
     speed = kp * error + b * fabs(error) / error;
     drive(speed, -speed, 10);
@@ -350,6 +375,52 @@ void gyroTurn(float target) {
     error = target - heading;
   }
   driveBrake();
+}
+
+void getColor () {
+  Color.setLightPower(100);
+  int color = Color.value();
+}
+
+void getDistance () {
+  int x = Dist.objectDistance(inches);
+}
+
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*                              User Control Task                            */
+/*                                                                           */
+/*  This task is used to control your robot during the user control phase of */
+/*  a VEX Competition.                                                       */
+/*                                                                           */
+/*  You must modify the code to add your own robot specific commands here.   */
+/*---------------------------------------------------------------------------*/
+
+void usercontrol() {
+  // User control code here, inside the loop
+  while (true) {
+    int lstick = Controller1.Axis3.position(percent);
+    int rstick = Controller1.Axis2.position(percent);
+    drive(lstick, rstick, 10);
+
+    if (Controller1.ButtonL1.pressing()) {
+      Intake.spin(forward, 100, percent);
+    }
+    else if (Controller1.ButtonL2.pressing()) {
+      Intake.spin(reverse, 100, percent);
+    }
+
+    if (Controller1.ButtonR2.pressing()) {
+      Shooter.spin(forward, 70, percent);
+    }
+    
+    if (Controller1.ButtonR1.pressing()) {
+      Indexer.set(true);
+      wait(200, msec);
+      Indexer.set(false);
+    }
+
+  }
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -364,9 +435,8 @@ void gyroTurn(float target) {
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
-  Brain.Screen.drawImageFromFile("logo.png", 0, 0);
-  wait(2, seconds);
-  drawGUI("menu");
+  //Brain.Screen.drawImageFromFile("logo.png", 0, 0);
+  drawGUI("welcome");
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -385,9 +455,11 @@ void autonomous() {
   drawGUI("autonRun");
     if(autonRoutine == "redLeft")
     {
-        inchDrive(24, 30);
         inchDrive(-24, 30);
-        gyroTurn(-90);
+        gyroTurn(180);
+        inchDrive(24, 30);
+        inchDrive(-48, 30);
+
     }
 
     else if(autonRoutine == "redRight")
@@ -423,31 +495,6 @@ void autonomous() {
     //...
 }
 
-/*---------------------------------------------------------------------------*/
-/*                                                                           */
-/*                              User Control Task                            */
-/*                                                                           */
-/*  This task is used to control your robot during the user control phase of */
-/*  a VEX Competition.                                                       */
-/*                                                                           */
-/*  You must modify the code to add your own robot specific commands here.   */
-/*---------------------------------------------------------------------------*/
-
-void usercontrol(void) {
-  // User control code here, inside the loop
-  while (true) {
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
-
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
-    // ........................................................................
-    wait(20, msec); // Sleep the task for a short amount of time to
-                    // prevent wasted resources.
-  }
-}
 
 //
 // Main will set up the competition functions and callbacks.
@@ -465,3 +512,12 @@ int main() {
     wait(100, msec);
   }
 }
+
+/*int main() {
+  vex::Gif gif("rick-roll.gif", 0, 0 );
+
+  while(1) {
+    this_thread::sleep_for(10);
+  }
+}
+*/

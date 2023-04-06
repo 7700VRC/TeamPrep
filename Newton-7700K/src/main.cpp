@@ -18,7 +18,9 @@
 // RB                   motor         15              
 // LF                   motor         2               
 // Intake               motor         13              
-// Gyro                 inertial      3               
+// Gyro                 inertial      12              
+// Color                optical       1               
+// Dist                 distance      5               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -27,11 +29,12 @@ using namespace vex;
 
 float pi = 3.1415926535897932387629433;
 float D = 4.0;
-float G = 1.0;
+float G = 3.0/5.0;
 float Diagonal = 33.941;
 int AutonSelected;
 int AutonMin = 0;
 int AutonMax = 3;
+int Color1 = 0;
 
 void drawGUI(){
   Brain.Screen.clearScreen();
@@ -116,7 +119,7 @@ void gyroTurn(float target){
   float error = target - heading;
   float accuracy = 1.0;
   float speed = 50;
-  float kp = 0.5;
+  float kp = 0.25;
   float b=5.0;
   while(fabs(error)>accuracy)
   {
@@ -127,6 +130,23 @@ void gyroTurn(float target){
     Brain.Screen.printAt(1, 160, "heading = %.2f  deg", heading);
   }
   driveBrake();
+}
+void getColor(){
+  Color.setLightPower(50);
+  Color1 = Color.value();
+  Brain.Screen.printAt(1, 200, "Color   %d    ",Color1);
+
+  //red is 19-35
+  //blue is 170-220
+
+}
+void getDistance(){
+  int x = Dist.objectDistance(inches);
+  Brain.Screen.printAt(1, 220, "Distance   %d    ",x);
+}
+void spinIntake(int sp, int wt = 0){
+  Intake.spin(forward, sp, pct);
+  wait(wt, msec);
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -158,24 +178,40 @@ void pre_auton() {
 void autonomous(void) {
   switch (AutonSelected) {
   case 0:
-  inchDrive(38);
+    drive(-10, -10, 120);
+    while(Color1 >= 0 && Color1 <= 100){
+      getColor();
+      spinIntake(-90, 10);
+      Brain.Screen.printAt(1, 240, "Color   %d    ",Color1);
+    }
+    spinIntake(0);
+    inchDrive(20);
+    gyroTurn(40);
+    driveBrake();
+    inchDrive(150);
+    gyroTurn(-130);
+    inchDrive(-40);
+    while(Color1 >= 19 && Color1 <= 35){
+      spinIntake(-90);
+    }
+
+  break;
+  case 1:
+   inchDrive(38);
   gyroTurn(45);
   driveBrake();
-  inchDrive(11*Diagonal);
+  inchDrive(150);
   gyroTurn(-130);
   inchDrive(-40);
   
   break;
-    case 1:
-  inchDrive(-24);
+  case 2:
+    drive(50, -50, 1000);
+    driveBrake();
   break;
-    case 2:
-  drive(50, -50, 1000);
-  driveBrake();
-  break;
-    case 3:
-  drive(-50, 50, 1000);
-  driveBrake();
+  case 3:
+    drive(-50, 50, 1000);
+    driveBrake();
   break;
   }
   /*
@@ -217,6 +253,17 @@ void driver(void) {
     float lstick=.75*Controller1.Axis3.position(pct);
     float rstick=.75*Controller1.Axis2.position(pct);
     drive(lstick, rstick, 10);
+    if(Controller1.ButtonR1.pressing()){
+      spinIntake(90);
+    }
+    else if(Controller1.ButtonR2.pressing()){
+      spinIntake(-90);
+    }
+    else{
+      spinIntake(0);
+    }
+    getColor();
+    getDistance();
   }
 }
 
