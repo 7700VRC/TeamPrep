@@ -11,6 +11,9 @@ extern motor LBmotor;
 extern motor RBmotor;
 extern motor LFmotor;
 extern inertial Gyro;
+extern optical Color;
+extern distance Dist;
+extern motor Intake;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

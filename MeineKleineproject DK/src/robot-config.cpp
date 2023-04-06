@@ -16,6 +16,9 @@ motor LBmotor = motor(PORT16, ratio18_1, true);
 motor RBmotor = motor(PORT15, ratio18_1, false);
 motor LFmotor = motor(PORT19, ratio18_1, false);
 inertial Gyro = inertial(PORT3);
+optical Color = optical(PORT4);
+distance Dist = distance(PORT5);
+motor Intake = motor(PORT13, ratio6_1, false);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

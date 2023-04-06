@@ -18,6 +18,9 @@
 // RBmotor              motor         15              
 // LFmotor              motor         19              
 // Gyro                 inertial      3               
+// Color                optical       4               
+// Dist                 distance      5               
+// Intake               motor         13              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -129,6 +132,23 @@ void gyroTurn(float target){
   driveBrake();
   
 }
+
+void getColor(){
+  Color.setLightPower(100);  
+  int color = Color.value();
+  Brain.Screen.printAt(1, 180, "Color  %d  ",color);
+  Color.setLightPower(0);
+}
+
+void getDistance(){
+  int x=Dist.objectDistance(inches);
+  Brain.Screen.printAt(1, 220, "Distance = %d   ",x);
+}
+
+void spinIntake(int sp, int wt=0){
+  Intake.spin(forward, sp, pct);
+  wait(wt, msec);
+}
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -229,6 +249,18 @@ void usercontrol(void) {
     int lstick = Controller1.Axis3.position(pct);
     int rstick = Controller1.Axis2.position(pct);
     drive(lstick, rstick, 10);
+    getColor();
+    getDistance();
+
+    if(Controller1.ButtonR1.pressing())
+    {
+      spinIntake(90);
+    }
+    else if (Controller1.ButtonR2.pressing())
+    {
+      spinIntake(-90);
+    }
+    else spinIntake(0);
   }
 }
 
