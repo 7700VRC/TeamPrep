@@ -15,9 +15,12 @@
 // RightFront           motor         5               
 // LeftBack             motor         7               
 // RightBack            motor         6               
+// Gyro                 inertial      2               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
+#include <algorithm>
+#include <iostream>
 
 using namespace vex;
 
@@ -49,11 +52,13 @@ void drivecoast(){
 }
 
 void inchDrive(float target){
-  float xl = 0.0;
-  float xr = 0.0;
+  float xl=0.0;
+  float xr=0.0;
   float error=target-xl;
   float accuracy=0.2;
   float kp=5.0;
+  float ks=0.0;
+  float speed=kp*error;
   float steer=xr-xl;
   float lspeed=kp*error+steer;
   float rspeed=kp*error-steer;
@@ -61,10 +66,15 @@ void inchDrive(float target){
   LeftFront.setRotation(0, rev);
   RightFront.setRotation(0, rev);
   while(fabs(error)>accuracy){
-    steer=xr-xl;
-    lspeed=kp*error+steer;
-    rspeed=kp*error-steer;
-    drive(lspeed, rspeed, 10);
+    steer=ks*(xr-xl);
+    speed=kp*error;
+
+    speed=std::min(speed,float(70));
+    speed=std::max(speed,float(-70));
+
+    lspeed=speed+(ks*steer);
+    rspeed=speed-(ks*steer);
+    drive(lspeed,rspeed,10);
 
     xl=LeftFront.rotation(rev)*Pi*D*G;
     xr=RightFront.rotation(rev)*Pi*D*D;
@@ -72,48 +82,52 @@ void inchDrive(float target){
   }
   driveBrake();
 }
+void gyroTurn(float target){
+  Gyro.setRotation(0.0, degrees);
+  float heading=0.0;
+  float error=target-heading;
+  float oldError=error;
+  float accuracy=2.0;
+  float kp=1;
+  float kd=0.1;
+  
+  while(fabs(error)> accuracy){
+    drive(kp*error+kd*(error-oldError), -(kp*error+kd*(error-oldError)), 10);
+    heading=Gyro.rotation(degrees);
+    oldError=error;
+    error=target-heading;
+    std::cout<<heading<<std::endl;
+  }
+  driveBrake();
+}
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
-/*  You may want to perform some actions before the competition starts.      */
-/*  Do them in the following function.  You must return from this function   */
-/*  or the autonomous and usercontrol tasks will not be started.  This       */
-/*  function is only called once after the V5 has been powered on and        */
-/*  not every time that the robot is disabled.                               */
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
-
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
 }
 
 /*---------------------------------------------------------------------------*/
+/*                            Autonomous Functions                           */
 /*                                                                           */
-/*                              Autonomous Task                              */
-/*                                                                           */
-/*  This task is used to control your robot during the autonomous phase of   */
-/*  a VEX Competition.                                                       */
-/*                                                                           */
-/*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  inchDrive(80);
-  wait(1000, msec);
-  inchDrive(-80);
+  inchDrive(52);
+  wait(100, msec);
+  gyroTurn(90);
+  wait(100, msec);
+  inchDrive(100);
+  wait(100, msec);
+
 }
 
 /*---------------------------------------------------------------------------*/
-/*                                                                           */
 /*                              User Control Task                            */
 /*                                                                           */
-/*  This task is used to control your robot during the user control phase of */
-/*  a VEX Competition.                                                       */
-/*                                                                           */
-/*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {

@@ -13,6 +13,7 @@ motor LeftFront = motor(PORT4, ratio18_1, true);
 motor RightFront = motor(PORT5, ratio18_1, false);
 motor LeftBack = motor(PORT7, ratio18_1, true);
 motor RightBack = motor(PORT6, ratio18_1, false);
+inertial Gyro = inertial(PORT2);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

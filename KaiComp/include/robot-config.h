@@ -8,6 +8,7 @@ extern motor LeftFront;
 extern motor RightFront;
 extern motor LeftBack;
 extern motor RightBack;
+extern inertial Gyro;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
