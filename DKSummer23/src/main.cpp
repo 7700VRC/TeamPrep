@@ -10,17 +10,14 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// LeftFront            motor         4               
-// RightFront           motor         5               
-// RightBack            motor         6               
-// LeftBack             motor         7               
-// Gyro                 inertial      2               
+// Controller1          controller
+// LeftFront            motor         4
+// RightFront           motor         5
+// RightBack            motor         6
+// LeftBack             motor         7
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
-#include <algorithm>
-#include <iostream>
 
 using namespace vex;
 
@@ -28,9 +25,10 @@ using namespace vex;
 competition Competition;
 
 // define your global instances of motors and other devices here
-float D = 4.0;   // wheel diameter in inches
-float G = 1.4;   // gear ration
-float Pi = 3.14; // value of pi
+float D = 4.0;       // wheel diameter inches
+float G = 7.0 / 5.0; // gear ratio
+float Pi = 3.14;
+
 void drive(int lspeed, int rspeed, int wt) {
   LeftFront.spin(forward, lspeed, pct);
   RightFront.spin(forward, rspeed, pct);
@@ -46,7 +44,7 @@ void driveBrake() {
   RightBack.stop(brake);
 }
 
-void driveCoast() {
+void drivecoast() {
   LeftFront.stop(coast);
   RightFront.stop(coast);
   LeftBack.stop(coast);
@@ -60,43 +58,21 @@ void inchDrive(float target) {
   float accuracy = 0.2;
   float steer = xr - xl;
   float kp = 5.0;
-  float ks = 3.0;
-  float speed = kp * error;
   float lspeed = kp * error + steer;
   float rspeed = kp * error - steer;
   LeftFront.setRotation(0, rev);
   RightFront.setRotation(0, rev);
   while (fabs(error) > accuracy) {
-    steer = ks * (xr - xl);
-    speed = kp * error;
-    speed = std::min(speed, float(75));
-    speed = std::max(speed, float(-75));
-    lspeed = speed + steer;
-    rspeed = speed - steer;
+    steer = xr - xl;
+    lspeed = kp * error + steer;
+    rspeed = kp * error - steer;
     drive(lspeed, rspeed, 10);
+
     xl = LeftFront.rotation(rev) * Pi * D * G;
     xr = RightFront.rotation(rev) * Pi * D * G;
     error = target - xl;
   }
   driveBrake();
-}
-
-void gyroTurn(float target){
-  Gyro.setRotation(0.0, degrees);
-  float heading = 0.0;
-  float error = target - heading;
-  float oldError = error;
-  float accuracy = 2.0;
-  float kp = 0.5;
-  float kd = 5.0; 
-  while (fabs(error) > accuracy){
-    drive(kp * error + kd * (error - oldError), -kp * error + kd * (error - oldError), 10);
-    heading = Gyro.rotation(degrees);
-    oldError = error; 
-    error = target - heading;
-    std::cout << heading << std::endl; 
-   }  
-   driveBrake();  
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -127,11 +103,9 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  inchDrive(60);
-  
-  gyroTurn(90);
-  
-  inchDrive(70);
+  inchDrive(24);
+  wait(1000, msec);
+  inchDrive(-24);
 }
 
 /*---------------------------------------------------------------------------*/
