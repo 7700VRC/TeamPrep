@@ -10,14 +10,17 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// Controller1          controller
-// LeftFront            motor         4
-// RightFront           motor         5
-// RightBack            motor         6
-// LeftBack             motor         7
+// Controller1          controller                    
+// LeftFront            motor         4               
+// RightFront           motor         5               
+// RightBack            motor         6               
+// LeftBack             motor         7               
+// Gyro                 inertial      3               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
+#include <algorithm>
+#include <iostream>
 
 using namespace vex;
 
@@ -58,14 +61,21 @@ void inchDrive(float target) {
   float accuracy = 0.2;
   float steer = xr - xl;
   float kp = 5.0;
+  float ks = 1.0;
+  float speed = kp * error;
   float lspeed = kp * error + steer;
   float rspeed = kp * error - steer;
   LeftFront.setRotation(0, rev);
   RightFront.setRotation(0, rev);
   while (fabs(error) > accuracy) {
-    steer = xr - xl;
-    lspeed = kp * error + steer;
-    rspeed = kp * error - steer;
+    steer = ks * (xr - xl);
+    speed = kp * error;
+
+    speed = std::min(speed, float(100.0));
+    speed = std::max(speed, float(-100.0));
+
+    lspeed = speed + steer;
+    rspeed = speed - steer;
     drive(lspeed, rspeed, 10);
 
     xl = LeftFront.rotation(rev) * Pi * D * G;
@@ -73,6 +83,22 @@ void inchDrive(float target) {
     error = target - xl;
   }
   driveBrake();
+}
+
+void gyroTurn(float target){
+  Gyro.setRotation(0.0, degrees);
+  float heading=0.0;
+  float error=target-heading;
+  float accuracy=2.0;
+  float kp=1.0;
+  while(true){
+    drive(kp*error, -kp*error, 10);
+    heading=Gyro.rotation(degrees);
+    error=target-heading;
+    std::cout<<heading<<std::endl;
+}
+  driveBrake();
+
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
