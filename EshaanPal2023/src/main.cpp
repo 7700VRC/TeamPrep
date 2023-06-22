@@ -10,12 +10,12 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// LeftFront            motor         4               
-// RightFront           motor         5               
-// RightBack            motor         6               
-// LeftBack             motor         7               
-// Gyro                 inertial      2               
+// Controller1          controller
+// LeftFront            motor         4
+// RightFront           motor         5
+// RightBack            motor         6
+// LeftBack             motor         7
+// Gyro                 inertial      2
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -54,9 +54,13 @@ void driveCoast() {
 }
 
 void inchDrive(float target) {
+  float avgSpeed[10] = {0};
+  int i = 0;
   float xl = 0.0;
   float xr = 0.0;
   float error = target - xl;
+  float oldError = error;
+  float counter = 0.0;
   float accuracy = 0.2;
   float steer = xr - xl;
   float kp = 5.0;
@@ -67,36 +71,56 @@ void inchDrive(float target) {
   LeftFront.setRotation(0, rev);
   RightFront.setRotation(0, rev);
   while (fabs(error) > accuracy) {
-    steer = ks * (xr - xl);
+    steer = ks * Gyro.yaw(degrees);
     speed = kp * error;
-    speed = std::min(speed, float(75));
-    speed = std::max(speed, float(-75));
-    lspeed = speed + steer;
-    rspeed = speed - steer;
+
+    speed = std::min(speed, float(80.0));
+    speed = std::max(speed, float(-80.0));
+
+    if (i > 99)
+      i = 0;
+    avgSpeed[i] = speed;
+    speed = 0.0;
+    for (int j = 0; j < 100; j++) {
+      speed = speed + avgSpeed[j];
+    }
+    i++;
+    speed = speed / 100;
+    std::cout << speed << std::endl;
+    lspeed = speed - steer;
+    rspeed = speed + steer;
     drive(lspeed, rspeed, 10);
+
     xl = LeftFront.rotation(rev) * Pi * D * G;
-    xr = RightFront.rotation(rev) * Pi * D * G;
+    oldError = error;
     error = target - xl;
+    if (fabs(error - oldError) < 0.01)
+      counter++;
+    else
+      counter = 0;
+    if (counter > 10)
+      break;
   }
   driveBrake();
 }
 
-void gyroTurn(float target){
+void gyroTurn(float target) {
   Gyro.setRotation(0.0, degrees);
   float heading = 0.0;
   float error = target - heading;
   float oldError = error;
   float accuracy = 2.0;
   float kp = 0.5;
-  float kd = 5.0; 
-  while (fabs(error) > accuracy){
-    drive(kp * error + kd * (error - oldError), -kp * error + kd * (error - oldError), 10);
+  float kd = 5.0;
+  while (fabs(error) > accuracy) {
+    drive(kp * error + kd * (error - oldError),
+          -kp * error + kd * (error - oldError), 10);
     heading = Gyro.rotation(degrees);
-    oldError = error; 
+    oldError = error;
     error = target - heading;
-    std::cout << heading << std::endl; 
-   }  
-   driveBrake();  
+    std::cout << heading << std::endl;
+  }
+  driveBrake();
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -127,11 +151,9 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  inchDrive(60);
-  
-  gyroTurn(90);
-  
-  inchDrive(70);
+  inchDrive(80);
+  wait(100, msec);
+  inchDrive(-80);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -146,13 +168,42 @@ void autonomous(void) {
 
 void usercontrol(void) {
   // User control code here, inside the loop
-  int lstick = 0;
-  int rstick = 0;
+  float avglSpeed[10] = {0};
+  float avgrSpeed[10] = {0};
+  float speed = 0.0;
+  int lspeed = 0;
+  int rspeed = 0;
+  int i = 0;
   while (true) {
-    lstick = Controller1.Axis3.position();
-    rstick = Controller1.Axis2.position();
 
-    drive(lstick, rstick, 10);
+    speed = Controller1.Axis3.position();
+
+    if (i > 9)
+      i = 0;
+    avglSpeed[i] = speed;
+    speed = 0.0;
+    for (int j = 0; j < 10; j++) {
+      speed = speed + avglSpeed[j];
+    }
+    lspeed = speed / 10;
+
+    speed = Controller1.Axis2.position();
+
+    if (i > 9)
+      i = 0;
+    avgrSpeed[i] = speed;
+    speed = 0.0;
+    for (int j = 0; j < 10; j++) {
+      speed = speed + avgrSpeed[j];
+    }
+    rspeed = speed / 10;
+
+    std::cout << "lspeed:" << lspeed << "rspeed:" << rspeed << std::endl;
+
+    i++;
+  
+
+    drive(lspeed, rspeed, 10);
   }
 }
 
