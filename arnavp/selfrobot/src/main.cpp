@@ -20,6 +20,9 @@ controller Controller1 = controller(primary);
 motor LeftMotor = motor(PORT10, ratio18_1, false);
 motor RightMotor = motor(PORT1, ratio18_1, true);
 
+float PI = 3.14;
+float D = 4.0;
+
 // define your global instances of motors and other devices here
 void drive(int leftSpeed, int rightSpeed, int wt){
   leftSpeed *= 120;
@@ -27,6 +30,17 @@ void drive(int leftSpeed, int rightSpeed, int wt){
   LeftMotor.spin(forward, leftSpeed, voltageUnits::mV);
   RightMotor.spin(forward, rightSpeed, voltageUnits::mV);
   wait(wt, msec);
+}
+void inchDrive(float target){
+  //Distance robot has traveled at the start
+  float x = 0.00;
+  //Setting motor revolution posisition to zero
+  LeftMotor.setPosition(0.0, rev);
+  while(x<target){
+    drive(50, 50, 10);
+    x = PI * D * LeftMotor.position(rev);
+  }
+  drive(0,0,0);
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -55,8 +69,9 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  drive(50, 50, 200);
-  drive(0, 0, 0);
+  //drive(50, 50, 200);
+  //drive(0, 0, 0);
+  inchDrive(10.0);
 }
 
 
