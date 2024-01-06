@@ -21,8 +21,8 @@ motor LeftMotor = motor(PORT10, ratio18_1, false);
 motor RightMotor = motor(PORT1, ratio18_1, true);
 
 float PI = 3.14;
-float D = 4.0;
-
+float D = 4.0; //wheel diamiter 
+float width = 11.5; // robot width 
 // define your global instances of motors and other devices here
 void drive(int leftSpeed, int rightSpeed, int wt){
   leftSpeed *= 120;
@@ -42,6 +42,19 @@ void inchDrive(float target){
   }
   drive(0,0,0);
 }
+void turnDegrees(float degrees){
+float x = 0.00; 
+float distTarget= (2 * PI * width * degrees)/ 360;
+LeftMotor.setPosition(0.0, rev);
+while(x<distTarget){
+  drive(50, -50, 10);
+  x = PI * D * LeftMotor.position(rev);
+}
+
+
+
+}
+  
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -71,7 +84,11 @@ void pre_auton(void) {
 void autonomous(void) {
   //drive(50, 50, 200);
   //drive(0, 0, 0);
-  inchDrive(10.0);
+  inchDrive(30.0);
+  turnDegrees(180);
+  inchDrive (30.0);
+  //wait for 2 seconds
+
 }
 
 // test comment
