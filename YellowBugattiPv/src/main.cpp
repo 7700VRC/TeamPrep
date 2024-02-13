@@ -11,8 +11,10 @@
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
 // Controller1          controller                    
-// LeftMotor            motor         1               
-// RightMotor           motor         10              
+// LeftMotor            motor         19              
+// RightMotor           motor         9               
+// Roller               motor         20              
+// ColorSensor          optical       10              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -78,7 +80,16 @@ void usercontrol(void) {
     int lstick=Controller1.Axis3.position();
     int rstick=Controller1.Axis2.position();
     drive(lstick, rstick, 10);
+    if(Controller1.ButtonR1.pressing()){
+    Roller.spin(forward, 70, pct);
 
+  }
+  else if(Controller1.ButtonR2.pressing()){
+    Roller.spin(forward, -70, pct);
+  }
+  else{
+    Roller.spin(forward, 0, pct);
+  }
   }
 }
 //

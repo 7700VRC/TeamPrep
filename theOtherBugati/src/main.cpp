@@ -13,6 +13,8 @@
 // Controller1          controller                    
 // LeftMotor            motor         1               
 // RightMotor           motor         10              
+// Roller               motor         2               
+// Color                optical       3               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -77,7 +79,7 @@ void pre_auton(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
-void autonomous(void) {
+void autonomous(void) { 
 wait(500, msec);
 InchDrive(24);
 drive(50, -50, 660);
@@ -99,17 +101,26 @@ DriveBrake();
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
-
 void usercontrol(void) {
   // User control code here, inside the loop
   while (true) {
+  
     int lstick=Controller1.Axis3.position();
     int rstick=Controller1.Axis2.position();
     drive(lstick, rstick, 10);
-    
+
+    if(Controller1.ButtonR1.pressing()){
+      Roller.spin(forward, 70, pct);
+    }
+  else if(Controller1.ButtonR2.pressing()){
+    Roller.spin(forward, -70, pct);
+  }
+  else{
+    Roller.spin(forward, 0, pct);
+  }
   }
 }
-
+// What is the chromatic shade of your quad wheeled back wheel drive auto transmission bugatti bra
 //
 // Main will set up the competition functions and callbacks.
 //
