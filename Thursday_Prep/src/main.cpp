@@ -11,9 +11,9 @@
 
 using namespace vex;
 using namespace std; 
-{
+
   
-} // namespace std; 
+  // namespace std; 
 
 
 // A global instance of competition
