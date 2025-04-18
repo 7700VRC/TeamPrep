@@ -1,19 +1,11 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       DK 7700                                                   */
-/*    Created:      May 13, 2022                                              */
-/*    Description:  Speed Control for 2 motor Flywheel testing                */
+/*    Author:       Jason Au                                                  */
+/*    Created:      4/17/2025, 4:05:56 PM                                     */
+/*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// F1                   motor         1               
-// F2                   motor         2               
-// ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
 
@@ -23,52 +15,8 @@ using namespace vex;
 competition Competition;
 
 // define your global instances of motors and other devices here
-double OldError = 0.0;
-double TBHval = 0.0;
-double FWDrive = 0.0;
 
-void spinFlywheel(double speed) {
-  speed = speed * 120; // speed is in percentage so convert to mV 100% = 12000
-                       // mV
-  F1.spin(forward, speed, voltageUnits::mV);
-  F2.spin(forward, speed, voltageUnits::mV);
-}
-
-void controlFlywheelSpeed(double target) {
-  double kI = .025;
-  double speed = F1.velocity(percent);
-  double error = target - speed;
-  double fwDrive = FWDrive + kI * error;
-// :D
-   Brain.Screen.printAt(1, 40, " speed = %.2f ", speed);
-  // Keep drive between 0 to 100%
-  if (fwDrive > 100)
-    fwDrive = 100;
-  if (fwDrive < 0)
-    fwDrive = 0;
-  // Check for zero crossing
-  if (error * OldError < 0) {
-    fwDrive = 0.5 * (fwDrive + TBHval);
-    TBHval = fwDrive;
-  }
-  
-
-  Brain.Screen.printAt(180, 40, "fwdrive %.1f  ", fwDrive);
-  spinFlywheel(fwDrive);
-
-  FWDrive = fwDrive;
-  OldError = error;
-}
-
-void flywheelMonitor() {
-  double current1 = F1.current();
-  double current2 = F2.current();
-  double t1 = F1.temperature(celsius);
-  double t2 = F2.temperature(celsius);
-
-  Brain.Screen.printAt(1, 60, "F1 current = %.1f   Temp = %.1f   ", current1, t1);
-  Brain.Screen.printAt(1, 80, "F2 current = %.1f   Temp = %.1f   ", current2, t2);
-}
+brain Brain;
 
 
 /*---------------------------------------------------------------------------*/
@@ -82,11 +30,31 @@ void flywheelMonitor() {
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
-  // Initializing Robot Configuration. DO NOT REMOVE!
-  vexcodeInit();
 
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
+}
+
+//screen pixle extremes are 0,0 and 480,272
+
+void draw_brain_screen () {
+  Brain.Screen.printAt (240, 135, "middle");
+  Brain.Screen.printAt (100, 80, "quadrent 2");
+  Brain.Screen.printAt (100, 200, "quadrent 3");
+  Brain.Screen.printAt (360, 80, "quadrent 1");
+  Brain.Screen.printAt (360, 200, "quadrent 4");
+}
+
+int draw_shapes (){
+
+Brain.Screen.setFillColor (yellow);
+Brain.Screen.setPenColor (white);
+Brain.Screen.setPenWidth (5);
+Brain.Screen.drawRectangle(360, 50, 70, 70);
+Brain.Screen.setFillColor (green);
+Brain.Screen.setPenColor (black);
+Brain.Screen.drawCircle(395, 85, 25);
+  return 0;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -100,8 +68,17 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  spinFlywheel(34);
+  // ..........................................................................
+  // Insert autonomous user code here.
+  // ..........................................................................
+
+  draw_brain_screen ();
+  wait (1, sec);
+  Brain.Screen.clearScreen ();
+  draw_shapes();
+
 }
+
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              User Control Task                            */
@@ -113,64 +90,17 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
+  // User control code here, inside the loop
+  while (1) {
+    // This is the main execution loop for the user control program.
+    // Each time through the loop your program should update motor + servo
+    // values based on feedback from the joysticks.
 
-  double targetSpeed = 0.0;
-  bool alg = true;
-  bool flag = true;
-  while (true) {
+    // ........................................................................
+    // Insert user code here. This is where you use the joystick values to
+    // update your motors, etc.
+    // ........................................................................
 
-    if (Controller1.ButtonA.pressing())
-      targetSpeed = 0;
-
-    if (Controller1.ButtonB.pressing())
-      targetSpeed = 17;
-
-    if (Controller1.ButtonY.pressing())
-      targetSpeed = 34;
-    if (Controller1.ButtonX.pressing())
-      targetSpeed = 68;
-    if (Controller1.ButtonUp.pressing())
-      targetSpeed = 90;
-    Brain.Screen.printAt(1, 20, "target speed = %.2f ", targetSpeed);
-    if(Controller1.ButtonDown.pressing() && flag){
-      flag = false;
-      alg = !alg;
-    }
-    if (!Controller1.ButtonDown.pressing()){
-      flag = true;
-    }
-    if (alg){
-      controlFlywheelSpeed(targetSpeed);
-      Brain.Screen.printAt(1, 120, "controlled speed    ");
-    }
-    else {
-      spinFlywheel(targetSpeed);
-        double speed = F1.velocity(percent);
-
-      Brain.Screen.printAt(1, 120, "not controlled     ");
-      Brain.Screen.printAt(1, 40, " speed = %.2f ", speed);
-    }
-
-    
-      
-  //targetSpeed = targetSpeed / 6.0;
-  // ew
-  // help 
-  // currently suffering from secondhand smoking
-  // i am now a potted potato
-  // "secondhand potato" - aidan 
- // h
- // the mitochondria is the powerhouse of the cell losers
- //  
-   //spinFlywheel(targetSpeed);
-   // pogchamp
-   // ur mom
-   // deez nuts
-   // lmao
-   // hkgtckutxkrtyghv
-   //yo so like renee was here and shes like and totally super amazing and tall yeah 
-    flywheelMonitor();
-    
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
