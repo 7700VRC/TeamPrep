@@ -1,42 +1,50 @@
+
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       student                                                   */
-/*    Created:      3/27/2025, 5:16:32 PM                                     */
+/*    Author:       Phoenix                                                   */
+/*    Created:      4/17/2025, 4:09:31 PM                                     */
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
 #include "vex.h"
-
 using namespace vex;
-using namespace std; 
-
-  
-  // namespace std; 
-
 
 // A global instance of competition
 competition Competition;
 
-//define drive motors
-motor RBM = motor (PORT11, ratio18_1, true); 
-motor LBM = motor (PORT12, ratio18_1, false);
-motor RFM = motor (PORT3, ratio18_1, true);
-motor LFM = motor (PORT2, ratio18_1, false);
-//define other motors
-motor INTAKE = motor (PORT4, ratio18_1, false);
-motor CLAMP = motor (PORT16, ratio18_1, false);
-
-//Define Control
-controller c1;
-
-
 // define your global instances of motors and other devices here
+brain Brain;
+
+void drawonscreen () {
+  Brain.Screen.printAt ( 140, 135, "middle");
+
+  Brain.Screen.printAt ( 120, 80, "left top");
+
+  Brain.Screen.printAt ( 320, 80, "right top");
+
+  Brain.Screen.printAt ( 120, 215, "bottom left");
+
+  Brain.Screen.printAt (260, 215, "bottom right");
+  }
+
+
+int drawshapes () {
+
+Brain.Screen.setPenColor(purple);
+Brain.Screen.setFillColor(orange);
+Brain.Screen.drawRectangle(240, 135, 90, 90);
+Brain.Screen.setPenColor(green);
+Brain.Screen.setFillColor(blue);
+Brain.Screen.drawCircle(285, 180, 20);
+
+  return 0;
+}
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
-/*                                                                           */
+/*                                                                           */ 
 /*  You may want to perform some actions before the competition starts.      */
 /*  Do them in the following function.  You must return from this function   */
 /*  or the autonomous and usercontrol tasks will not be started.  This       */
@@ -64,6 +72,11 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
+ drawonscreen();
+ vex::wait (1, sec);
+ Brain.Screen.clearScreen();
+ drawshapes(); 
+
 }
 
 /*---------------------------------------------------------------------------*/
@@ -79,36 +92,14 @@ void autonomous(void) {
 void usercontrol(void) {
   // User control code here, inside the loop
   while (1) {
+    // This is the main execution loop for the user control program.
+    // Each time through the loop your program should update motor + servo
+    // values based on feedback from the joysticks.
 
-//drive code    
-int rspeed = c1.Axis2.position (pct);
-int lspeed = c1.Axis3.position (pct);
-RBM.setVelocity (rspeed, pct);
-RFM.setVelocity (rspeed, pct);
-LBM.setVelocity (lspeed, pct);
-LFM.setVelocity (lspeed, pct);
-
-RBM.spin (forward);
-RFM.spin (forward);
-LBM.spin (forward);
-LFM.spin (forward);
-
-//clamp and intake
-if (c1.ButtonR1.pressing ()){
-  INTAKE.spin (forward, 75, pct);
-}
-else if(c1.ButtonR2.pressing ()){
-  INTAKE.spin (forward, -75, pct);
-}
-else {INTAKE.stop ();}
-
-if (c1.ButtonL1.pressing ()){
-  CLAMP.spin (forward, 75, pct);
-}
-else if(c1.ButtonL2.pressing ()){
-  CLAMP.spin (forward, -75, pct);
-}
-else {CLAMP.stop ();}
+    // ........................................................................
+    // Insert user code here. This is where you use the joystick values to
+    // update your motors, etc.
+    // ........................................................................
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
