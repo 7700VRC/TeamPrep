@@ -4,7 +4,7 @@
 /*    Author:       Kieran Paramasivum                                        */
 /*    Created:      4/14/2025, 4:47:20 PM                                     */
 /*    Description:  7700F practice                                            */
-/*                                                                            */
+/*    I am using team prep robot.                                             */
 /*----------------------------------------------------------------------------*/
 
 #include "vex.h"
@@ -16,18 +16,52 @@ competition Competition;
 
 // define your global instances of motors and other devices here
 brain Brain;
+
+motor LF (PORT7, ratio18_1, false);
+motor LB (PORT18, ratio18_1, false);
+motor RF (PORT20, ratio18_1, true);
+motor RB (PORT9, ratio18_1, true);
+
+float dia = 4.00;
+float gear_Rtio = 1.00;
+
+// formula for gear ratio, driven gear divided by driving gear = ratio 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
-void screenPrinting (int x1, int x2, int y1, int y2) {
-Brain.Screen.printAt(x1, y1, ":/ ");
+  void moveRobot(int rspeed, int lspeed, int duration){
+  LF.spin(forward, lspeed, pct );
+  LB.spin(forward, lspeed, pct );
+  RF.spin(forward, rspeed, pct );
+  RB.spin(forward, rspeed, pct );
 
-Brain.Screen.printAt(x2, y2, ":)");
+  wait(duration, msec);
+  }
+  
+  void stopRobot() {
+    LF.stop(brake);
+    LB.stop(brake);
+    RF.stop(brake);
+    RB.stop(brake);
 
-Brain.Screen.setPenColor(green);
-Brain.Screen.setFillColor(yellow);
-Brain.Screen.drawRectangle(10, 230, 5, 5);
+  }
 
-}
+  void inchDrive(int inches){
+    float x = 0;
+    float error = inches - x;
+    float kp = 3;
+    float speed = kp * error;
+
+    LF.setPosition(0, rev);
+
+    while (fabs(error) > 0.5) {
+      moveRobot(speed, speed, 10);
+      x = LF.position(rev) * M_PI * dia * gear_Rtio; //distance robot has moved
+      error = inches - x;
+      speed = kp * error;
+    }
+    stopRobot();
+    Brain.Screen.printAt(10, 20, "distance = %0.1f", x);
+  }
 /*---------------------------------------------------------------------------*/
 
 //Part of Pre-Auton
@@ -48,9 +82,14 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  // ..........................................................................
-  // Insert autonomous user code here.
-  // ..........................................................................
+
+  inchDrive(12);
+  //moveRobot(50, -50, 950);
+  //inchDrive(12);
+  
+  stopRobot();
+
+
 }
 
 /*---------------------------------------------------------------------------*/
@@ -75,10 +114,6 @@ void usercontrol(void) {
 // Main will set up the competition functions and callbacks.
 //
 int main() {
-  screenPrinting(242,400,135,10 ); //These numbers represent x1,x2,y1,y2 as definied in the Screen Printing section
-  wait(2, sec);
-  Brain.Screen.clearScreen();
-  screenPrinting(42,250, 100, 50);
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
