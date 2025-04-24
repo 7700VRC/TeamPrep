@@ -1,10 +1,10 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       Kieran Paramasivum                                        */
-/*    Created:      4/14/2025, 4:47:20 PM                                     */
-/*    Description:  7700F practice                                            */
-/*    I am using team prep robot.                                             */
+/*    Author:       Jason Au                                                  */
+/*    Created:      4/17/2025, 4:05:56 PM                                     */
+/*    Description:  V5 project                                                */
+/*                                                                            */
 /*----------------------------------------------------------------------------*/
 
 #include "vex.h"
@@ -15,60 +15,46 @@ using namespace vex;
 competition Competition;
 
 // define your global instances of motors and other devices here
+
 brain Brain;
 
-motor LF (PORT7, ratio18_1, false);
-motor LB (PORT18, ratio18_1, false);
-motor RF (PORT20, ratio18_1, true);
-motor RB (PORT9, ratio18_1, true);
 
-float dia = 4.00;
-float gear_Rtio = 1.00;
-
-// formula for gear ratio, driven gear divided by driving gear = ratio 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
-  void moveRobot(int rspeed, int lspeed, int duration){
-  LF.spin(forward, lspeed, pct );
-  LB.spin(forward, lspeed, pct );
-  RF.spin(forward, rspeed, pct );
-  RB.spin(forward, rspeed, pct );
-
-  wait(duration, msec);
-  }
-  
-  void stopRobot() {
-    LF.stop(brake);
-    LB.stop(brake);
-    RF.stop(brake);
-    RB.stop(brake);
-
-  }
-
-  void inchDrive(int inches){
-    float x = 0;
-    float error = inches - x;
-    float kp = 3;
-    float speed = kp * error;
-
-    LF.setPosition(0, rev);
-
-    while (fabs(error) > 0.5) {
-      moveRobot(speed, speed, 10);
-      x = LF.position(rev) * M_PI * dia * gear_Rtio; //distance robot has moved
-      error = inches - x;
-      speed = kp * error;
-    }
-    stopRobot();
-    Brain.Screen.printAt(10, 20, "distance = %0.1f", x);
-  }
+/*                                                                           */
+/*  You may want to perform some actions before the competition starts.      */
+/*  Do them in the following function.  You must return from this function   */
+/*  or the autonomous and usercontrol tasks will not be started.  This       */
+/*  function is only called once after the V5 has been powered on and        */
+/*  not every time that the robot is disabled.                               */
 /*---------------------------------------------------------------------------*/
 
-//Part of Pre-Auton
 void pre_auton(void) {
 
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
+}
+
+//screen pixle extremes are 0,0 and 480,272
+
+void draw_brain_screen () {
+  Brain.Screen.printAt (240, 135, "middle");
+  Brain.Screen.printAt (100, 80, "quadrent 2");
+  Brain.Screen.printAt (100, 200, "quadrent 3");
+  Brain.Screen.printAt (360, 80, "quadrent 1");
+  Brain.Screen.printAt (360, 200, "quadrent 4");
+}
+
+int draw_shapes (){
+
+Brain.Screen.setFillColor (yellow);
+Brain.Screen.setPenColor (white);
+Brain.Screen.setPenWidth (5);
+Brain.Screen.drawRectangle(360, 50, 70, 70);
+Brain.Screen.setFillColor (green);
+Brain.Screen.setPenColor (black);
+Brain.Screen.drawCircle(395, 85, 25);
+  return 0;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -82,13 +68,14 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
+  // ..........................................................................
+  // Insert autonomous user code here.
+  // ..........................................................................
 
-  inchDrive(12);
-  //moveRobot(50, -50, 950);
-  //inchDrive(12);
-  
-  stopRobot();
-
+  draw_brain_screen ();
+  wait (1, sec);
+  Brain.Screen.clearScreen ();
+  draw_shapes();
 
 }
 
@@ -103,10 +90,19 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
+  // User control code here, inside the loop
   while (1) {
-   
+    // This is the main execution loop for the user control program.
+    // Each time through the loop your program should update motor + servo
+    // values based on feedback from the joysticks.
 
-    
+    // ........................................................................
+    // Insert user code here. This is where you use the joystick values to
+    // update your motors, etc.
+    // ........................................................................
+
+    wait(20, msec); // Sleep the task for a short amount of time to
+                    // prevent wasted resources.
   }
 }
 
