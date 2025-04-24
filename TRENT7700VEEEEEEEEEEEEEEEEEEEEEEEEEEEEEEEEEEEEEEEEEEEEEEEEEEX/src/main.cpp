@@ -17,6 +17,13 @@ competition Competition;
 
 // define your global instances of motors and other devices here
 brain Brain;
+motor LF (PORT6, ratio6_1, true);
+motor RF (PORT9, ratio6_1, false);
+motor LB (PORT11, ratio6_1, true);
+motor RB (PORT20, ratio6_1, false);
+
+float dia = 3.25;
+float gearRatio = 0.6;
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -30,6 +37,39 @@ void printscreen () {
   Brain.Screen.printAt(240,26, "fdhjsklfhdjsqklfdhjkslfhjdkslahfjkdsahjfds");
   Brain.Screen.drawRectangle (140, 20, 15, 15);
   
+}
+
+void Drive(int rspeed, int lspeed, int duration){
+  LF.spin(forward, lspeed, pct);
+  RF.spin(forward, rspeed, pct);
+  LB.spin(forward, lspeed, pct);
+  RB.spin(forward, rspeed, pct);
+
+  wait(duration, msec);
+}
+void stopRobot() {
+LF.stop(brake);
+RF.stop(brake);
+LB.stop(brake);
+RB.stop(brake);
+}
+
+void inchDrive(int inches){
+  float x = 0;
+  float error = inches - x;
+  float kp = 10.0;
+  float speed = kp * error;
+
+  LF.setPosition(0, rev);
+
+  while (fabs(error) > 0.4) {
+    Drive(speed, speed, 10);
+    x = LF.position(rev)*M_PI*dia*gearRatio;
+    error = inches - x;
+    speed = kp *error;
+  }
+  stopRobot();
+  Brain.Screen.printAt(100, 20, "distance=  %0.1f ", x);
 }
 void pre_auton(void) {
 
@@ -48,6 +88,12 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
+  inchDrive(12);
+  wait(100, msec);
+  Drive(-10, 10, 500);
+  wait(100, msec);
+  Drive(10, 10, 500);
+  wait(100, msec);
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
