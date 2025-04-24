@@ -15,16 +15,66 @@ using namespace vex;
 competition Competition;                                                          
 
 // define your global instances of motors and other devices here
-brain Brain;                                                                         
+brain Brain;           
+motor LF (PORT11, ratio6_1, true);
+motor LB (PORT4, ratio6_1, true);
+motor RF (PORT10, ratio6_1, false);
+motor RB (PORT19, ratio6_1, false);   
+
+
+ float dia = 4.00;
+ float gear_Ratio = 0.4; 
+
 /*---------------------------------------------------------------------------*/    
 /*                          Pre-Autonomous Functions                         */  
 void screenPrinting (int x1, int x2, int y1, int y2) {          
 Brain.Screen.printAt(x1, y1, "The tonk is a reincarnation of a M60");  
 Brain.Screen.setPenColor(cyan);
 Brain.Screen.setFillColor(white);
-Brain.Screen.drawRectangle(x2, y2, 190, 50.01, 50 );           
+Brain.Screen.drawRectangle(x2, y2, 190, 50.01, 50 ); 
+
 
 }
+
+
+void moveRobot(int rspeed, int lspeed, int duration){
+
+ LF.spin(forward, lspeed, pct );
+ LB.spin(forward, lspeed, pct );
+ RF.spin(forward, rspeed, pct );
+ RB.spin(forward, rspeed, pct );
+
+ wait(duration, msec);
+}
+void stopRobot() {
+LF.stop(brake);
+LB.stop(brake);
+RF.stop(brake);
+RB.stop(brake);
+
+
+}
+
+void inchDrive(int inches){
+  float x = 0;
+  float error = inches - x;
+  float kp = 2;
+  float speed = kp * error;
+
+  LF.setPosition(0, rev);
+
+  while (fabs(error) > 0.5) {
+    moveRobot(speed, speed,10 );
+    x = LF.position(rev)*M_PI*dia*gear_Ratio; //distance robot has moved
+    error = inches - x;
+    speed = kp * error; 
+  }
+  stopRobot();
+  Brain.Screen.printAt(10, 20, "distance= %0.1f", x);
+}
+ 
+
+
 /*                                                                           */ 
 /*  You may want to perform some actions before the competition starts.      */ 
 /*  Do them in the following function.  You must return from this function   */
@@ -50,9 +100,10 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  // ..........................................................................
-  // Insert autonomous user code here.
-  // ..........................................................................
+ 
+ inchDrive(12);
+ stopRobot();
+
 }
 
 /*---------------------------------------------------------------------------*/
