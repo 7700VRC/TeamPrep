@@ -17,7 +17,13 @@ competition Competition;
 // define your global instances of motors and other devices here
 
 brain Brain;
+motor LF (PORT4, ratio6_1, false);
+motor LB (PORT3, ratio6_1, false);
+motor RF (PORT20, ratio6_1, true);
+motor RB (PORT21, ratio6_1, true);
 
+float dia = 3.25;
+float gear_Ratio = 1.3;
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -33,7 +39,46 @@ Brain.Screen.setPenColor(purple);
 Brain.Screen.setFillColor(blue);
 Brain.Screen.drawRectangle(10, 140, 5, 5);
 
- }                                                                          
+ }
+
+void moveRobot(int rspeed, int lspeed, int duration){
+
+  LF.spin(forward, lspeed, pct );
+  LB.spin(forward, lspeed, pct);
+  RF.spin(forward, rspeed, pct);
+  RB.spin(forward, rspeed, pct);
+
+  wait(3000, msec);
+
+}
+
+  void stopRobot() {
+  LF.stop(brake);
+  LB.stop(brake);
+  RF.stop(brake);
+  RB.stop(brake);
+  
+}
+
+void inchDrive(int inches){
+float x = 0;
+float error = inches - x;
+float kp = 3.0;
+float speed = kp * error;
+
+LF.setPosition(0, rev);
+
+  while (fabs(error) > 0.5) {
+    moveRobot(speed, speed, 10);
+    x = LF.position(rev)*M_PI*dia*gear_Ratio; //distance robot has moved
+    error = inches - x;
+    speed = kp * error;
+  }
+  stopRobot();
+  Brain.Screen.printAt(10, 20, "distance = %0.1f", x);
+}
+
+                                                                        
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 
@@ -54,9 +99,10 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  // ..........................................................................
-  // Insert autonomous user code here.
-  // ..........................................................................
+inchDrive(10);
+moveRobot(35, 70, 1000);
+inchDrive(10);
+stopRobot();
 }
 
 /*---------------------------------------------------------------------------*/
