@@ -16,6 +16,49 @@ competition Competition;
 
 // define your global instances of motors and other devices here
 brain Brain;
+motor LF (PORT2, ratio6_1, false);
+motor LB (PORT1, ratio6_1, false);
+motor RF (PORT15, ratio6_1, true);
+motor RB (PORT16, ratio6_1, true);
+
+float WD = 3.25;
+float GR = 0.75;
+
+void moveRobot (int lspeed, int rspeed, int duration) {
+  
+  LF.spin(forward, lspeed, pct);
+  LB.spin(forward, lspeed, pct);
+  RF.spin(forward, rspeed, pct);
+  RB.spin(forward, rspeed, pct);
+
+  wait(duration, msec);
+}
+
+void stopRobot () {
+  LF.stop(brake);
+  LB.stop(brake);
+  RF.stop(brake);
+  RB.stop(brake);
+}
+
+
+
+void inchDrive(float inches) {
+  float x = 0;
+  float error = inches - x;
+  float Kp = 3.0;
+  float speed = error *Kp;
+
+  LF.setPosition(0, rev);
+
+  while (fabs (error) > 0.5) {
+    moveRobot(speed, speed, 10);
+    x = LF.position(rev)*WD*M_PI*GR;
+    error = inches - x;
+    speed = error * Kp;
+  }
+stopRobot();
+}
 
 void drawOnScreen () {
   Brain.Screen.printAt (240, 135, "MIDDLE");
@@ -69,11 +112,16 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-
- drawOnScreen ();
- wait(1, sec);
- Brain.Screen.clearScreen();
- drawShapes(); 
+  
+ moveRobot(50, 50, 1500);
+ moveRobot(50, -50, 1000); 
+ moveRobot(50, 50, 1500);
+ stopRobot();
+//drive straight for time sharp u turn go back start stop robot
+ //drawOnScreen ();
+ //wait(1, sec);
+ //Brain.Screen.clearScreen();
+ //drawShapes(); 
  
   
   // ..........................................................................
