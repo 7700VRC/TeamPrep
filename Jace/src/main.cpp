@@ -20,6 +20,12 @@ motor LF(PORT10, ratio18_1, false );
 motor LB(PORT20, ratio18_1, false );
 motor RF(PORT1, ratio18_1, true );
 motor RB(PORT3, ratio18_1, true );
+
+
+
+float WD = 3.25;
+float GR = 0.6
+
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*
@@ -60,6 +66,14 @@ void stopRobot() {
   LB.stop(brake);
 LB.stop(brake);
 LB.stop(brake);
+}
+
+
+
+void inchDrive(float inches){
+ float x = 0;
+float error = 24
+
 }
 
 
