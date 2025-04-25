@@ -16,6 +16,10 @@ competition Competition;
 
 // define your global instances of motors and other devices here
 brain Brain;
+motor LF(PORT10, ratio18_1, false );
+motor LB(PORT20, ratio18_1, false );
+motor RF(PORT1, ratio18_1, true );
+motor RB(PORT3, ratio18_1, true );
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*
@@ -24,10 +28,7 @@ brain Brain;
 
 //return type: int, float,void                      */
 void drawOnScreen  () {
-  Brain.Screen.printAt (240, 135, "MIDDLE")
   
-Brain.Screen.printAt (120,80,"Left Top corner");
-Brain.Screen.printAt (100,200,  "bottom Left Corner");
   
   
   
@@ -44,11 +45,22 @@ Brain.Screen.setFillColor(yellow);
   return 0;
 }
 
+void moverobot (int rspeed, int lspeed, int duration) {
 
+  LF.spin(forward, lspeed, pct );
+  LB.spin(forward, lspeed, pct );
+  RB.spin(forward, rspeed, pct );
+  RF.spin(forward, rspeed, pct );
 
+wait(duration, msec);
+}
 
-
-
+void stopRobot() {
+  LF.stop(brake);
+  LB.stop(brake);
+LB.stop(brake);
+LB.stop(brake);
+}
 
 
 /*not every time the robot is disabled
@@ -79,8 +91,33 @@ void autonomous(void) {
 Brain.Screen.clearScreen();
 drawShapes();
 
+
+
+moverobot(50,50, 500);
+stopRobot();
+
+
 }
 
+
+
+
+
+
+
+
+
+//drive the robot straight for a certain amount of time
+
+
+//make a sharp U turn
+
+
+//go back to where you started from
+
+
+
+//stop the robot
 
 
 /*---------------------------------------------------------------------------*/
