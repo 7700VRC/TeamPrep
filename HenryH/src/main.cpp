@@ -13,6 +13,10 @@ using namespace vex;
 
 // A global instance of competition
 brain Brain;
+ motor LF  (PORT6, ratio6_1, false);
+ motor LB  (PORT11, ratio6_1, false);
+ motor RF  (PORT9, ratio6_1, true);
+ motor RB  (PORT20, ratio6_1, true);
 competition Competition;
 
 // define your global instances of motors and other devices here
@@ -24,10 +28,10 @@ void drawOnScreen () {
 
 Brain.Screen.print("The champions have risen");
 Brain.Screen.printAt(60, 68, "Henry is King!!!!");
-Brain.Screen.printAt(300, 68,  "Henry is King!!!!");
-Brain.Screen.printAt(60, 203,  "Henry is King!!!!");
+Brain.Screen.printAt(300, 68,  "Tianrui is King!!!!");
+Brain.Screen.printAt(60, 203,  "Tianrui is King!!!!");
 Brain.Screen.printAt(300, 203,  "Henry is King!!!!");
-Brain.Screen.printAt(160, 135,  "Tianrui has fallen!!!!");
+Brain.Screen.printAt(160, 135,  "Soryra has fallen!!!!");
 
 }
 int drawShape(){
@@ -40,6 +44,19 @@ int drawShape(){
   Brain.Screen.setPenWidth(7);
   Brain.Screen.drawCircle(79, 79, 15);
   return 0;
+}
+void move(int lspeed, int rspeed, int wt){
+  LF.spin(forward, lspeed, pct);
+  LB.spin(forward, lspeed, pct);
+  RF.spin(forward, rspeed, pct);
+  RB.spin(forward, rspeed, pct);
+  wait (wt, msec);
+}
+void stop(){
+  LF.stop(brake);
+  LB.stop(brake);
+  RF.stop(brake);
+  RB.stop(brake);
 }
 /*---------------------------------------------------------------------------*/
 
@@ -62,11 +79,16 @@ void pre_auton(void) {
 void autonomous(void) {
   // ..........................................................................
   
-    drawOnScreen();
+    /*drawOnScreen();
     wait(100, msec);
     Brain.Screen.clearScreen();
-    drawShape();
-  // ..........................................................................
+    drawShape();*/
+    move(50, 50, 750);
+    move(100, -100, 510);
+    move(50, 50, 750);
+    stop();
+
+// ..........................................................................
 
 }
 /*---------------------------------------------------------------------------*/
