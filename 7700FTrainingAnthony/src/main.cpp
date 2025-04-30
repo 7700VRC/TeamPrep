@@ -23,7 +23,7 @@ motor RF (PORT20, ratio6_1, true);
 motor RB (PORT21, ratio6_1, true);
 
 float dia = 3.25;
-float gear_Ratio = 1.3;
+float gear_Ratio = 0.6;
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
