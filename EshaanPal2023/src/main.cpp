@@ -10,17 +10,22 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
+// LeftFront            motor         19
+// LeftMiddle           motor         20
+// RightFront           motor         17
+// RightMiddle          motor         18
+// LeftBack             motor         11
+// RightBack            motor         12
+// Slapper              motor         10
+// Gyro                 inertial      15
 // Controller1          controller
-// LeftFront            motor         4
-// RightFront           motor         5
-// RightBack            motor         6
-// LeftBack             motor         7
-// Gyro                 inertial      2
+// LeftPlow             digital_out   A
+// RightPlow            digital_out   H
+// Intake               motor         16
+// Hang                 digital_out   G
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
-#include <algorithm>
-#include <iostream>
 
 using namespace vex;
 
@@ -28,100 +33,7 @@ using namespace vex;
 competition Competition;
 
 // define your global instances of motors and other devices here
-float D = 4.0;   // wheel diameter in inches
-float G = 1.4;   // gear ration
-float Pi = 3.14; // value of pi
-void drive(int lspeed, int rspeed, int wt) {
-  LeftFront.spin(forward, lspeed, pct);
-  RightFront.spin(forward, rspeed, pct);
-  LeftBack.spin(forward, lspeed, pct);
-  RightBack.spin(forward, rspeed, pct);
-  wait(wt, msec);
-}
 
-void driveBrake() {
-  LeftFront.stop(brake);
-  RightFront.stop(brake);
-  LeftBack.stop(brake);
-  RightBack.stop(brake);
-}
-
-void driveCoast() {
-  LeftFront.stop(coast);
-  RightFront.stop(coast);
-  LeftBack.stop(coast);
-  RightBack.stop(coast);
-}
-
-void inchDrive(float target) {
-  float avgSpeed[10] = {0};
-  int i = 0;
-  float xl = 0.0;
-  float xr = 0.0;
-  float error = target - xl;
-  float oldError = error;
-  float counter = 0.0;
-  float accuracy = 0.2;
-  float steer = xr - xl;
-  float kp = 5.0;
-  float ks = 3.0;
-  float speed = kp * error;
-  float lspeed = kp * error + steer;
-  float rspeed = kp * error - steer;
-  LeftFront.setRotation(0, rev);
-  RightFront.setRotation(0, rev);
-  while (fabs(error) > accuracy) {
-    steer = ks * Gyro.yaw(degrees);
-    speed = kp * error;
-
-    speed = std::min(speed, float(80.0));
-    speed = std::max(speed, float(-80.0));
-
-    if (i > 99)
-      i = 0;
-    avgSpeed[i] = speed;
-    speed = 0.0;
-    for (int j = 0; j < 100; j++) {
-      speed = speed + avgSpeed[j];
-    }
-    i++;
-    speed = speed / 100;
-    std::cout << speed << std::endl;
-    lspeed = speed - steer;
-    rspeed = speed + steer;
-    drive(lspeed, rspeed, 10);
-
-    xl = LeftFront.rotation(rev) * Pi * D * G;
-    oldError = error;
-    error = target - xl;
-    if (fabs(error - oldError) < 0.01)
-      counter++;
-    else
-      counter = 0;
-    if (counter > 10)
-      break;
-  }
-  driveBrake();
-}
-
-void gyroTurn(float target) {
-  Gyro.setRotation(0.0, degrees);
-  float heading = 0.0;
-  float error = target - heading;
-  float oldError = error;
-  float accuracy = 2.0;
-  float kp = 0.5;
-  float kd = 5.0;
-  while (fabs(error) > accuracy) {
-    drive(kp * error + kd * (error - oldError),
-          -kp * error + kd * (error - oldError), 10);
-    heading = Gyro.rotation(degrees);
-    oldError = error;
-    error = target - heading;
-    std::cout << heading << std::endl;
-  }
-  driveBrake();
-}
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -135,10 +47,191 @@ void gyroTurn(float target) {
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
+  Gyro.calibrate();
 
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
+
+bool Plow = false;
+int Autonum = 2;
+bool In = false;
+bool Out = false;
+bool Slap = false;
+bool Reverse = false;
+int waitTime = 80;
+
+void slapper() {
+  Slapper.spin(forward, 40, pct);
+  if (Controller1.ButtonR2.pressing() == false)
+    Slapper.spin(forward, 0, pct);
+}
+void intake() {
+  Intake.spin(forward, 100, pct);
+  if (Controller1.ButtonA.pressing() == false)
+    Intake.spin(forward, 0, pct);
+}
+void intakeToggle(float speed) { Intake.spin(forward, speed, pct); }
+void intakeToggleOff() {
+  Intake.spin(forward, 0, pct);
+  Intake.stop(brake);
+}
+
+void reverseIntake() {
+  Intake.spin(forward, -100, pct);
+  if (Controller1.ButtonB.pressing() == false)
+    Intake.spin(forward, 0, pct);
+}
+
+void slapperToggle(float speed) { Slapper.spin(forward, speed, pct); }
+void driveVolts(double lspeed, double rspeed, double multiplier, int wt) {
+  lspeed = lspeed * 120 * multiplier;
+  rspeed = rspeed * 120 * multiplier;
+  LeftFront.spin(forward, lspeed, voltageUnits::mV);
+  LeftMiddle.spin(forward, lspeed, voltageUnits::mV);
+  LeftBack.spin(forward, lspeed, voltageUnits::mV);
+  RightFront.spin(forward, rspeed, voltageUnits::mV);
+  RightMiddle.spin(forward, rspeed, voltageUnits::mV);
+  RightBack.spin(forward, rspeed, voltageUnits::mV);
+  task::sleep(wt);
+}
+void drive(int power, int turn, int time) {
+  LeftFront.spin(forward, power + turn, pct);
+  LeftMiddle.spin(forward, power + turn, pct);
+  LeftBack.spin(forward, power + turn, pct);
+  RightFront.spin(forward, power - turn, pct);
+  RightMiddle.spin(forward, power - turn, pct);
+  RightBack.spin(forward, power - turn, pct);
+  task::sleep(time);
+}
+void Brake1() {
+  LeftFront.stop(brake);
+  LeftMiddle.stop(brake);
+  LeftBack.stop(brake);
+  RightFront.stop(brake);
+  RightMiddle.stop(brake);
+  RightBack.stop(brake);
+}
+void inchDrive(float target, int timeout = 1500, float kp = 2.75) {
+  timer t2;
+  double pie = 3.14159;
+  double dia = 4;
+  double g = 3.0 / 6.0;
+  float x = 0.0;
+  float tolerance = 1;
+  float accuracy = 1;
+  float ki = 0;
+  float error = target - x;
+  float speed = error * kp;
+  float integral = 0;
+  float prevError = target;
+  float derivative = 0;
+  float kd = 0;
+  RightFront.setRotation(0.0, rev);
+  while (t2.time(msec) < timeout) {
+    x = RightFront.position(rev) * pie * dia * g;
+    error = target - x;
+
+    if (fabs(error) < tolerance) {
+      integral += error;
+    }
+    derivative = error - prevError;
+    prevError = error;
+    driveVolts(speed, speed, 1, 10);
+    speed = error * kp + integral * ki + derivative * kd;
+    Controller1.Screen.setCursor(1, 1);
+    Controller1.Screen.clearLine();
+    Controller1.Screen.print(error);
+  }
+  Brake1();
+}
+
+void gyroTurnBig(float target, int timeout = 1500) {
+  timer t1;
+  float kp = 0.3;
+  float ki = 0.2;
+  float kd = 0.4;
+  float integral = 0;
+  float integralTolerance = 3;
+  float heading = 0.0;
+  float error = target - heading;
+  float prevError = 0;
+  float derivative;
+  float speed = kp * error;
+  float accuracy = 1.0;
+  float bias = 0;
+
+  while (t1.time(msec) < timeout) {
+    heading = Gyro.rotation(degrees);
+    error = target - heading;
+    derivative = error - prevError;
+    prevError = error;
+    if (fabs(error) < integralTolerance) {
+      integral += error;
+    }
+    if (fabs(error) < accuracy) {
+      integral = 0;
+    }
+
+    speed = kp * error + kd * derivative + ki * integral;
+    driveVolts(speed, -speed, 1, 0);
+    Controller1.Screen.setCursor(1, 1);
+    Controller1.Screen.clearLine();
+    Controller1.Screen.print(error);
+  }
+  Brake1();
+  wait(10, msec);
+}
+void gyroTurnSmall(float target, int timeout = 450, float kp = 0.3) {
+  timer t1;
+  float ki = 0.2;
+  float kd = 0.4;
+  float integral = 0;
+  float integralTolerance = 3;
+  float heading = 0.0;
+  float error = target - heading;
+  float prevError = 0;
+  float derivative;
+  float speed = kp * error;
+  float accuracy = 1.0;
+  float bias = 0;
+
+  while (t1.time(msec) < timeout) {
+    heading = Gyro.rotation(degrees);
+    error = target - heading;
+    derivative = (error - prevError);
+    prevError = error;
+    if (fabs(error) < integralTolerance) {
+      integral += error;
+    }
+    if (fabs(error) < accuracy) {
+      integral = 0;
+    }
+
+    speed = kp * error + kd * derivative + ki * integral;
+    driveVolts(speed, -speed, 1, 0);
+    Controller1.Screen.setCursor(1, 1);
+    Controller1.Screen.clearLine();
+    Controller1.Screen.print(error);
+  }
+  Brake1();
+  wait(10, msec);
+}
+void deployablePlow() {
+  if (Plow == false) {
+    Plow = true;
+    LeftPlow.set(true);
+    RightPlow.set(true);
+  } else if (Plow == true) {
+    Plow = false;
+    LeftPlow.set(false);
+    RightPlow.set(false);
+  }
+}
+
+// void leftPlow(){
+//   if ()
+// }
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -151,75 +244,459 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  inchDrive(80);
-  wait(100, msec);
-  inchDrive(-80);
-}
+  int shots = 0;
+  switch (Autonum) {
+  case 1:
+    // NearSide
+    // inchDrive(-40, 2000, 2);
+    // wait(200, msec);
+    // gyroTurnSmall(90, 500);
+    // wait(200, msec);
+    // inchDrive(22, 1200, 2);
+    // wait(200, msec);
+    // gyroTurnSmall(-150, 650);
+    // wait(200, msec);
+    // inchDrive(16, 1000, 2);
+    // wait(200, msec);
+    // gyroTurnSmall(50, 1200, 1.2);
+    // wait(200, msec);
+    // intakeToggle(100);
+    // wait(200, msec);
+    // inchDrive(28, 750, 4);
+    // wait(200, msec);
+    // gyroTurnSmall(130, 700, 1);
+    // wait(200, msec);
+    // intakeToggleOff();
+    // wait(200, msec);
+    // inchDrive(10, 400, 3);
 
-/*---------------------------------------------------------------------------*/
-/*                                                                           */
-/*                              User Control Task                            */
-/*                                                                           */
-/*  This task is used to control your robot during the user control phase of */
-/*  a VEX Competition.                                                       */
-/*                                                                           */
-/*  You must modify the code to add your own robot specific commands here.   */
-/*---------------------------------------------------------------------------*/
+    //NEARSIDE
+    RightPlow.set(true);
+    wait(1000,msec);
+    RightPlow.set(false);
+    wait(200,msec);
+    inchDrive(-10, 400, 3);
+    wait(200,msec);
+    inchDrive(10, 400, 3);
+    wait(200,msec);
+    inchDrive(40, 3000, 1);
+    wait(200,msec);
+    gyroTurnSmall(-180, 1000, 2);
+    wait(200,msec);
+    intakeToggle(100);
+    wait(200,msec);
+    inchDrive(10, 1500, 3);
+    wait(200,msec);
+    gyroTurnSmall(-190, 960, 1);
+    wait(200,msec);
+    inchDrive(12.5, 1800, 3);
+    break;
 
-void usercontrol(void) {
-  // User control code here, inside the loop
-  float avglSpeed[10] = {0};
-  float avgrSpeed[10] = {0};
-  float speed = 0.0;
-  int lspeed = 0;
-  int rspeed = 0;
-  int i = 0;
-  while (true) {
+  case 2:
+    // FarSide
+    // 1. Face towards bar
+    // 2. Drive forwardpick up ball under bar
+    // 3. Drive back and use turn to push preload in
+    // 4. Drive forward, turn around, push ball in intake in
+    // 5. Back out, face triball
+    //FARSIDE
+    inchDrive(-40, 1500, 2);
+    wait(waitTime, msec);
+    inchDrive(8, 650, 4);
+    wait(waitTime, msec);
+    gyroTurnSmall(160, 500);
+    wait(waitTime, msec);
+    intakeToggle(-100);
+    inchDrive(30, 1500, 2);
+    wait(waitTime, msec);
+    gyroTurnSmall(300, 710);
+    wait(waitTime,msec);
+    intakeToggle(100);
+    inchDrive(30, 1000, 2);
+    wait(waitTime, msec);
+    inchDrive(-30, 1500, 1.5);
+    wait(waitTime, msec);
+    intakeToggle(-100);
+    gyroTurnSmall(60, 600);
+    wait(waitTime,msec);
+    inchDrive(15, 500, 4);
+    wait(waitTime,msec);
+    gyroTurnSmall(310, 710);
+    LeftPlow.set(true);
+    RightPlow.set(true);
+    wait(waitTime,msec);
+    intakeToggle(100);
+    inchDrive(30, 1000, 2);
+    LeftPlow.set(false);
+    RightPlow.set(false);
+    wait(waitTime, msec);
+    inchDrive(-30, 1500, 1.5);
+    wait(waitTime, msec);
+    gyroTurnSmall(430, 700);
+    wait(waitTime, msec);
+    inchDrive(30, 1000, 4);
 
-    speed = Controller1.Axis3.position();
 
-    if (i > 9)
-      i = 0;
-    avglSpeed[i] = speed;
-    speed = 0.0;
-    for (int j = 0; j < 10; j++) {
-      speed = speed + avglSpeed[j];
-    }
-    lspeed = speed / 10;
 
-    speed = Controller1.Axis2.position();
+    // wait(200, msec);
+    // gyroTurnSmall(330, 710);
+   
+  //  inchDrive(35, 1750, 2);
+  //   wait(200, msec);
+  //   gyroTurnSmall(-90, 300);
+    
+    break;
 
-    if (i > 9)
-      i = 0;
-    avgrSpeed[i] = speed;
-    speed = 0.0;
-    for (int j = 0; j < 10; j++) {
-      speed = speed + avgrSpeed[j];
-    }
-    rspeed = speed / 10;
+  case 3:
+    // Skills
+    inchDrive(-12, 2000, 4);
+    wait(5, msec);
+    gyroTurnSmall(20, 600);
+    wait(5, msec);
+    slapperToggle(60);
+    Slapper.setRotation(0, rev);
+    while (shots < 48) {
+      shots = Slapper.rotation(rev);
+      wait(100, msec);
+    }     
+    slapperToggle(0);
+    wait(5, msec);
+    Intake.spin(forward, 100, pct);
+    wait(5, msec);
+    gyroTurnSmall(50, 800);
+    wait(5, msec);
+    gyroTurnSmall(30, 800);
+    wait(5, msec);
+    inchDrive(8, 2000, 8);
+    wait(5, msec);
+    gyroTurnSmall(-30, 800);
+    wait(5, msec);
+    inchDrive(26, 2750, 8);
+    wait(5, msec);
+    gyroTurnSmall(-60, 1000);
+    wait(5,msec);
+    inchDrive(6, 2000, 9);
+    wait(5,msec);
+    gyroTurnSmall(-130, 900);
+    wait(5,msec);
+    inchDrive(12, 1750, 9);
+    wait(5,msec);
+    inchDrive(-6, 1500, 9);
+    wait(5,msec);
+    inchDrive(12,1200,9);
+    wait(5,msec);
+    inchDrive(-6,1200, 9);
+    gyroTurnSmall(-200, 500);
+    wait(5, msec);
+    inchDrive(20, 1500, 4);
+    wait(5, msec);
+    LeftPlow.set(true);
+    RightPlow.set(true);
+    gyroTurnSmall(90, 500);
+    wait(5, msec);
+    inchDrive(12, 1750, 8);
+    wait(5, msec);
+    inchDrive(-12, 1750, 8);
+    wait(5, msec);
+    gyroTurnSmall(-45, 750);
+    wait(5, msec);
+    inchDrive(12, 1750, 8);
+    wait(5, msec);
+    inchDrive(-12, 2000, 8);
+    wait(5,msec);
+    inchDrive(12, 1750, 8);
+    wait(5, msec);
+    inchDrive(-12, 2000, 8);
+    wait(5,msec);
 
-    std::cout << "lspeed:" << lspeed << "rspeed:" << rspeed << std::endl;
-
-    i++;
-  
-
-    drive(lspeed, rspeed, 10);
+    break;
   }
-}
+  // gyroTurnSmall(-90, 500);
+  // gyroTurnSmall(-45, 760);
+  // gyroTurnSmall(-60,600);
 
-//
-// Main will set up the competition functions and callbacks.
-//
-int main() {
-  // Set up callbacks for autonomous and driver control periods.
-  Competition.autonomous(autonomous);
-  Competition.drivercontrol(usercontrol);
 
-  // Run the pre-autonomous function.
-  pre_auton();
 
-  // Prevent main from exiting with an infinite loop.
-  while (true) {
-    wait(100, msec);
-  }
-}
+  // inchDrive(12, 2000, 3);
+  // wait(50,msec);
+  // gyroTurnSmall(-90, 500);
+  // wait(50, msec);
+  // inchDrive(16, 2000, 2);
+  // wait(50,msec);
+  // gyroTurnSmall(-120, 700);
+  // wait(50,msec);
+  // inchDrive(12, 1500, 5);
+  // wait(50, msec);
+  // inchDrive(-30, 3000, 1.35);
+  // wait(50, msec);
+  // inchDrive(5, 1500, 2);
+  // gyroTurnSmall(90, 500);
+  // wait(50, msec);
+  // inchDrive(-24, 2000, 4);
+
+  // MATCH AUTON NEARSIDE 11/4/2023
+  // inchDrive(40, 600, 4);
+  // wait(2000,msec);
+  // inchDrive(-30, 600, 1.5);
+
+  // MATCH AUTON NEARSIDE 11/6/2023 WORKING
+  // inchDrive(-40,2000,2);
+  // wait(200, msec);
+  // gyroTurnSmall(90, 500);
+  // wait(200,msec);
+  // inchDrive(22,  1200, 2);
+  // wait(200,msec);
+  // gyroTurnSmall(-150, 650);
+  // wait(200,msec);
+  // inchDrive(16, 1000, 2);
+  // wait(200,msec);
+  // gyroTurnSmall(50, 1200, 1.2);
+  // wait(200,msec);
+  // intakeToggle(100);
+  // wait(200,msec);
+  // inchDrive(28, 750, 4);
+  // wait(200,msec);
+  // gyroTurnSmall(130, 700, 1);
+  // wait(200,msec);
+  // intakeToggleOff();
+  // wait(200,msec);
+  // inchDrive(10, 400, 3);
+  // MATCH AUTON FARSIDE 11/28/2023
+  // inchDrive(-40,2000,2);
+  // wait(200,msec);
+  // inchDrive(9,750,4);
+  // wait(200,msec);
+  // gyroTurnSmall(120, 600);
+  // wait(200,msec);
+  // intakeToggle(-100);
+  // wait(200,msec);
+  // inchDrive(30, 1500, 2);
+  // wait(200,msec);
+  // gyroTurnSmall(330,500);
+  // wait(200,msec);
+  // intakeToggle(0);
+  // inchDrive(30, 1500, 2);
+  // wait(200,msec);
+  // intakeToggle(100);
+  // inchDrive(-15,750,3);
+  // wait(200, msec);
+  // gyroTurnSmall(-135, 300);
+
+  // MATCH AUTON NEARSIDE 11/28/23 Not WORKING PORT  1
+  // inchDrive(-40,2000,2);
+  // wait(200, msec);
+  // gyroTurnSmall(-90, 500);
+  // wait(200,msec);
+  // inchDrive(24,  1250, 2);
+  // wait(200,msec);
+  // gyroTurnSmall(150, 650);
+  // wait(200,msec);
+  // inchDrive(18, 1050, 2);
+  // wait(200,msec);
+  // gyroTurnSmall(-50, 1350, 1.2);
+  // wait(200,msec);
+  // intakeToggle(100);
+  // wait(200,msec);
+  // inchDrive(20, 1150, 4);
+  // wait(200,msec);
+  // gyroTurnSmall(-132, 650, 1);
+  // wait(200,msec);
+  // intakeToggleOff();
+  // wait(200,msec);
+  // inchDrive(10.5, 410, 3);
+  // MATCH AUTON NEARSIDE 11/28/23 Working Port 5
+  // LeftPlow.set(true);
+  // wait(8000, msec);
+  // inchDrive(-17.5,1500,2);
+  //     wait(200, msec);
+  //     gyroTurnSmall(-60, 500);
+  //     wait(200,msec);
+  //     inchDrive(19,  1100, 2);
+  //     wait(200,msec);
+  //     gyroTurnSmall(150, 650);
+  //     wait(200,msec);
+  //     inchDrive(18, 1050, 2);
+  //     wait(200,msec);
+  //     gyroTurnSmall(-45, 1150, 1.2);
+  //     wait(200,msec);
+  //     intakeToggle(100);
+  //     wait(200,msec);
+  //     inchDrive(20, 1150, 4);
+  //     wait(200,msec);
+  //     gyroTurnSmall(-132, 650, 1);
+  //     wait(200,msec);
+  //     intakeToggleOff();
+  //     wait(200,msec);
+  //     LeftPlow.set(true);
+  //     inchDrive(10.5, 410, 3);
+
+  // MATCH AUTON NEARSIDE 11/17/23
+  //  inchDrive(-40,2000,2);
+  //   wait(200, msec);
+  //   // gyroTurnSmall(-90, 500);
+  //   // wait(200,msec);
+  //   inchDrive(12, 1500, 1);
+  //   wait(200,msec);
+  //   gyroTurnSmall(-135, 1400, 3);
+  //    LeftPlow.set(true);
+  //   inchDrive(-30,  3000, 2);
+  //   wait(200,msec);
+  //   gyroTurnSmall(45, 650, 1);
+  //   LeftPlow.set(true);
+  //   wait(200,msec);
+  //   inchDrive(-18, 1100, 2);
+  //   wait(200,msec);
+  //   gyroTurnSmall(-135, 1400, 3);
+  //   wait(200,msec);
+  //   intakeToggle(100);
+  //   wait(200,msec);
+  //   inchDrive(-26, 725, 4);
+  //   wait(200,msec);
+  //   gyroTurnSmall(-120, 700, 1);
+  //   wait(200,msec);
+  //   intakeToggleOff();
+  //   wait(200,msec);
+  //   inchDrive(12, 450, 3);
+
+  // MATCH AUTON FARSIDE 11/4/2023
+  // Intake.spin(forward, -100, pct);
+  // inchDrive(-4, 700, 5);
+  // inchDrive(16, 2000, 4);
+  // wait(50,msec);
+  // gyroTurnSmall(-90, 500);
+  // wait(50, msec);
+  // inchDrive(16, 2000, 4);
+  // wait(50,msec);
+  // gyroTurnSmall(-145, 400);
+  // wait(50,msec);
+  // inchDrive(8, 1000, 8);
+  // Intake.spin(forward, 100, pct);
+  // wait(50,msec);
+  // inchDrive(-4, 1500, 4);
+  // wait(50, msec);
+  // gyroTurnSmall(-235, 760);
+  // wait(50, msec);
+  // inchDrive(-5, 1500, 10);
+  // wait(50,msec);
+  // inchDrive(18.5, 2000, 4);
+  // wait(50,msec);
+  // gyroTurnSmall(-245, 760);
+
+  // gyroTurnSmall(-275,500);
+  // wait(50,msec);
+  // inchDrive(12,2000, 4);
+  // MATCH AUTON NEARSIDE
+  // Intake.spin(forward, -100, pct);
+  // inchDrive(20, 3600);
+  // wait(50,msec);
+  // inchDrive(-6,600);
+  // wait(50,msec);
+  // gyroTurnSmall(130, 400);
+  // wait(50,msec);
+  // inchDrive(12, 1200);
+  // wait(50,msec);
+  // gyroTurnSmall(50, 725);
+  // wait(50,msec);
+  // Intake.spin(forward, 100, pct);
+  // inchDrive(12,1200);
+  // Intake.spin(forward,0, pct);
+
+  // SKILLS OLD
+  // inchDrive(-12, 2000, 4);
+  // wait(5,msec);
+  // gyroTurnSmall(30, 600);
+  //  wait(5,msec);
+  // slapperToggle(40);
+  // Slapper.setRotation(0, rev);
+  // while (shots<2){
+  //   shots = Slapper.rotation(rev);
+  //   wait(100, msec);
+  // }
+  // slapperToggle(0);
+  // wait(5, msec);
+  // Intake.spin(forward, 100, pct);
+  // gyroTurnSmall(50, 600);
+  // wait(5, msec);
+
+  // gyroTurnSmall(30,800);
+
+  // wait(5, msec);
+  // inchDrive(34, 3000, 6);
+  //     wait(5, msec);
+  // gyroTurnSmall(-165, 500);
+  //     wait(5, msec);
+  // inchDrive(20, 4000, 4);
+  //     wait(5, msec);
+  // LeftPlow.set(true);
+  // RightPlow.set(true);
+  // gyroTurnSmall(90, 500);
+  // wait(5,msec);
+  // inchDrive(8, 3000, 8);
+  //     wait(5, msec);
+  // inchDrive(-8, 3000, 8);
+  //     wait(5, msec);
+  // inchDrive(8, 3000, 8);
+  //     wait(5, msec);
+  // inchDrive(-12, 3000, 8);
+
+  // SKILLS 11/20/23
+  // inchDrive(-12, 2000, 4);
+  // wait(5,msec);
+
+  // gyroTurnSmall(20, 600);
+  //  wait(5,msec);
+
+  // slapperToggle(40);
+  // Slapper.setRotation(0, rev);
+  // while (shots<46){
+  //   shots = Slapper.rotation(rev);
+  //   wait(100, msec);
+  // }
+  // slapperToggle(0);
+  // wait(5, msec);
+
+  // Intake.spin(forward, 100, pct);
+  // wait(5,msec);
+
+  // gyroTurnSmall(50, 800);
+  // wait(5, msec);
+
+  // gyroTurnSmall(30,800);
+  // wait(5, msec);
+
+  // inchDrive(8, 2000, 8);
+  // wait(5, msec);
+
+  // gyroTurnSmall(-30, 800);
+  // wait(5,msec);
+
+  // inchDrive(28,3000,8);
+  // wait(5,msec);
+
+  // gyroTurnSmall(-200, 500);
+  // wait(5, msec);
+
+  // inchDrive(28, 4500, 4);
+  // wait(5, msec);
+
+  // LeftPlow.set(true);
+  // RightPlow.set(true);
+  // gyroTurnSmall(90, 500);
+  // wait(5,msec);
+  // inchDrive(8, 3000, 8);
+  //     wait(5, msec);
+  // inchDrive(-8, 3000, 8);
+  //     wait(5, msec);
+  // inchDrive(8, 3000, 8);
+  //     wait(5, msec);
+  // inchDrive(-12, 3000, 8);
+
+  //  *IMPORTANT*
+  //  GYROTURNSMALL; KP = 6.2
+  //  gyroTurnSmall(-90, 249);
+  //  gyroTurnSmall(-45, 350);
+  //  gyroTurnSmall(-30, 450);
+
+  // inchDrive(-12, 3000, 3.5);
+  // gyroTurnSmall(70, 600, 0.7);
+  // inchDrive(-1, 3000, 4);
