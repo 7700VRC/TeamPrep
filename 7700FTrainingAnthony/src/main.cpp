@@ -122,20 +122,7 @@ void Pturn(float degrees) {
   speed = error * Kp;
   }
   }
-    else if (degrees < 2) {
-
-  while(fabs(error)>2){
-  LF.spin(forward, speed, pct );
-  LB.spin(forward, speed, pct);
-  RF.spin(reverse, speed, pct);
-  RB.spin(reverse, speed, pct); 
-  wait(30, msec);
-  heading = imu.rotation(deg);
-  error = heading - degrees;
-  speed = error * Kp;
-  }
-  }
-    
+  
 
   LF.stop();
   LB.stop();
