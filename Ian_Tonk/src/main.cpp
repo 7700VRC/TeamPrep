@@ -19,7 +19,9 @@ brain Brain;
 motor LF (PORT11, ratio6_1, true);
 motor LB (PORT4, ratio6_1, true);
 motor RF (PORT10, ratio6_1, false);
-motor RB (PORT19, ratio6_1, false);   
+motor RB (PORT19, ratio6_1, false);  
+
+inertial imu (PORT13); 
 
 
  float dia = 4.00;
@@ -72,8 +74,49 @@ void inchDrive(int inches){
   stopRobot();
   Brain.Screen.printAt(10, 20, "distance= %0.1f", x);
 }
- 
 
+
+
+void gyroPrint() {
+  float heading = imu.heading(deg);
+  float rotation = imu.rotation(deg);
+  Brain.Screen.clearScreen();
+  Brain.Screen.printAt(10, 20, "Heading = %0.1f", heading);
+  Brain.Screen.printAt(10, 40, "Rotation = %0.1f", rotation);
+  Brain.Screen.printAt(10, 60, "Pitch = %0.f", imu.pitch(deg));
+  Brain.Screen.printAt(10, 80, "Yaw = %0.1f", imu.yaw(deg));
+  Brain.Screen.printAt(10, 100, "Roll = %0.f", imu.roll(deg));
+}
+ 
+void gyroTurn(float degrees) {
+
+  while (imu.rotation()<degrees) {
+    moveRobot(-10, 10, 50);
+
+    }
+  stopRobot();
+}
+ 
+ void Pturn(float degrees) {
+   float heading = imu.rotation(deg);
+   float error = degrees - heading;
+   float Kp = 0.3; //constant and does not change
+   float speed = error * Kp;
+   imu.resetRotation();
+    
+
+   while(fabs(error)>=2){  //2 is our tolerance
+   moveRobot(speed, -speed, 30);
+   heading = imu.rotation(deg);
+   error = heading - degrees;
+   speed = error * Kp;
+
+   
+   }
+   
+   stopRobot();
+
+ }
 
 /*                                                                           */ 
 /*  You may want to perform some actions before the competition starts.      */ 
@@ -83,7 +126,12 @@ void inchDrive(int inches){
 /*  not every time that the robot is disabled.                               */
 /*---------------------------------------------------------------------------*/
 
+// 
 void pre_auton(void) {
+                                                           
+while(imu.isCalibrating())wait(200, msec); 
+
+
 
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
@@ -101,8 +149,10 @@ void pre_auton(void) {
 
 void autonomous(void) {
  
- inchDrive(12);
- stopRobot();
+ Pturn(90);
+ wait(1, sec);
+ Pturn(-90);
+ gyroPrint();
 
 }
 
@@ -122,6 +172,9 @@ void usercontrol(void) {
 
   // User control code here, inside the loop
   while (1) {
+
+
+    gyroPrint();
     
   
     
@@ -135,7 +188,7 @@ void usercontrol(void) {
     // update your motors, etc.
     // ........................................................................
 
-    wait(20, msec); // Sleep the task for a short amount of time to
+    wait(200, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
 }
