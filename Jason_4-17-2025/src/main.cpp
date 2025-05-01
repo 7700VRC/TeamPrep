@@ -16,8 +16,18 @@ competition Competition;
 
 // define your global instances of motors and other devices here
 
+//Robot Used (7700A)
+
 brain Brain;
 
+
+motor LB (PORT2, ratio6_1, true);
+motor LF (PORT4, ratio6_1, true);
+motor RB (PORT21, ratio6_1, false);
+motor RF (PORT19, ratio6_1, false);
+
+float WD = 3.25;
+float GR = 0.6
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -57,6 +67,44 @@ Brain.Screen.drawCircle(395, 85, 25);
   return 0;
 }
 
+void moveRobot (int rspeed, int lspeed, int duration) {
+  LF.spin (forward, lspeed, pct);
+  LB.spin (forward, lspeed, pct);
+  RF.spin (forward, rspeed, pct);
+  RB.spin (forward, rspeed, pct);
+
+  wait(duration, msec);
+}
+
+
+void stopRobot () {
+  LF.stop (brake);
+  LB.stop (brake);
+  RF.stop (brake);
+  RB.stop (brake);
+}
+
+void inchDrive (float inches){
+  float x = 0;
+  float error = inches - x;
+  float KP = 3.0;
+  float speed =  error * KP;
+
+LF.resetPosition();
+LB.resetPosition();
+RF.resetPosition();
+RB.resetPosition();
+
+while (fabs (error > 0.5)){
+moveRobot(speed, speed, 10);
+x = LF.position(rev) * WD * M_PI * GR;
+error = inches - x;
+speed = error * KP;
+}
+stopRobot();
+
+}
+
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -73,10 +121,15 @@ void autonomous(void) {
   // ..........................................................................
 
   draw_brain_screen ();
-  wait (1, sec);
   Brain.Screen.clearScreen ();
   draw_shapes();
 
+moveRobot (50, 50, 1500);
+stopRobot ();
+moveRobot (50, -50, 605);
+stopRobot ();
+moveRobot (50, 50, 1500);
+stopRobot ();
 }
 
 /*---------------------------------------------------------------------------*/

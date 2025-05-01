@@ -17,13 +17,14 @@ competition Competition;
 // define your global instances of motors and other devices here
 
 brain Brain;
-motor LF (PORT4, ratio6_1, false);
-motor LB (PORT3, ratio6_1, false);
-motor RF (PORT20, ratio6_1, true);
-motor RB (PORT21, ratio6_1, true);
+motor LF (PORT4, ratio6_1, true);
+motor LB (PORT3, ratio6_1, true);
+motor RF (PORT20, ratio6_1, false);
+motor RB (PORT21, ratio6_1, false);
+inertial imu (PORT10);
 
 float dia = 3.25;
-float gear_Ratio = 1.3;
+float gear_Ratio = 0.6;
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -78,11 +79,63 @@ LF.setPosition(0, rev);
   Brain.Screen.printAt(10, 20, "distance = %0.1f", x);
 }
 
-                                                                        
+void gyroPrint() {
+
+  float heading = imu.heading(deg);
+  float rotation = imu.rotation(deg);
+  Brain.Screen.clearScreen();
+  Brain.Screen.printAt(10, 20, "Heading = %0.1f", heading);
+  Brain.Screen.printAt(10, 40, "Rotation = %0.1f", rotation);
+  Brain.Screen.printAt(10, 60, "Pitch = %0.1f", imu.pitch(deg));
+  Brain.Screen.printAt(10, 80, "Yaw = 0.1f", imu.yaw(deg));
+  Brain.Screen.printAt(10, 80, "Roll = 0.1f", imu.roll(deg));
+}
+
+void gyroTurn(float degrees) {
+
+  while (imu.rotation()<degrees) {
+   //moveRobot(-30, 30, 50);
+  LF.spin(forward, 30, pct );
+  LB.spin(forward, 30, pct);
+  RF.spin(reverse, 30, pct);
+  RB.spin(reverse, 30, pct); 
+  }
+  stopRobot();
+}
+
+void Pturn(float degrees) {
+  float heading = imu.rotation(deg);
+  float error = degrees - heading;
+  float Kp = 0.5;
+  float speed = error * Kp;
+
+  
+
+  while(fabs(error)>2){
+  LF.spin(forward, speed, pct );
+  LB.spin(forward, speed, pct);
+  RF.spin(forward, -speed, pct);
+  RB.spin(forward, -speed, pct); 
+  wait(30, msec);
+  heading = imu.rotation(deg);
+  error = heading - degrees;
+  speed = error * Kp;
+  }
+  
+
+  LF.stop();
+  LB.stop();
+  RF.stop();
+  RB.stop();
+    
+}
+                                                    
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
+
+while(imu.isCalibrating())wait(200, msec);
 
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
@@ -99,11 +152,13 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-inchDrive(10);
-moveRobot(35, 70, 1000);
-inchDrive(10);
-stopRobot();
+ Pturn(90);
+ wait(2000, msec);
+ Pturn(-90);
+ gyroPrint(); 
 }
+
+
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -120,13 +175,14 @@ void usercontrol(void) {
   
   while (1) {
 
+    gyroPrint();
 
-    Brain.Screen.printAt(242, 136, "A murder case");
-    Brain.Screen.printAt(450, 20, "Blood");
-    Brain.Screen.drawRectangle(10, 140, 5, 5);
+   // Brain.Screen.printAt(242, 136, "A murder case");
+    // Brain.Screen.printAt(450, 20, "Blood");
+    // Brain.Screen.drawRectangle(10, 140, 5, 5); 
   
 
-    wait(20, msec); // Sleep the task for a short amount of time to
+    wait(200, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
 }
