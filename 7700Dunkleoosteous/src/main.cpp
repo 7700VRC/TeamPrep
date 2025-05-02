@@ -14,10 +14,11 @@ using namespace vex;
 // A global instance of competition
 competition Competition;
 brain Brain;
-motor LF (PORT6, ratio6_1, false);
-motor LB (PORT11, ratio6_1, false);
-motor RF (PORT9, ratio6_1, true);
-motor RB (PORT20, ratio6_1, true);
+motor LF (PORT6, ratio6_1, true);
+motor LB (PORT11, ratio6_1, true);
+motor RF (PORT9, ratio6_1, false);
+motor RB (PORT20, ratio6_1, false);
+inertial Pneumonultramicroscopicsilicovolcanoconiosis (PORT8);
 
 // define your global instances of motors and other devices here
 float dia = 3.25;
@@ -74,10 +75,48 @@ void inchDrive(float target){
   }
   robotStop();
 }
+void gyroPrint(){
+  Brain.Screen.printAt(10, 20, "Heading= %0.1f", Pneumonultramicroscopicsilicovolcanoconiosis.heading(deg));
+  Brain.Screen.printAt(10, 40, "Rotation= %0.1f", Pneumonultramicroscopicsilicovolcanoconiosis.rotation(deg));
+  Brain.Screen.printAt(10, 60, "Yaw= %0.1f", Pneumonultramicroscopicsilicovolcanoconiosis.yaw(deg));
+  Brain.Screen.printAt(10, 80, "Roll= %0.1f", Pneumonultramicroscopicsilicovolcanoconiosis.roll(deg));
+  Brain.Screen.printAt(10, 100, "Pitch= %0.1f", Pneumonultramicroscopicsilicovolcanoconiosis.pitch(deg));
+
+}
+void PneumonultramicroscopicsilicovolcanoconiosisTurn(float degr){
+  if (degr<0){
+  while(Pneumonultramicroscopicsilicovolcanoconiosis.rotation(deg)>degr){
+    robotDrive(-50, 50, 30);
+  }
+  robotStop();
+  }
+  
+  else if(degr<0){
+  while(Pneumonultramicroscopicsilicovolcanoconiosis.rotation(deg)<degr){
+
+    robotDrive(50, -50, 30);
+
+  }
+  
+  }
+  robotStop();
+}
 /*---------------------------------------------------------------------------*/
-
+void Pturn(float tragderg){
+  float heading = Pneumonultramicroscopicsilicovolcanoconiosis.rotation(deg);
+  float error = tragderg-heading;
+  float Kp = 1.5;
+  float speed = Kp*error;
+  while(fabs(error >0.5)){
+    robotDrive(-speed, speed, 30);
+    heading = Pneumonultramicroscopicsilicovolcanoconiosis.rotation(deg);
+    error = tragderg-heading;
+    speed = Kp*error;
+  }
+  robotStop();
+}
 void pre_auton(void) {
-
+while(Pneumonultramicroscopicsilicovolcanoconiosis.isCalibrating())wait(200, msec);
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -94,8 +133,11 @@ void pre_auton(void) {
 
 void autonomous(void) {
   // ..........................................................................hdhdhdhdhddddhhdii dhdhdhdhdhdttht',.pyf      ..
-inchDrive(10);
-  // ..........................................................................
+Pturn(90);
+wait(1, sec);
+Pturn(-90); 
+
+ // ..........................................................................
 }
 
 /*---------------------------------------------------------------------------*/
@@ -114,7 +156,8 @@ void usercontrol(void) {
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
     // values based on feedback from the joysticks.
-
+gyroPrint();
+wait(200, msec);
     // ........................................................................
     // Insert user code here. This is where you use the joystick values to
     // update your motors, etc.
