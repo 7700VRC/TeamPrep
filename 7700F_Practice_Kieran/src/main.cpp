@@ -3,8 +3,8 @@
 /*    Module:       main.cpp                                                  */
 /*    Author:       Kieran Paramasivum                                        */
 /*    Created:      4/14/2025, 4:47:20 PM                                     */
-/*    Description:  7700F practice                                            */
-/*                                                                            */
+/*    Description:  7700F practice coding                                     */
+/*    I am using 7700F robot.                                                 */
 /*----------------------------------------------------------------------------*/
 
 #include "vex.h"
@@ -16,25 +16,100 @@ competition Competition;
 
 // define your global instances of motors and other devices here
 brain Brain;
+
+motor LF (PORT20, ratio18_1, true);
+motor LB (PORT19, ratio18_1, true);
+motor RF (PORT11, ratio18_1, false);
+motor RB (PORT12, ratio18_1, false);
+
+inertial gyrosense (PORT15);
+
+float dia = 4.00;
+float gear_Rtio = 1.00;
+
+// formula for gear ratio, driven gear divided by driving gear = ratio 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
-void screenPrinting (int x1, int x2, int y1, int y2) {
-Brain.Screen.printAt(x1, y1, ":/ ");
+  void moveRobot(int rspeed, int lspeed, int duration){
+  LF.spin(forward, lspeed, pct );
+  LB.spin(forward, lspeed, pct );
+  RF.spin(forward, rspeed, pct );
+  RB.spin(forward, rspeed, pct );
 
-Brain.Screen.printAt(x2, y2, ":)");
+  wait(duration, msec);
+  }
+  
+  void stopRobot() {
+    LF.stop(brake);
+    LB.stop(brake);
+    RF.stop(brake);
+    RB.stop(brake);
 
-Brain.Screen.setPenColor(green);
-Brain.Screen.setFillColor(yellow);
-Brain.Screen.drawRectangle(10, 230, 5, 5);
+  }
 
-}
+  void inchDrive(int inches){
+    float x = 0;
+    float error = inches - x;
+    float kp = 3;
+    float speed = kp * error;
+
+    LF.setPosition(0, rev);
+
+    while (fabs(error) > 0.5) {
+      moveRobot(speed, speed, 10);
+      x = LF.position(rev) * M_PI * dia * gear_Rtio; //distance robot has moved
+      error = inches - x;
+      speed = kp * error;
+    }
+    stopRobot();
+    Brain.Screen.printAt(10, 20, "distance = %0.1f", x);
+  }
+
+  void gyroPrint() {
+    float heading = gyrosense.heading(deg);
+    float rotation = gyrosense.rotation(deg);
+    Brain.Screen.clearScreen();
+    Brain.Screen.printAt(10,20,"Heading = %0.1f", heading);
+    Brain.Screen.printAt(10,40,"Rotation = %0.1f", rotation);
+    Brain.Screen.printAt(10,60,"Pitch  =  %0.1f", gyrosense.pitch());
+  }
+
+
+  void gyroTurn(float degrees){
+    while(gyrosense.rotation()<degrees) {
+      moveRobot(-50, 50, 30);
+
+    }
+    stopRobot();
+
+  }
+
+  void Pturn(float degrees){
+    float heading = gyrosense.rotation(deg);
+    float error = degrees - heading;
+    float Kp = 2.0;
+    float speed = error * Kp;
+    gyrosense.resetRotation();
+   
+    while(fabs(error)>=2){ 
+      moveRobot(speed, -speed, 30);
+      heading = gyrosense.rotation(deg);
+      error = heading - degrees;
+      speed = error * Kp;
+    
+
+    }
+  
+    stopRobot();
+  }
 /*---------------------------------------------------------------------------*/
 
 //Part of Pre-Auton
 void pre_auton(void) {
 
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
+  while(gyrosense.isCalibrating()) wait(200, msec);
+
+
 }
 
 /*---------------------------------------------------------------------------*/
@@ -48,9 +123,12 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  // ..........................................................................
-  // Insert autonomous user code here.
-  // ..........................................................................
+
+  Pturn(90);
+  wait(1, sec);
+  Pturn(-90);
+  gyroPrint();
+
 }
 
 /*---------------------------------------------------------------------------*/
@@ -65,9 +143,10 @@ void autonomous(void) {
 
 void usercontrol(void) {
   while (1) {
-   
 
-    
+   gyroPrint(); 
+   wait(200, msec); 
+
   }
 }
 
@@ -75,10 +154,6 @@ void usercontrol(void) {
 // Main will set up the competition functions and callbacks.
 //
 int main() {
-  screenPrinting(242,400,135,10 ); //These numbers represent x1,x2,y1,y2 as definied in the Screen Printing section
-  wait(2, sec);
-  Brain.Screen.clearScreen();
-  screenPrinting(42,250, 100, 50);
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
