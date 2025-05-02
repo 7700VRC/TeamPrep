@@ -20,14 +20,16 @@ competition Competition;
 
 brain Brain;
 
+motor LB (PORT19, ratio6_1, true);
+motor LF (PORT20, ratio6_1, true);
+motor RB (PORT12, ratio6_1, false);
+motor RF (PORT11, ratio6_1, false);
 
-motor LB (PORT2, ratio6_1, true);
-motor LF (PORT4, ratio6_1, true);
-motor RB (PORT21, ratio6_1, false);
-motor RF (PORT19, ratio6_1, false);
+inertial Gyro (PORT15);
 
+//Define variables
 float WD = 3.25;
-float GR = 0.6
+float GR = 0.6;
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -43,6 +45,8 @@ void pre_auton(void) {
 
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
+
+  while (Gyro.isCalibrating())wait(200, msec);
 }
 
 //screen pixle extremes are 0,0 and 480,272
@@ -67,6 +71,11 @@ Brain.Screen.drawCircle(395, 85, 25);
   return 0;
 }
 
+
+
+//drive things
+
+
 void moveRobot (int rspeed, int lspeed, int duration) {
   LF.spin (forward, lspeed, pct);
   LB.spin (forward, lspeed, pct);
@@ -83,6 +92,7 @@ void stopRobot () {
   RF.stop (brake);
   RB.stop (brake);
 }
+
 
 void inchDrive (float inches){
   float x = 0;
@@ -105,6 +115,58 @@ stopRobot();
 
 }
 
+void printGyro (){
+  Brain.Screen.printAt(10, 20, "Heading = %0.1f", Gyro.heading (deg));
+  Brain.Screen.printAt(10, 40, "Rotation = %0.1f", Gyro.rotation (deg));
+  Brain.Screen.printAt(10, 60, "Yaw = %0.1f", Gyro.yaw (deg));
+  Brain.Screen.printAt(10, 80, "Roll = %0.1f", Gyro.roll (deg));
+  Brain.Screen.printAt(10, 100, "Pitch = %0.1f", Gyro.pitch (deg));
+}
+// lebrown le brown lecrown James LeArash James
+void GyroTurn (float degrees) {
+ 
+ if (degrees > 0){
+
+  while (Gyro.rotation (deg) < degrees){
+
+
+moveRobot (-50, 50, 30);
+
+    wait(30,msec);
+    }
+  
+
+}
+else if (degrees<0){
+ while (Gyro.rotation (deg) < degrees){
+moveRobot (50, -50, 30);
+
+    wait(30,msec);
+}}
+  stopRobot();
+}
+
+
+
+
+void Pturn (float targetDegrees) {
+  float heading = Gyro.rotation (deg);
+  float error = targetDegrees - heading;
+  float Kp = 1.0;
+  float speed = Kp * error;
+
+  while (fabs (error) > 5){
+    moveRobot (-50, 50, 30);
+    wait (30, msec);
+
+    heading = Gyro.rotation (deg);
+    error = heading -targetDegrees;
+    speed = error * Kp;
+
+  }
+  stopRobot();
+}
+
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -120,16 +182,9 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
 
-  draw_brain_screen ();
-  Brain.Screen.clearScreen ();
-  draw_shapes();
-
-moveRobot (50, 50, 1500);
-stopRobot ();
-moveRobot (50, -50, 605);
-stopRobot ();
-moveRobot (50, 50, 1500);
-stopRobot ();
+  Pturn (90);
+wait (1, sec);
+Pturn (-90);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -152,8 +207,8 @@ void usercontrol(void) {
     // ........................................................................
     // Insert user code here. This is where you use the joystick values to
     // update your motors, etc.
-    // ........................................................................
-
+    // .......................................................................
+    printGyro ();
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
@@ -175,3 +230,7 @@ int main() {
     wait(100, msec);
   }
 }
+
+
+
+

@@ -16,18 +16,14 @@ competition Competition;
 
 // define your global instances of motors and other devices here
 brain Brain;
+motor LF (PORT1, ratio6_1, false );
+motor LB (PORT2, ratio6_1, false );
+motor RF (PORT3, ratio6_1, true );
+motor RB (PORT4, ratio6_1, true );
 
-void drawonscreen () {
-  Brain.Screen.printAt ( 140, 135, "middle");
 
-  Brain.Screen.printAt ( 120, 80, "left top");
-
-  Brain.Screen.printAt ( 320, 80, "right top");
-
-  Brain.Screen.printAt ( 120, 215, "bottom left");
-
-  Brain.Screen.printAt (260, 215, "bottom right");
-  }
+float WD = 3.25;
+float GR = 0.6
 
 
 int drawshapes () {
@@ -57,7 +53,44 @@ void pre_auton(void) {
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
+void moveBot (int rspeed, int lspeed, int duration) {
 
+  LF.spin(forward, lspeed, pct);
+  LB.spin(forward, lspeed, pct);
+  RF.spin(forward, rspeed, pct);
+  RB.spin(forward, rspeed, pct);
+
+wait(duration, msec);
+
+}
+
+void stopBot() {
+LF.stop(brake);
+LB.stop(brake);
+RF.stop(brake);
+RB.stop(brake);
+}
+void inchDrive(float inches){
+float x = 0;
+float error = inches - x;
+float Kp = 3.0;
+float speed = error *Kp;
+
+LF.resetposition();
+
+while (fabs (error) > 0.5){
+movebot(speed, speed, 10);
+x = LF.position(rev)*WD*M_PI*GR;
+error = inches - x;
+speed = error * Kp;
+
+
+}
+stopbot();
+
+
+
+}
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -77,6 +110,12 @@ void autonomous(void) {
  Brain.Screen.clearScreen();
  drawshapes(); 
 
+moveBot(40, 40, 1500);
+stopBot();
+moveBot(40, -40, 600);
+stopBot();
+moveBot(40, 40, 1500);
+stopBot();
 }
 
 /*---------------------------------------------------------------------------*/
