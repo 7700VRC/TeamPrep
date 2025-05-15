@@ -1,10 +1,10 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       Kieran Paramasivum                                        */
-/*    Created:      4/14/2025, 4:47:20 PM                                     */
-/*    Description:  7700F practice coding                                     */
-/*    I am using 7700F robot.                                                 */
+/*    Author:       student                                                   */
+/*    Created:      5/1/2025, 4:09:20 PM                                      */
+/*    Description:  V5 project                                                */
+/*                                                                            */
 /*----------------------------------------------------------------------------*/
 
 #include "vex.h"
@@ -15,100 +15,101 @@ using namespace vex;
 competition Competition;
 
 // define your global instances of motors and other devices here
+
+
+
 brain Brain;
+motor LBM(PORT12, ratio6_1, false);
+motor LFM(PORT2, ratio6_1, false );
+motor RBM(PORT11, ratio6_1, true);
+motor RFM(PORT5, ratio6_1, true);
 
-motor LF (PORT20, ratio18_1, true);
-motor LB (PORT19, ratio18_1, true);
-motor RF (PORT11, ratio18_1, false);
-motor RB (PORT12, ratio18_1, false);
+inertial imu (PORT3);
 
-inertial gyrosense (PORT15);
 
-float dia = 4.00;
-float gear_Rtio = 1.00;
-
-// formula for gear ratio, driven gear divided by driving gear = ratio 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
-  void moveRobot(int rspeed, int lspeed, int duration){
-  LF.spin(forward, lspeed, pct );
-  LB.spin(forward, lspeed, pct );
-  RF.spin(forward, rspeed, pct );
-  RB.spin(forward, rspeed, pct );
+             
 
-  wait(duration, msec);
-  }
+
+void printGyro(){
+  Brain.Screen.printAt(10,20, "Heading = %0.1f", imu.heading(deg));
+  Brain.Screen.printAt(10,40, "Rotation = %0.1f", imu.rotation(deg));
+  Brain.Screen.printAt(10,60, "Yaw = %0.1f", imu.yaw(deg));
+  Brain.Screen.printAt(10,80, "Roll = %0.1f", imu.roll(deg));
+  Brain.Screen.printAt(10,100, "Pitch = %0.1f", imu.pitch(deg));
+}
+
+
+void gyroTurn(float degrees){
+if  (degrees>0){
+
+while (imu.rotation(deg)< degrees){
+
+  RFM.spin(forward, -50, pct);
+  RBM.spin(forward, -50, pct);
+  LFM.spin(forward, 50, pct);
+  LBM.spin(forward, 50, pct);
+  wait(30, msec);
+
+  //moverobot(-50, 50, 30);
+
+}
+
+}
+
+else if (degrees>0){
+
+while (imu.rotation(deg)> degrees){
+
+  RFM.spin(forward, -50, pct);
+  RBM.spin(forward, -50, pct);
+  LFM.spin(forward, 50, pct);
+  LBM.spin(forward, 50, pct);
+  wait(30, msec);
+
+  //moverobot(-50, 50, 30);
+}
+}
+
+RFM.stop(brake);
+RBM.stop(brake);
+LFM.stop(brake);
+LBM.stop(brake);
+}
+
+
+void Pturn(float targetDegrees){
+  float heading = imu.rotation(deg);
+  float error = targetDegrees - heading;
+  float Kp = 0.5;
+  float speed = Kp *error;
   
-  void stopRobot() {
-    LF.stop(brake);
-    LB.stop(brake);
-    RF.stop(brake);
-    RB.stop(brake);
+  while (fabs(error)> 5 ){ //tolerance
+  RFM.spin(forward, speed, pct);
+  RBM.spin(forward, speed, pct);
+  LFM.spin(forward, speed, pct);
+  LBM.spin(forward, speed, pct);
+  wait(30, msec);
+
+  heading = imu.rotation(deg);
+  error = heading - targetDegrees;
+  speed = error *Kp;
 
   }
-
-  void inchDrive(int inches){
-    float x = 0;
-    float error = inches - x;
-    float kp = 3;
-    float speed = kp * error;
-
-    LF.setPosition(0, rev);
-
-    while (fabs(error) > 0.5) {
-      moveRobot(speed, speed, 10);
-      x = LF.position(rev) * M_PI * dia * gear_Rtio; //distance robot has moved
-      error = inches - x;
-      speed = kp * error;
-    }
-    stopRobot();
-    Brain.Screen.printAt(10, 20, "distance = %0.1f", x);
-  }
-
-  void gyroPrint() {
-    float heading = gyrosense.heading(deg);
-    float rotation = gyrosense.rotation(deg);
-    Brain.Screen.clearScreen();
-    Brain.Screen.printAt(10,20,"Heading = %0.1f", heading);
-    Brain.Screen.printAt(10,40,"Rotation = %0.1f", rotation);
-    Brain.Screen.printAt(10,60,"Pitch  =  %0.1f", gyrosense.pitch());
-  }
+RFM.stop(brake);
+RBM.stop(brake);
+LFM.stop(brake);
+LBM.stop(brake);
+}
 
 
-  void gyroTurn(float degrees){
-    while(gyrosense.rotation()<degrees) {
-      moveRobot(-50, 50, 30);
-
-    }
-    stopRobot();
-
-  }
-
-  void Pturn(float degrees){
-    float heading = gyrosense.rotation(deg);
-    float error = degrees - heading;
-    float Kp = 2.0;
-    float speed = error * Kp;
-    gyrosense.resetRotation();
-   
-    while(fabs(error)>=2){ 
-      moveRobot(speed, -speed, 30);
-      heading = gyrosense.rotation(deg);
-      error = heading - degrees;
-      speed = error * Kp;
-    
-
-    }
-  
-    stopRobot();
-  }
-/*---------------------------------------------------------------------------*/
-
-//Part of Pre-Auton
 void pre_auton(void) {
 
-  while(gyrosense.isCalibrating()) wait(200, msec);
-
+  while(imu.isCalibrating())wait(200, msec);
+  gyroTurn(90);
+  wait(1, sec);
+  gyroTurn(-90);
 
 }
 
@@ -123,12 +124,10 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-
-  Pturn(90);
+ 
+  gyroTurn(90);
   wait(1, sec);
-  Pturn(-90);
-  gyroPrint();
-
+  gyroTurn(-90);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -142,11 +141,15 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
+  // User control code here, inside the loop
   while (1) {
+    // This is the main execution loop for the user control program.
+    // Each time through the loop your program should update motor + servo
+    // values based on feedback from the joysticks.
 
-   gyroPrint(); 
-   wait(200, msec); 
-
+   printGyro();
+    wait(200, msec); // Sleep the task for a short amount of time to
+                    // prevent wasted resources.
   }
 }
 
