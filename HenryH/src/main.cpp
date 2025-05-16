@@ -18,7 +18,9 @@ brain Brain;
  motor RF  (PORT9, ratio6_1, true);
  motor RB  (PORT20, ratio6_1, true);
 competition Competition;
-
+float D = 3.25;
+float G = 0.6;
+float P = M_PI;
 // define your global instances of motors and other devices here
 
 /*---------------------------------------------------------------------------*/
@@ -57,6 +59,20 @@ void stop(){
   LB.stop(brake);
   RF.stop(brake);
   RB.stop(brake);
+}
+void move_better(int tar){
+float x = 0;
+float err = tar - x;
+float kp = 3.0;
+float speed = err * kp;
+RB.setPosition(0, rev);
+while (fabs(err) > 0.25){
+  move(speed, speed, 10);
+  x = RB.position(rev)*D*G*P;
+  float err = tar - x;
+  float speed = err * kp;
+}
+stop();
 }
 /*---------------------------------------------------------------------------*/
 
