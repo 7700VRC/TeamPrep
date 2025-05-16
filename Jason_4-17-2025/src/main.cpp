@@ -20,12 +20,12 @@ competition Competition;
 
 brain Brain;
 
-motor LB (PORT19, ratio6_1, true);
-motor LF (PORT20, ratio6_1, true);
-motor RB (PORT12, ratio6_1, false);
-motor RF (PORT11, ratio6_1, false);
+motor LB (PORT4, ratio6_1, true);
+motor LF (PORT11, ratio6_1, true);
+motor RB (PORT19, ratio6_1, false);
+motor RF (PORT10, ratio6_1, false);
 
-inertial Gyro (PORT15);
+inertial Gyro (PORT13);
 
 //Define variables
 float WD = 3.25;
