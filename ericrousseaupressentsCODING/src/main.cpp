@@ -13,7 +13,11 @@ using namespace vex;
 
 // A global instance of competition
 competition Competition;
-
+motor LF(PORT19 ratio18_1, false)
+motor LB(PORT16 ratio18_1, false) 
+motor RF(PORT18 ratio18_1, true)
+motor RB(PORT17 ratio18_1, true)
+inertial thingy (PORT21);
 // define your global instances of motors and other devices here
 brain Brain;
 /*---------------------------------------------------------------------------*/
@@ -31,11 +35,62 @@ Brain.Screen.drawRectangle(240, 135, 20, 20);
 return 0;
 
   }
+
+  void printgyro() {
+    Brain.Screen.printAt(10, 20,"Heading= %0.1f", thingy.heading(deg));
+    Brain.Screen.printAt(10, 40,"Rotation= %0.1f", thingy.rotation(deg));
+    Brain.Screen.printAt(10, 60,"Yaw= %0.1f", thingy.yaw(deg));
+    Brain.Screen.printAt(10, 80,"Roll= %0.1f", thingy.roll(deg));
+    Brain.Screen.printAt(10, 20,"pitch= %0.1f", thingy.pitch(deg));
+  }
 /*  not every time that the robot is disabled        
 /*---------------------------------------------------------------------------*/
 
+void gyroturn(float degrees){
+
+  while(thingy.rotation(deg)< degrees){
+
+    RF.spin(forward, -speed. pct);
+    Rb.spin(forward, -speed. pct);
+    LF.spin(forward, speed. pct);
+    LB.spin(forward, speed. pct);
+    wait(30, msec);
+   
+    heading = thingy.rotation(deg);
+    error = heading - targetdegrees;
+    speed = error * kp;
+    //moverobot(-50, 50, 30);
+  }
+LF.stop(brake);
+LB.stop(brake);
+RF.stop(brake);
+RB.stop(brake);
+}
+
+
+void Pturn(float targetdegrees) {
+  float heading = thingy.rotation(deg);
+  float error = heading - targetdegrees;
+  float kp = 0.5; // constant P gain
+  float speed = kp * erorr;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 void pre_auton(void) {
 
+  while(thingy.isCalibrating())wait(200. msec);
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -54,7 +109,9 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-  drawshapes();
+  Pturn(90);
+  wait(1, sec);
+  Pturn(-90);
 }
 
 /*---------------------------------------------------------------------------*/

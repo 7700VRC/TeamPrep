@@ -17,17 +17,20 @@ competition Competition;
 // define your global instances of motors and other devices here
 
 //Brain/Control
-controller Controller1();
+controller Controller1;
 brain Brain;
 
 //Drive Motors
-motor RF (PORT10, ratio6_1 , false);
-motor RB (PORT19, ratio6_1 , false);
-motor LF (PORT11, ratio6_1 , true);
-motor LB (PORT4, ratio6_1 , true);
+motor RF (PORT5, ratio6_1 , false);
+motor RB (PORT11, ratio6_1 , false);
+motor LF (PORT2, ratio6_1 , true);
+motor LB (PORT12, ratio6_1 , true);
 
+motor intake(PORT8, ratio18_1, true);
 //Gyro
 inertial GYRO (PORT13);
+
+ 
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -127,14 +130,19 @@ Robotstop ();
 void usercontrol(void) {
   // User control code here, inside the loop
   while (1) {
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
+    
+      int lspeed = Controller1.Axis3.position(pct);
 
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
-    // ........................................................................
+      int rspeed = Controller1.Axis2.position(pct);
+      Robotdrive(rspeed, lspeed, 10);
+
+      if (Controller1.ButtonR2.pressing()) {
+       intake.spin(fwd, -85, pct);   
+      }
+      else if (Controller1.ButtonR1.pressing()){
+     intake.spin(fwd, 85, pct);
+      }
+      else { (intake.stop()); } 
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
