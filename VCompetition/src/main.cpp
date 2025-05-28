@@ -17,14 +17,14 @@ competition Competition;
 // define your global instances of motors and other devices here
 brain Brain;
 motor LF (PORT2, ratio6_1, false);
-motor LB (PORT1, ratio6_1, false);
-motor RF (PORT15, ratio6_1, true);
-motor RB (PORT16, ratio6_1, true);
+motor LB (PORT12, ratio6_1, false);
+motor RF (PORT5, ratio6_1, true);
+motor RB (PORT11, ratio6_1, true);
 
 float WD = 3.25;
 float GR = 0.75;
 
-void moveRobot (int lspeed, int rspeed, int duration) {
+void robotDrive (int lspeed, int rspeed, int duration) {
   
   LF.spin(forward, lspeed, pct);
   LB.spin(forward, lspeed, pct);
@@ -43,8 +43,26 @@ void stopRobot () {
 
 
 
-void inchDrive(float inches) {
-  float x = 0;
+void inchDrive(float target) {
+  float error = 0;
+  float Kp = 3.0; 
+  LF.resetPosition();
+  float x = LF.position(rev)*WD*3.14* GR;
+  error = target-x; 
+
+  while(fabs (error ) > 0.5) {
+   float speed= error* Kp;
+
+    robotDrive(speed,speed,50);
+    x = LF.position(rev)*WD*3.14* GR;
+    error = target - x;
+    speed= error* Kp;
+    
+  }
+  stopRobot();
+  Brain.Screen.printAt(10,20, "distance = %0.1f" , x);
+}
+  /*float x = 0;
   float error = inches - x;
   float Kp = 3.0;
   float speed = error *Kp;
@@ -58,7 +76,7 @@ void inchDrive(float inches) {
     speed = error * Kp;
   }
 stopRobot();
-}
+*/
 
 void drawOnScreen () {
   Brain.Screen.printAt (240, 135, "MIDDLE");
@@ -113,10 +131,9 @@ void pre_auton(void) {
 
 void autonomous(void) {
   
- moveRobot(50, 50, 1500);
- moveRobot(50, -50, 1000); 
- moveRobot(50, 50, 1500);
- stopRobot();
+inchDrive(20);
+
+
 //drive straight for time sharp u turn go back start stop robot
  //drawOnScreen ();
  //wait(1, sec);
