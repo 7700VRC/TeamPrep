@@ -21,12 +21,12 @@ controller Controller1;
 brain Brain;
 
 //Drive Motors
-motor RF (PORT5, ratio6_1 , false);
-motor RB (PORT11, ratio6_1 , false);
-motor LF (PORT2, ratio6_1 , true);
-motor LB (PORT12, ratio6_1 , true);
+motor RF (PORT17, ratio18_1 , false);
+motor RB (PORT18, ratio18_1 , false);
+motor LF (PORT16, ratio18_1 , true);
+motor LB (PORT19, ratio18_1 , true);
 
-motor intake(PORT8, ratio18_1, true);
+motor intake(PORT21, ratio18_1, true);
 //Gyro
 inertial GYRO (PORT13);
 
@@ -58,6 +58,10 @@ LF.spin (fwd, Lspeed, pct);
 LB.spin (fwd, Lspeed, pct);
 wait (duration, msec);
 }
+
+
+
+
 
 
 void turntoAngle (float targetAngle){
