@@ -43,12 +43,13 @@ inertial GYRO (PORT13);
 /*---------------------------------------------------------------------------*/
 
 //Function to stop robot
+//Function to stop robot
 void Robotstop() {
 RF.stop (brake);
 RB.stop (brake);
 LF.stop (brake);
 LB.stop (brake);
-}
+} 
 
 //Function to drive robot
 void Robotdrive (int Lspeed, int Rspeed, int duration) {
@@ -60,8 +61,45 @@ wait (duration, msec);
 }
 
 
+void inchDrive (float inches){
+  float x = 0;
+  float error = inches - x;
+  float KP = 3.0;
+  float speed =  error * KP;
+
+LF.resetPosition();
+LB.resetPosition();
+RF.resetPosition();
+RB.resetPosition();
+
+while (fabs (error > 0.5)){
+Robotdrive(speed, speed, 10);
+x = LF.position(rev) * WD * M_PI * GR;
+error = inches - x;
+speed = error * KP;
+}
+Robotstop();
+
+}
 
 
+void Pturn (float targetDegrees) {
+  float heading = GYRO.rotation (deg);
+  float error = targetDegrees - heading;
+  float Kp = 1.0;
+  float speed = Kp * error;
+
+  while (fabs (error) > 5){
+    Robotdrive (-50, 50, 30);
+    wait (30, msec);
+
+    heading = GYRO.rotation (deg);
+    error = heading -targetDegrees;
+    speed = error * Kp;
+
+  }
+  Robotstop();
+}
 
 
 void turntoAngle (float targetAngle){
@@ -96,6 +134,8 @@ while (true) {
 }
 Robotstop ();
 }
+
+
 
 
 
