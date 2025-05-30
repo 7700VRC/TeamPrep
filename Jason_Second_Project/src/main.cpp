@@ -21,17 +21,21 @@ controller Controller1;
 brain Brain;
 
 //Drive Motors
-motor RF (PORT17, ratio18_1 , false);
-motor RB (PORT18, ratio18_1 , false);
-motor LF (PORT16, ratio18_1 , true);
-motor LB (PORT19, ratio18_1 , true);
+motor RF (PORT17, ratio18_1 , true);
+motor RB (PORT18, ratio18_1 , true);
+motor LF (PORT16, ratio18_1 , false);
+motor LB (PORT19, ratio18_1 , false);
 
-motor intake(PORT21, ratio18_1, true);
+//other motors
+motor intake(PORT21, ratio6_1, true);
+motor clamp (PORT11, ratio18_1, false);
+
 //Gyro
-inertial GYRO (PORT13);
+inertial GYRO (PORT20);
 
- 
-
+ //Define Costants
+ float WD = 4;
+ float GR = 1;
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -72,7 +76,7 @@ LB.resetPosition();
 RF.resetPosition();
 RB.resetPosition();
 
-while (fabs (error > 0.5)){
+while (fabs (error) > 0.5){
 Robotdrive(speed, speed, 10);
 x = LF.position(rev) * WD * M_PI * GR;
 error = inches - x;
@@ -86,11 +90,11 @@ Robotstop();
 void Pturn (float targetDegrees) {
   float heading = GYRO.rotation (deg);
   float error = targetDegrees - heading;
-  float Kp = 1.0;
+  float Kp = 0.5;
   float speed = Kp * error;
 
   while (fabs (error) > 5){
-    Robotdrive (-50, 50, 30);
+    Robotdrive (-speed, speed, 30);
     wait (30, msec);
 
     heading = GYRO.rotation (deg);
@@ -155,9 +159,25 @@ void pre_auton(void) {
 
 void autonomous(void) {
 
-Robotdrive (50, 50, 2000);
-Robotstop ();
-//turntoAngle (90);
+  //Clamp Preset
+clamp.spin (reverse, 50, pct);
+wait(1000, msec);
+clamp.stop (hold);
+//start
+wait(100, msec);
+inchDrive (-28);
+wait(100, msec);
+clamp.spin (fwd, 50, pct);
+wait(1000, msec);
+clamp.stop (hold);
+wait(100, msec);
+Pturn (-85);
+wait(100, msec);
+intake.spin (fwd, 100, pct);
+wait(100, msec);
+inchDrive (17);
+wait(100, msec);
+intake.stop ();
 
 }
 
