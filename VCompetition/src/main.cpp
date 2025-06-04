@@ -1,9 +1,9 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       student                                                   */
+/*    Author:       Bradan                                                 */
 /*    Created:      4/17/2025, 4:44:40 PM                                     */
-/*    Description:  V5 project                                                */
+/*    Description:  7700F                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
@@ -16,14 +16,14 @@ competition Competition;
 
 // define your global instances of motors and other devices here
 brain Brain;
-motor LF (PORT2, ratio6_1, false);
-motor LB (PORT12, ratio6_1, false);
-motor RF (PORT5, ratio6_1, true);
-motor RB (PORT11, ratio6_1, true);
-
+motor LF (PORT5, ratio18_1, false);
+motor LB (PORT19, ratio18_1, true);
+motor RF (PORT13, ratio18_1, true);
+motor RB (PORT1, ratio18_1, false);
+inertial Steven_Kwan (PORT15);
 float WD = 3.25;
 float GR = 0.75;
-
+float pi = 3.14;
 void robotDrive (int lspeed, int rspeed, int duration) {
   
   LF.spin(forward, lspeed, pct);
@@ -40,7 +40,40 @@ void stopRobot () {
   RF.stop(brake);
   RB.stop(brake);
 }
+void printSteven_Kwan(){
+  Brain.Screen.printAt(10, 20, "Heading= %0.1f", Steven_Kwan.heading(deg));
+  Brain.Screen.printAt(10, 40, "Rotation= %0.1f", Steven_Kwan.rotation(deg));
+}
 
+void turn (float target){
+if(target > 0){
+  while(Steven_Kwan.rotation(deg)<target){
+   robotDrive(50, -50, 30);
+
+  }
+}
+else if(target < 0) {
+while(Steven_Kwan.rotation(deg)>target){
+   robotDrive(-50, 50, 30);  
+}
+}
+stopRobot();
+}
+
+
+void pTurn(float target) {
+float x = Steven_Kwan.rotation(deg);
+float error = target - x;
+float Kp = 0.5; 
+float speed = 0;
+while (fabs(error) > 5){
+speed = Kp * error;
+robotDrive(speed, -speed, 30);
+error = target -x;
+
+}
+stopRobot();
+}
 
 
 void inchDrive(float target) {
@@ -54,7 +87,7 @@ void inchDrive(float target) {
    float speed= error* Kp;
 
     robotDrive(speed,speed,50);
-    x = LF.position(rev)*WD*3.14* GR;
+    x = LB.position(rev)*WD*3.14* GR;
     error = target - x;
     speed= error* Kp;
     
@@ -76,7 +109,7 @@ void inchDrive(float target) {
     speed = error * Kp;
   }
 stopRobot();
-*/
+
 
 void drawOnScreen () {
   Brain.Screen.printAt (240, 135, "MIDDLE");
@@ -105,7 +138,7 @@ int drawShapes () {
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
-/*                                                                           */
+/*                          edgar                                            */
 /*  You may want to perform some actions before the competition starts.      */
 /*  Do them in the following function.  You must return from this function   */
 /*  or the autonomous and usercontrol tasks will not be started.  This       */
@@ -114,6 +147,8 @@ int drawShapes () {
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
+
+  while(Steven_Kwan.isCalibrating())wait(0.2,sec);
 
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
@@ -131,7 +166,10 @@ void pre_auton(void) {
 
 void autonomous(void) {
   
-inchDrive(20);
+inchDrive(10);
+turn(45);
+wait(300, msec);
+turn(-90);
 
 
 //drive straight for time sharp u turn go back start stop robot
@@ -142,7 +180,7 @@ inchDrive(20);
  
   
   // ..........................................................................
-  // Insert autonomous user code here.
+  
   // ..........................................................................
 }
 
@@ -167,6 +205,8 @@ void usercontrol(void) {
     // Insert user code here. This is where you use the joystick values to
     // update your motors, etc.
     // ........................................................................
+printSteven_Kwan();
+wait(200, msec);
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
