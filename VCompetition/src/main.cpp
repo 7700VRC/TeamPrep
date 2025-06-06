@@ -15,14 +15,20 @@ using namespace vex;
 competition Competition;
 
 // define your global instances of motors and other devices here
+controller troller;
 brain Brain;
-motor LF (PORT5, ratio18_1, false);
-motor LB (PORT19, ratio18_1, true);
-motor RF (PORT13, ratio18_1, true);
-motor RB (PORT1, ratio18_1, false);
-inertial Steven_Kwan (PORT15);
-float WD = 3.25;
 float GR = 0.75;
+motor LF (PORT2, ratio18_1, false);
+motor LB (PORT12, ratio18_1, false);
+motor RF (PORT5, ratio18_1, true);
+motor RB (PORT11, ratio18_1, true);
+inertial Steven_Kwan (PORT3);
+motor intake(PORT8, ratio6_1 );
+motor clamp(PORT16, ratio6_1);
+
+
+float WD = 4.00;
+float GR = 1.0;
 float pi = 3.14;
 void robotDrive (int lspeed, int rspeed, int duration) {
   
@@ -32,6 +38,20 @@ void robotDrive (int lspeed, int rspeed, int duration) {
   RB.spin(forward, rspeed, pct);
 
   wait(duration, msec);
+}
+
+
+
+
+void spinIntake (int speed ){
+intake.spin(forward, speed, pct);
+}
+
+
+void spinClamp(int speed, int waitTime){
+  clamp.spin(forward, speed, pct);
+  wait(waitTime, msec); 
+  clamp.stop();
 }
 
 void stopRobot () {
@@ -73,6 +93,25 @@ error = target -x;
 
 }
 stopRobot();
+}
+void inchDriveBackwards(float target) {
+  float error = 0;
+  float Kp = 3.0; 
+  LF.resetPosition();
+  float x = LF.position(rev)*WD*3.14* GR;
+  error = target-x; 
+
+  while(fabs (error ) > 0.5) {
+   float speed= error* Kp;
+
+    robotDrive(speed,speed,50);
+    x = LB.position(rev)*WD*3.14* GR;
+    error = target - x;
+    speed= -error* Kp;
+    
+  }
+  stopRobot();
+  Brain.Screen.printAt(10,20, "distance = %0.1f" , x);
 }
 
 
@@ -165,12 +204,17 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  
-inchDrive(10);
-turn(45);
-wait(300, msec);
-turn(-90);
 
+//spinClamp(50, 1000); 
+
+spinClamp(75, 1000);
+inchDriveBackwards(-30.76);
+spinClamp(-95, 1900);
+spinIntake(-81);
+
+// intake.spin(forward, 75, pct); 
+// inchDrive(10);
+// intake.stop(); 
 
 //drive straight for time sharp u turn go back start stop robot
  //drawOnScreen ();
@@ -197,14 +241,23 @@ turn(-90);
 void usercontrol(void) {
   // User control code here, inside the loop
   while (1) {
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
+    float Lspeed = troller.Axis3.position(pct); 
+        float Rspeed = troller.Axis2.position(pct); 
+        robotDrive(Lspeed, Rspeed, 50); 
+    
+    if (troller.ButtonR1.pressing()){ 
+      clamp.spin(forward, 75, pct); 
+    
+    }
+    else if (troller.ButtonR2.pressing()){ 
+      clamp.spin(forward, -75, pct); 
+    
+    }
+    else { 
+      clamp.stop(hold); 
+    }
 
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
-    // ........................................................................
+
 printSteven_Kwan();
 wait(200, msec);
 
