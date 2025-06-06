@@ -17,7 +17,6 @@ competition Competition;
 // define your global instances of motors and other devices here
 controller troller;
 brain Brain;
-float GR = 0.75;
 motor LF (PORT2, ratio18_1, false);
 motor LB (PORT12, ratio18_1, false);
 motor RF (PORT5, ratio18_1, true);
