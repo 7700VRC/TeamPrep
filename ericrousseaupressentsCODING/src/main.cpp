@@ -13,11 +13,12 @@ using namespace vex;
 
 // A global instance of competition
 competition Competition;
-motor LF(PORT19 ratio18_1, false)
-motor LB(PORT16 ratio18_1, false) 
-motor RF(PORT18 ratio18_1, true)
-motor RB(PORT17 ratio18_1, true)
-inertial thingy (PORT21);
+motor LF(PORT2, ratio18_1, false);
+motor LB(PORT19, ratio18_1, false) ;
+motor RF(PORT5, ratio18_1, true);
+motor RB(PORT11, ratio18_1, true);
+inertial thingy (PORT3);
+motor intake(PORT8, ratio18_1, true);
 // define your global instances of motors and other devices here
 brain Brain;
 /*---------------------------------------------------------------------------*/
@@ -43,17 +44,49 @@ return 0;
     Brain.Screen.printAt(10, 80,"Roll= %0.1f", thingy.roll(deg));
     Brain.Screen.printAt(10, 20,"pitch= %0.1f", thingy.pitch(deg));
   }
-/*  not every time that the robot is disabled        
 /*---------------------------------------------------------------------------*/
 
-void gyroturn(float degrees){
+// void gyroturn(float degrees){
 
-  while(thingy.rotation(deg)< degrees){
+//   while(thingy.rotation(deg)< degrees){
 
-    RF.spin(forward, -speed. pct);
-    Rb.spin(forward, -speed. pct);
-    LF.spin(forward, speed. pct);
-    LB.spin(forward, speed. pct);
+//     RF.spin(forward, -speed. pct);
+//     RB.spin(forward, -speed. pct);
+//     LF.spin(forward, speed. pct);
+//     LB.spin(forward, speed. pct);
+//     wait(30, msec);
+   
+//     heading = thingy.rotation(deg);
+//     error = heading - targetdegrees;
+//     speed = error * kp;
+//     //moverobot(-50, 50, 30);
+//   }
+// LF.stop(brake);
+// LB.stop(brake);
+// RF.stop(brake);
+// RB.stop(brake);
+// }
+
+void driveRobotI(int rspeed, int lspeed, int wt) { 
+    RF.spin(forward, rspeed. pct);
+    RB.spin(forward, rspeed. pct);
+    LF.spin(forward, lspeed. pct);
+    LB.spin(forward, lspeed. pct);
+    wait(wt, msec); 
+}
+
+
+void Pturn(float targetdegrees) {
+  float heading = thingy.rotation(deg);
+  float error = heading - targetdegrees;
+  float kp = 0.5; // constant P gain
+  float speed = kp * error;
+while(fabs (error)> 5){
+
+    RF.spin(forward, speed, pct);
+    RB.spin(forward, speed, pct);
+    LF.spin(forward, -speed, pct);
+    LB.spin(forward, -speed, pct);
     wait(30, msec);
    
     heading = thingy.rotation(deg);
@@ -65,15 +98,6 @@ LF.stop(brake);
 LB.stop(brake);
 RF.stop(brake);
 RB.stop(brake);
-}
-
-
-void Pturn(float targetdegrees) {
-  float heading = thingy.rotation(deg);
-  float error = heading - targetdegrees;
-  float kp = 0.5; // constant P gain
-  float speed = kp * erorr;
-
 }
 
 
@@ -90,7 +114,7 @@ void Pturn(float targetdegrees) {
 
 void pre_auton(void) {
 
-  while(thingy.isCalibrating())wait(200. msec);
+  while(thingy.isCalibrating())wait(200, msec);
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
