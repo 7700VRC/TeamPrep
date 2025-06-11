@@ -3,11 +3,12 @@
 /*    Module:       main.cpp                                                  */
 /*    Author:       Bradan                                                 */
 /*    Created:      4/17/2025, 4:44:40 PM                                     */
-/*    Description:  7700F                                                */
-/*                                                                            */
-/*----------------------------------------------------------------------------*/
+/*    Description:  7700                                              */
+/*                                                      */
+/*-----------------------------------------------------------------------*/
 
 #include "vex.h"
+
 
 using namespace vex;
 
@@ -17,13 +18,13 @@ competition Competition;
 // define your global instances of motors and other devices here
 controller troller;
 brain Brain;
-motor LF (PORT2, ratio18_1, false);
-motor LB (PORT12, ratio18_1, false);
-motor RF (PORT5, ratio18_1, true);
-motor RB (PORT11, ratio18_1, true);
-inertial Steven_Kwan (PORT3);
-motor intake(PORT8, ratio6_1 );
-motor clamp(PORT16, ratio6_1);
+motor LF (PORT6, ratio18_1, true);
+motor LB (PORT9, ratio18_1, true);
+motor RF (PORT16, ratio18_1, false);
+motor RB (PORT3, ratio18_1, false);
+inertial Steven_Kwan (PORT20);
+//motor intake(PORT8, ratio6_1 );
+//motor clamp(PORT16, ratio6_1);
 
 
 float WD = 4.00;
@@ -43,14 +44,14 @@ void robotDrive (int lspeed, int rspeed, int duration) {
 
 
 void spinIntake (int speed ){
-intake.spin(forward, speed, pct);
+//intake.spin(forward, speed, pct);
 }
 
 
 void spinClamp(int speed, int waitTime){
-  clamp.spin(forward, speed, pct);
+  //clamp.spin(forward, speed, pct);
   wait(waitTime, msec); 
-  clamp.stop();
+  //clamp.stop();
 }
 
 void stopRobot () {
@@ -89,6 +90,7 @@ while (fabs(error) > 5){
 speed = Kp * error;
 robotDrive(speed, -speed, 30);
 error = target -x;
+printSteven_Kwan();
 
 }
 stopRobot();
@@ -204,16 +206,8 @@ void pre_auton(void) {
 
 void autonomous(void) {
 
-//spinClamp(50, 1000); 
 
-spinClamp(75, 1000);
-inchDriveBackwards(-30.76);
-spinClamp(-95, 1900);
-spinIntake(-81);
-
-// intake.spin(forward, 75, pct); 
-// inchDrive(10);
-// intake.stop(); 
+robotDrive(100, 100, 1000);
 
 //drive straight for time sharp u turn go back start stop robot
  //drawOnScreen ();
@@ -245,15 +239,15 @@ void usercontrol(void) {
         robotDrive(Lspeed, Rspeed, 50); 
     
     if (troller.ButtonR1.pressing()){ 
-      clamp.spin(forward, 75, pct); 
+      //clamp.spin(forward, 75, pct); 
     
     }
     else if (troller.ButtonR2.pressing()){ 
-      clamp.spin(forward, -75, pct); 
+      //clamp.spin(forward, -75, pct); 
     
     }
     else { 
-      clamp.stop(hold); 
+      //clamp.stop(hold); 
     }
 
 
