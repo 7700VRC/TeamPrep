@@ -21,6 +21,7 @@
 // Color                optical       4               
 // Dist                 distance      5               
 // Intake               motor         13              
+// Vision21             vision        21              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -148,6 +149,15 @@ void getDistance(){
 void spinIntake(int sp, int wt=0){
   Intake.spin(forward, sp, pct);
   wait(wt, msec);
+}
+
+int getObjectx(){
+  int x=0;
+Vision21.takeSnapshot(S);
+
+
+
+  return x;
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */

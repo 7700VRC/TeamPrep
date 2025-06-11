@@ -11,8 +11,13 @@
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
 // Controller1          controller                    
+<<<<<<< HEAD
 // F1                   motor         2               
 // F2                   motor         20              
+=======
+// F1                   motor         1               
+// F2                   motor         2               
+>>>>>>> 73474b82654e2e927fa359541e03f9b8b9b80751
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -99,8 +104,9 @@ void pre_auton(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
-void autonomous(void) {}
-
+void autonomous(void) {
+  spinFlywheel(34);
+}
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              User Control Task                            */
@@ -129,7 +135,7 @@ void usercontrol(void) {
     if (Controller1.ButtonX.pressing())
       targetSpeed = 68;
     if (Controller1.ButtonUp.pressing())
-      targetSpeed = 100;
+      targetSpeed = 90;
     Brain.Screen.printAt(1, 20, "target speed = %.2f ", targetSpeed);
     if(Controller1.ButtonDown.pressing() && flag){
       flag = false;
@@ -167,6 +173,7 @@ void usercontrol(void) {
    // deez nuts
    // lmao
    // hkgtckutxkrtyghv
+   //yo so like renee was here and shes like and totally super amazing and tall yeah 
     flywheelMonitor();
     
     wait(20, msec); // Sleep the task for a short amount of time to
