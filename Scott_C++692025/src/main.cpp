@@ -50,17 +50,47 @@ void gyroturn (float degrees ){
     }
 }
 void pgyroturn(float target){
-    float kp = 2;
-    float error = target = gyro1.yaw();
+    float kp = 0.7;
+    float error = target - gyro1.yaw();
     float accuracy = 3;
     while (fabs(error)>accuracy){
-        error = target - gyro1.yaw();
+        error = target - gyro1.rotation();
         float speed = kp * error;
         drive(speed, -speed,10);
     }
     breakDrive();
     
 }
+
+void pinchdrive(float target2){
+    float pi = 3.1415926;
+    float dia = 4;
+    float avgRev = (rf.position(rev) + lf.position(rev)) / 2;
+    float dist = avgRev * (dia * pi);
+    float error = target2 - dist;
+
+
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
