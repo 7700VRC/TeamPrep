@@ -12,6 +12,12 @@ using namespace vex;
 
 // A global instance of vex::brain used for printing to the V5 brain screen
 vex::brain Brain;
+inertial gyro1 = inertial(PORT7);
+
+void gyroPrint()
+{
+    Brain.Screen.printAt(10, 60, "angle = %.3f", gyro1.rotation());
+}
 motor rf = motor(PORT20);
 motor rb = motor(PORT17);
 motor lf = motor(PORT13, true);
@@ -64,6 +70,31 @@ void turn(float degrees)
     brakeDrive(brake);
 }
 
+void gyroturn(float target)
+{
+    float degrees = gyro1.heading();
+    while (degrees < target)
+    {
+        degrees = gyro1.heading();
+
+        drive(10, -10, 10);
+    }
+    brakeDrive(brake);
+}
+void pgyroturn(float target)
+{
+    float kp = 100;
+    float error = target - gyro1.yaw();
+    float accuracy = 0.1;
+    while (fabs(error) > accuracy)
+    {
+        error = target - gyro1.rotation();
+        float speed = kp * error;
+        drive(speed, -speed, 10);
+    }
+    brakeDrive(brake);
+}
+
 void obstaclecourse()
 {
 
@@ -92,21 +123,33 @@ void obstaclecourse()
 }
 int main()
 {
+
+    gyro1.calibrate();
+    while (gyro1.isCalibrating() == true)
+    {
+        wait(10, msec);
+    }
+    pgyroturn(90);
+    // inchDrive(1000);
     // turn(90);
     int maxSpeed = 100;
     while (true)
     {
-        controller1.Screen.setCursor(1, 1);
-        controller1.Screen.print("%d    ", maxSpeed);
-        if (controller1.ButtonL1.pressing())
-        maxSpeed--;
-        if (controller1.ButtonR1.pressing())
-        {
-            maxSpeed++;
-        }
-        int lstick = controller1.Axis3.position() / 100 * maxSpeed;
-        int rstick = controller1.Axis2.position() / 100 * maxSpeed;
-        drive(lstick, rstick, 15);
-        this_thread::sleep_for(10);
-    } // 45, 90 deg, 33.5, 45 deg, 34, 45 deg, 31, 45 deg, 14 in, 90 deg, 26, 90 deg, 23.5, 45 deg, 28, 45 deg, 27.5 in, 90 deg, 45 in
-}
+        gyroPrint();
+
+        brakeDrive(brake);
+    }
+
+    // controller1.Screen.setCursor(1, 1);
+    // controller1.Screen.print("%d    ", maxSpeed);
+    // if (controller1.ButtonL1.pressing())
+    // maxSpeed--;
+    // if (controller1.ButtonR1.pressing())
+    // {
+    //     maxSpeed++;
+    // }
+    // int lstick = controller1.Axis3.position() / 100 * maxSpeed;
+    // int rstick = controller1.Axis2.position() / 100 * maxSpeed;
+    // drive(lstick, rstick, 15);
+    this_thread::sleep_for(10);
+} // 45, 90 deg, 33.5, 45 deg, 34, 45 deg, 31, 45 deg, 14 in, 90 deg, 26, 90 deg, 23.5, 45 deg, 28, 45 deg, 27.5 in, 90 deg, 45 in
