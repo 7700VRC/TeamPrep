@@ -11,12 +11,17 @@ using namespace vex;
 
 // A global instance of vex::brain used for printing to the V5 brain screen
 vex::brain Brain;
+inertial gyro1 = inertial(PORT9);
 motor lf = motor(PORT15, true);
 motor rf = motor(PORT12);
 motor lb = motor(PORT8, true);
 motor rb = motor(PORT14);
 controller Conteroler1;
-// define your global instances of motors and other devices here
+
+void gyroPrint(){
+    Brain.Screen.printAt(10, 60, "angle = %.3f", gyro1.rotation());
+}
+
 void drive(int lspeed, int rspeed, int wt)
 {
     lf.spin(fwd, lspeed, pct);
@@ -33,6 +38,46 @@ void breakDrive(brakeType type = brake)
     lb.stop(type);
     rb.stop(type);
 }
+void gyroturn (float degrees ){
+    float target = degrees;
+    float degrees_right_now = gyro1.rotation();
+    if(target > 0 and degrees_right_now < target ){
+        drive(+1, -1, 760);
+}
+    if (target < 0 and degrees_right_now > target ){
+        drive(-1, +1, 760);
+
+    }
+}
+void pgyroturn(float target){
+    float kp = 2;
+    float error = target = gyro1.yaw();
+    float accuracy = 3;
+    while (fabs(error)>accuracy){
+        error = target - gyro1.yaw();
+        float speed = kp * error;
+        drive(speed, -speed,10);
+    }
+    breakDrive();
+    
+}
+
+
+
+
+
+        
+    
+
+
+    
+
+
+    
+
+
+// define your global instances of motors and other devices here
+
 void inchDrive(double inches)
 {
     float pi = 3.1415926;
@@ -61,10 +106,8 @@ void turn_qur_left(){
     drive(-10, +10, 760);
     breakDrive();
 }
-void turn_qur_right(){
-    drive(+10, -10, 760);
-    breakDrive();
-}
+
+
 
 void obstaclecourse(){
 
@@ -74,8 +117,6 @@ void obstaclecourse(){
     inchDrive(15.5);
     turn_qur_left();
     inchDrive(16.5);
-    turn_qur_right();
-    turn_qur_right();
     inchDrive(15.5);
     turn_qur_left();
     turn_right();
@@ -97,7 +138,18 @@ int main()
 {
 
     int max_speed = 100;
+    gyro1.calibrate();
+    
+    breakDrive();
+        while (gyro1.isCalibrating() == true){
+        wait(10,msec);
+        }
+        pgyroturn(90);
     while(1) {
+    
+            
+    
+        
 
         Conteroler1.Screen.setCursor(1,1);
         Conteroler1.Screen.print("%d ", max_speed);
