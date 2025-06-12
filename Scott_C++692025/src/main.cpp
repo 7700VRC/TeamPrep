@@ -38,21 +38,10 @@ void breakDrive(brakeType type = brake)
     lb.stop(type);
     rb.stop(type);
 }
-void gyroturn (float degrees ){
-    float target = degrees;
-    float degrees_right_now = gyro1.rotation();
-    if(target > 0 and degrees_right_now < target ){
-        drive(+1, -1, 760);
-}
-    if (target < 0 and degrees_right_now > target ){
-        drive(-1, +1, 760);
-
-    }
-}
 void pgyroturn(float target){
-    float kp = 0.7;
+    float kp = 0.6;
     float error = target - gyro1.yaw();
-    float accuracy = 3;
+    float accuracy = 1;
     while (fabs(error)>accuracy){
         error = target - gyro1.rotation();
         float speed = kp * error;
@@ -62,6 +51,18 @@ void pgyroturn(float target){
     
 }
 
+void gyroturn (float degrees ){
+    pgyroturn(degrees);
+    //     float target = degrees;
+    //     float degrees_right_now = gyro1.rotation();
+    //     if(target > 0 and degrees_right_now < target ){
+    //         drive(+1, -1, 760);
+    // }
+    //     if (target < 0 and degrees_right_now > target ){
+    //         drive(-1, +1, 760);
+    
+    //     }
+    }
 void pinchdrive(float target2){
     float pi = 3.1415926;
     float dia = 4;
@@ -110,17 +111,26 @@ void pinchdrive(float target2){
 
 void inchDrive(double inches)
 {
+    float start_angle = gyro1.rotation();
+    float kt = 10;
+    float acurresy = 0.1;
     float pi = 3.1415926;
     float dia = 4;
+    float error = inches;
     lf.resetPosition();
     rf.resetPosition();
     float avgRev = (rf.position(rev) + lf.position(rev)) / 2;
     float dist = avgRev * (dia * pi);
-    while (dist < inches)
-    {
+    while (fabs(error)>acurresy)
+    {   
+        float turn_error = start_angle - gyro1.rotation();
         avgRev = (rf.position(rev) + lf.position(rev)) / 2;
         dist = avgRev * dia * pi * 1.5;
-        drive(10, 10, 10);
+        float kp = 3;
+        error = inches - dist;
+        float speed = error * kp;
+        drive(speed + turn_error * kt, speed - turn_error * kt, 10);
+           
     }
     breakDrive();
 }
@@ -139,42 +149,33 @@ void turn_qur_left(){
 
 
 
-void obstaclecourse(){
 
 
-    inchDrive(23);
-    turn_right();
-    inchDrive(15.5);
-    turn_qur_left();
-    inchDrive(16.5);
-    inchDrive(15.5);
-    turn_qur_left();
-    turn_right();
-    inchDrive(13);
-    turn_left();
-    inchDrive(24.5);
-    turn_qur_left();
-    inchDrive(13);
-    turn_qur_left();
-    inchDrive(13);
-    turn_left();
-    inchDrive(22);
 
 
-}
 /* code */
 
 int main()
 {
-
-    int max_speed = 100;
     gyro1.calibrate();
-    
+    while(gyro1.isCalibrating())
+    wait(10,msec);
+    inchDrive(56);
+    gyroturn(90);
+    inchDrive(25);
+    gyroturn(180);
+    inchDrive(30);
+    gyroturn(270);
+    inchDrive(108);
+    gyroturn(180);
+    inchDrive(23.5);
     breakDrive();
-        while (gyro1.isCalibrating() == true){
-        wait(10,msec);
-        }
-        pgyroturn(90);
+
+    
+
+    float max_speed = 120;
+
+
     while(1) {
     
             
