@@ -8,6 +8,7 @@
 /*----------------------------------------------------------------------------*/
 #include "vex.h"
 using namespace vex;
+competition Competition;
 
 // A global instance of vex::brain used for printing to the V5 brain screen
 vex::brain Brain;
@@ -40,12 +41,18 @@ void breakDrive(brakeType type = brake)
 }
 void pgyroturn(float target){
     float kp = 0.6;
+    float ki = 0;
+    float kd = 0.025;
     float error = target - gyro1.yaw();
     float accuracy = 1;
+    float totalerror = 0;
+    float preverror = error;
     while (fabs(error)>accuracy){
         error = target - gyro1.rotation();
-        float speed = kp * error;
-        drive(speed, -speed,10);
+        float speed = kp * error + totalerror  * ki + (error-preverror)*kd;
+        totalerror += error;
+        preverror = error;
+        drive(speed, -speed, 10);
     }
     breakDrive();
     
@@ -112,7 +119,7 @@ void pinchdrive(float target2){
 void inchDrive(double inches)
 {
     float start_angle = gyro1.rotation();
-    float kt = 10;
+    float kt = 0;
     float acurresy = 0.1;
     float pi = 3.1415926;
     float dia = 4;
@@ -155,25 +162,10 @@ void turn_qur_left(){
 
 /* code */
 
-int main()
-{
-    gyro1.calibrate();
-    while(gyro1.isCalibrating())
-    wait(10,msec);
-    inchDrive(56);
-    gyroturn(90);
-    inchDrive(25);
-    gyroturn(180);
-    inchDrive(30);
-    gyroturn(270);
-    inchDrive(108);
-    gyroturn(180);
-    inchDrive(23.5);
-    breakDrive();
+void drivercontrol(){
 
-    
 
-    float max_speed = 120;
+    int max_speed = 1000;
 
 
     while(1) {
@@ -185,7 +177,7 @@ int main()
         Conteroler1.Screen.setCursor(1,1);
         Conteroler1.Screen.print("%d ", max_speed);
 
-        if(Conteroler1.ButtonL1.pressing() and Conteroler1.ButtonR2.pressing()){
+        if(Conteroler1.ButtonL1.pressing() and Conteroler1.ButtonL2.pressing()){
             max_speed--;
         }
 
@@ -203,6 +195,34 @@ int main()
        
 
     }
+    while (true) {
+        this_thread::sleep_for(10);
+    }
+    {
+        /* code */
+    }
+    
+}
+
+void auton(){
+
+
+    inchDrive(33);
+    pgyroturn(-45);
+    inchDrive(36);
+
+}
+
+int main()
+{
+    gyro1.calibrate();
+    while(gyro1.isCalibrating())
+
+    Competition.autonomous(auton);
+
+
+    
+
 }
 
 //45, 90deg, 30.5, 45deg, 34, 45deg, 31, 45deg, 14, 90deg
