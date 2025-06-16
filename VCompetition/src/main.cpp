@@ -1,13 +1,14 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       student                                                   */
+/*    Author:       Bradan                                                 */
 /*    Created:      4/17/2025, 4:44:40 PM                                     */
-/*    Description:  V5 project                                                */
-/*                                                                            */
-/*----------------------------------------------------------------------------*/
+/*    Description:  7700                                              */
+/*                                                      */
+/*-----------------------------------------------------------------------*/
 
 #include "vex.h"
+
 
 using namespace vex;
 
@@ -15,16 +16,21 @@ using namespace vex;
 competition Competition;
 
 // define your global instances of motors and other devices here
+controller troller;
 brain Brain;
-motor LF (PORT2, ratio6_1, false);
-motor LB (PORT1, ratio6_1, false);
-motor RF (PORT15, ratio6_1, true);
-motor RB (PORT16, ratio6_1, true);
+motor LF (PORT6, ratio18_1, true);
+motor LB (PORT9, ratio18_1, true);
+motor RF (PORT16, ratio18_1, false);
+motor RB (PORT3, ratio18_1, false);
+inertial Steven_Kwan (PORT20);
+//motor intake(PORT8, ratio6_1 );
+//motor clamp(PORT16, ratio6_1);
 
-float WD = 3.25;
-float GR = 0.75;
 
-void moveRobot (int lspeed, int rspeed, int duration) {
+float WD = 4.00;
+float GR = 1.0;
+float pi = 3.14;
+void robotDrive (int lspeed, int rspeed, int duration) {
   
   LF.spin(forward, lspeed, pct);
   LB.spin(forward, lspeed, pct);
@@ -34,17 +40,102 @@ void moveRobot (int lspeed, int rspeed, int duration) {
   wait(duration, msec);
 }
 
+
+
+
+void spinIntake (int speed ){
+//intake.spin(forward, speed, pct);
+}
+
+
+void spinClamp(int speed, int waitTime){
+  //clamp.spin(forward, speed, pct);
+  wait(waitTime, msec); 
+  //clamp.stop();
+}
+
 void stopRobot () {
   LF.stop(brake);
   LB.stop(brake);
   RF.stop(brake);
   RB.stop(brake);
 }
+void printSteven_Kwan(){
+  Brain.Screen.printAt(10, 20, "Heading= %0.1f", Steven_Kwan.heading(deg));
+  Brain.Screen.printAt(10, 40, "Rotation= %0.1f", Steven_Kwan.rotation(deg));
+}
+
+void turn (float target){
+if(target > 0){
+  while(Steven_Kwan.rotation(deg)<target){
+   robotDrive(50, -50, 30);
+
+  }
+}
+else if(target < 0) {
+while(Steven_Kwan.rotation(deg)>target){
+   robotDrive(-50, 50, 30);  
+}
+}
+stopRobot();
+}
 
 
+void pTurn(float target) {
+float x = Steven_Kwan.rotation(deg);
+float error = target - x;
+float Kp = 0.5; 
+float speed = 0;
+while (fabs(error) > 5){
+speed = Kp * error;
+robotDrive(speed, -speed, 30);
+error = target -x;
+printSteven_Kwan();
 
-void inchDrive(float inches) {
-  float x = 0;
+}
+stopRobot();
+}
+void inchDriveBackwards(float target) {
+  float error = 0;
+  float Kp = 3.0; 
+  LF.resetPosition();
+  float x = LF.position(rev)*WD*3.14* GR;
+  error = target-x; 
+
+  while(fabs (error ) > 0.5) {
+   float speed= error* Kp;
+
+    robotDrive(speed,speed,50);
+    x = LB.position(rev)*WD*3.14* GR;
+    error = target - x;
+    speed= -error* Kp;
+    
+  }
+  stopRobot();
+  Brain.Screen.printAt(10,20, "distance = %0.1f" , x);
+}
+
+
+void inchDrive(float target) {
+  float error = 0;
+  float Kp = 3.0; 
+  LF.resetPosition();
+  float x = LF.position(rev)*WD*3.14* GR;
+  error = target-x; 
+
+  while(fabs (error ) > 0.5) {
+   float speed= error* Kp;
+
+    robotDrive(speed,speed,50);
+    x = LB.position(rev)*WD*3.14* GR;
+    error = target - x;
+    speed= error* Kp;
+    
+  }
+  stopRobot();
+  Brain.Screen.printAt(10,20, "distance = %0.1f" , x);
+}
+  /*float x = 0;
   float error = inches - x;
   float Kp = 3.0;
   float speed = error *Kp;
@@ -58,7 +149,7 @@ void inchDrive(float inches) {
     speed = error * Kp;
   }
 stopRobot();
-}
+
 
 void drawOnScreen () {
   Brain.Screen.printAt (240, 135, "MIDDLE");
@@ -87,7 +178,7 @@ int drawShapes () {
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
-/*                                                                           */
+/*                          edgar                                            */
 /*  You may want to perform some actions before the competition starts.      */
 /*  Do them in the following function.  You must return from this function   */
 /*  or the autonomous and usercontrol tasks will not be started.  This       */
@@ -96,6 +187,8 @@ int drawShapes () {
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
+
+  while(Steven_Kwan.isCalibrating())wait(0.2,sec);
 
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
@@ -112,11 +205,10 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  
- moveRobot(50, 50, 1500);
- moveRobot(50, -50, 1000); 
- moveRobot(50, 50, 1500);
- stopRobot();
+
+
+robotDrive(100, 100, 1000);
+
 //drive straight for time sharp u turn go back start stop robot
  //drawOnScreen ();
  //wait(1, sec);
@@ -125,7 +217,7 @@ void autonomous(void) {
  
   
   // ..........................................................................
-  // Insert autonomous user code here.
+  
   // ..........................................................................
 }
 
@@ -142,14 +234,25 @@ void autonomous(void) {
 void usercontrol(void) {
   // User control code here, inside the loop
   while (1) {
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
+    float Lspeed = troller.Axis3.position(pct); 
+        float Rspeed = troller.Axis2.position(pct); 
+        robotDrive(Lspeed, Rspeed, 50); 
+    
+    if (troller.ButtonR1.pressing()){ 
+      //clamp.spin(forward, 75, pct); 
+    
+    }
+    else if (troller.ButtonR2.pressing()){ 
+      //clamp.spin(forward, -75, pct); 
+    
+    }
+    else { 
+      //clamp.stop(hold); 
+    }
 
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
-    // ........................................................................
+
+printSteven_Kwan();
+wait(200, msec);
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.

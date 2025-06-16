@@ -13,8 +13,8 @@
 // Controller1          controller                    
 // LeftMotor            motor         19              
 // RightMotor           motor         9               
-// Roller               motor         20              
-// ColorSensor          optical       10              
+// Roller               motor         16              
+// ColorSensor          optical       6               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -24,11 +24,36 @@ using namespace vex;
 // A global instance of competition
 competition Competition;
 
+bool Red = true;
 // define your global instances of motors and other devices here
-void drive(int lspeed, int rspeed, int wt){
-LeftMotor.spin(forward, lspeed, pct);
-RightMotor.spin(forward, rspeed, pct);
-wait(wt, msec);
+void drive(int lspeed, int rspeed, int wt) {
+  LeftMotor.spin(forward, lspeed, pct);
+  RightMotor.spin(forward, rspeed, pct);
+  wait(wt, msec);
+}
+
+void turnRoller() {
+  int colorR = ColorSensor.value();
+  drive(10, 10, 10);
+      Brain.Screen.printAt(1, 40, "color value = %d  ",colorR);
+  if (Red == true) {
+    while (colorR < 150) {
+      ColorSensor.setLightPower(100);
+      Roller.spin(forward, 100, percent);
+      colorR = ColorSensor.value();
+      Brain.Screen.printAt(1, 40, "color value = %d  ",colorR);
+    }
+    Roller.stop();
+
+  } else {
+    while (colorR > 50) {
+      Roller.spin(forward, 70, percent);
+      colorR = ColorSensor.value();
+    }
+    Roller.stop();
+  }
+   ColorSensor.setLightPower(0);
+  drive(0, 0, 0);
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -76,20 +101,19 @@ void autonomous(void) {
 
 void usercontrol(void) {
   // User control code here, inside the loop
+  Controller1.ButtonA.pressed(turnRoller);
   while (true) {
-    int lstick=Controller1.Axis3.position();
-    int rstick=Controller1.Axis2.position();
+    int lstick = Controller1.Axis3.position();
+    int rstick = Controller1.Axis2.position();
     drive(lstick, rstick, 10);
-    if(Controller1.ButtonR1.pressing()){
-    Roller.spin(forward, 70, pct);
+    if (Controller1.ButtonR1.pressing()) {
+      Roller.spin(forward, 70, pct);
 
-  }
-  else if(Controller1.ButtonR2.pressing()){
-    Roller.spin(forward, -70, pct);
-  }
-  else{
-    Roller.spin(forward, 0, pct);
-  }
+    } else if (Controller1.ButtonR2.pressing()) {
+      Roller.spin(forward, -70, pct);
+    } else {
+      Roller.spin(forward, 0, pct);
+    }
   }
 }
 //

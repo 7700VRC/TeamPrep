@@ -72,7 +72,21 @@ LB.stop(brake);
 
 void inchDrive(float inches){
  float x = 0;
-float error = 24
+float error = inches - x;
+float Kp = 3.0;
+float speed = error  *Kp
+
+LF .resetpostion();
+//LF.setPosition(o.rev);
+while (fabs (error) > 0.5){
+
+moveRobot(speed,speed, 10) ;
+x = LF.position(rev)*WD*M_PI*GR;
+error = inches - x;
+speed = error * Kp;
+
+}
+stopRobot();
 
 }
 
