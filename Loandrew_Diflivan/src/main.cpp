@@ -19,6 +19,7 @@ brain Brain;
 controller Controller;
 motor LM (PORT10, ratio18_1, false);
 motor RM (PORT1, ratio18_1, true);
+motor intake (PORT7, ratio18_1, false);
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -61,6 +62,7 @@ void autonomous(void) {
 
 drive(4, 50);
 
+
 }
 
 /*---------------------------------------------------------------------------*/
@@ -85,6 +87,18 @@ int Lspeed = Controller.Axis3.position(pct);
 int Rspeed = Controller.Axis2.position(pct);
 LM.spin(fwd, Lspeed, pct);
 RM.spin(fwd, Rspeed, pct);
+
+if(Controller.ButtonR1.pressing()){
+  intake.spin(reverse, 75, pct);
+}
+else if(Controller.ButtonR2.pressing()){
+  intake.spin(fwd, 75, pct);
+
+}
+
+else{
+  intake.stop();
+}
 
 
     // This is the main execution loop for the user control program.
