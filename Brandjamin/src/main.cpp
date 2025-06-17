@@ -19,6 +19,7 @@ brain Brain;
 controller Controller;
 motor LM (PORT20, ratio18_1, false);
 motor RM (PORT11, ratio18_1, true);
+motor IN (PORT9, ratio36_1, false);
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -30,7 +31,9 @@ motor RM (PORT11, ratio18_1, true);
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
-
+  Brain.Screen.printAt(20,20,"Starting");
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -68,7 +71,7 @@ void rightOrbit(double time,int speed){
 
 }
 void autonomous(void) {
-  Brain.Screen.printAt(10,20, "Autonomous Stage");
+  Brain.Screen.clearScreen();
   drive(1,50);
   leftTurn(1.25,50);
   drive(0.75,50);
@@ -92,19 +95,209 @@ void autonomous(void) {
 
 void usercontrol(void) {
   // User control code here, inside the loop
-  Brain.Screen.printAt(10,50,"User Control Stage");
+  
+ Brain.Screen.clearScreen();
   while (1) {
-    
+  //Motor Speed values  
     int Lspeed = Controller.Axis3.position(pct);
     int Rspeed = Controller.Axis3.position(pct);
+    int IntakeSpeed = 100;
 
+
+//Turning mechanism
     Lspeed = Lspeed + Controller.Axis1.position(pct);  
     Rspeed = Rspeed - Controller.Axis1.position(pct);
 
-    
 
+  
+//DRIVE
     LM.spin(fwd,Lspeed,pct);
     RM.spin(fwd,Rspeed,pct);
+//Intake
+    if(Controller.ButtonR1.pressing()){
+    IN.spin(fwd,IntakeSpeed,pct);
+}
+    else
+      if(Controller.ButtonL1.pressing()){
+      IN.spin(fwd,-IntakeSpeed,pct);
+      }
+    else
+      IN.stop();
+
+//Lights
+if(Controller.ButtonX.pressing()){
+  Brain.Screen.setFillColor(red);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(green);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+}
+//Lights
+if(Controller.ButtonY.pressing()){
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(white);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+}
+//Lights
+if(Controller.ButtonB.pressing()){
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+}
+//Lights
+if(Controller.ButtonA.pressing()){
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(purple);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(orange);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+}
+//Lights
+if(Controller.ButtonUp.pressing()){
+  Brain.Screen.setFillColor(red);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(green);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(white);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(purple);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(orange);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+}
+//Lights
+if(Controller.ButtonLeft.pressing()){
+  Brain.Screen.setFillColor(red);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(orange);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(green);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(purple);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+}
+//Lights
+if(Controller.ButtonDown.pressing()){
+  Brain.Screen.setFillColor(red);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(green);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(white);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(purple);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(orange);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+}
+//Lights
+if(Controller.ButtonRight.pressing()){
+  Brain.Screen.setFillColor(red);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(green);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(white);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(purple);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(orange);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+}
+}
+
+
+
 
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
@@ -118,7 +311,7 @@ void usercontrol(void) {
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
-}
+
 
 //
 // Main will set up the competition functions and callbacks.
