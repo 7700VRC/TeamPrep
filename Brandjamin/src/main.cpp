@@ -20,6 +20,9 @@ controller Controller;
 motor LM (PORT20, ratio18_1, false);
 motor RM (PORT11, ratio18_1, true);
 motor IN (PORT9, ratio36_1, false);
+motor belt (PORT2,ratio18_1,false);
+double pi = 3.14;
+float diameter = 4.0;
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -47,6 +50,25 @@ void pre_auton(void) {
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
+void inDrive(double dist, int speed){
+  double circ = pi*diameter;
+  RM.resetPosition();
+  double rotations = RM.position(rev);
+  double x = circ*rotations;
+  while(x<dist){
+    Brain.Screen.print("Loop running");
+    LM.spin(fwd, speed, pct);
+    RM.spin(fwd, speed, pct);
+    rotations = RM.position(rev);
+    x = circ*rotations;
+  }
+
+  LM.stop();
+  RM.stop();
+  Brain.Screen.print("Stopped");
+  }
+
+
 void drive(double time,int speed){
 
   LM.spin(fwd,speed,pct);
@@ -72,12 +94,8 @@ void rightOrbit(double time,int speed){
 }
 void autonomous(void) {
   Brain.Screen.clearScreen();
-  drive(1,50);
-  leftTurn(1.25,50);
-  drive(0.75,50);
-  rightOrbit(7.5,50);
-  leftTurn(1.15,50);
-  drive(1,50);
+  inDrive(24,50);
+  
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
@@ -294,6 +312,18 @@ if(Controller.ButtonRight.pressing()){
   Brain.Screen.drawRectangle(0,0,480,272);
   Brain.Screen.clearScreen();
 }
+
+
+//Belt
+  if(Controller.ButtonUp.pressing()){
+    belt.spin(fwd,50,pct);
+  }
+  if(Controller.ButtonDown.pressing()){
+    belt.spin(fwd,-50,pct);
+  }
+  if(Controller.ButtonLeft.pressing()){
+    belt.spin(fwd,0,pct);
+  }
 }
 
 
