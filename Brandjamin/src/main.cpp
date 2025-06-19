@@ -19,6 +19,11 @@ brain Brain;
 controller Controller;
 motor LM (PORT20, ratio18_1, false);
 motor RM (PORT11, ratio18_1, true);
+motor IN (PORT9, ratio18_1, false);
+motor belt (PORT2,ratio18_1,false);
+inertial Gyro (PORT5);
+double pi = 3.14;
+float diameter = 4.0;
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -30,7 +35,9 @@ motor RM (PORT11, ratio18_1, true);
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
-
+  Brain.Screen.printAt(20,20,"Starting");
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -44,6 +51,48 @@ void pre_auton(void) {
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
+void stopAll(){
+  LM.stop();
+  RM.stop();
+  IN.stop();
+  belt.stop();
+}
+void inRevDrive(double dist, int speed){
+  double circ = pi*diameter;
+  RM.resetPosition();
+  double rotations = RM.position(rev);
+  double x = circ*rotations;
+  while(x>dist){
+    Brain.Screen.print("Loop running");
+    LM.spin(fwd, -speed, pct);
+    RM.spin(fwd, -speed, pct);
+    rotations = RM.position(rev);
+    x = circ*rotations;
+  }
+
+  LM.stop();
+  RM.stop();
+  Brain.Screen.print("Stopped");
+  }
+void inDrive(double dist, int speed){
+  double circ = pi*diameter;
+  RM.resetPosition();
+  double rotations = RM.position(rev);
+  double x = circ*rotations;
+  while(x<dist){
+    Brain.Screen.print("Loop running");
+    LM.spin(fwd, speed, pct);
+    RM.spin(fwd, speed, pct);
+    rotations = RM.position(rev);
+    x = circ*rotations;
+  }
+
+  LM.stop();
+  RM.stop();
+  Brain.Screen.print("Stopped");
+  }
+
+
 void drive(double time,int speed){
 
   LM.spin(fwd,speed,pct);
@@ -52,29 +101,117 @@ void drive(double time,int speed){
   LM.stop();
   RM.stop();
 }
-void leftTurn(double time,int speed){
-
+void leftTurn(double time,int speed,int xLspeed){
+  LM.spin(fwd,speed*xLspeed,pct);
   RM.spin(fwd,speed,pct);
   wait(time, sec);
   RM.stop();
-
+  LM.stop();
 }
-void rightOrbit(double time,int speed){
-  RM.spin(fwd,speed*0.6,pct);
+void rightTurn(double time,int speed,int xRspeed){
+  RM.spin(fwd,speed*xRspeed,pct);
   LM.spin(fwd,speed,pct);
   wait(time, sec);
   LM.stop();
   RM.stop();
+}
+
+void inLeftDrive(int speed,double angle,int xLspeed){
+  double circ = pi*diameter;
+  RM.resetPosition();
+  double rotations = RM.position(rev);
+  double x = -circ*rotations;
+  double angleOutOf1 = angle/360;
+  while(x<circ*angleOutOf1){
+    Brain.Screen.print("Loop running");
+    LM.spin(fwd, speed*xLspeed, pct);
+    RM.spin(fwd, speed, pct);
+    rotations = RM.position(rev);
+    x = circ*rotations;
+  }
+}
+void inRightDrive(int speed,double angle,int xRspeed){
+  double circ = pi*diameter;
+  RM.resetPosition();
+  double rotations = LM.position(rev);
+  double x = circ*rotations;
+  double angleOutOf1 = angle/360;
+  while(x<circ*angleOutOf1){
+    Brain.Screen.print("Loop running");
+    LM.spin(fwd, speed, pct);
+    RM.spin(fwd, speed*xRspeed, pct);
+    rotations = LM.position(rev);
+    x = circ*rotations;
+  }
 
 }
+void gyroRight(double angle){
+  Gyro.resetHeading();
+  double currentHeading = Gyro.rotation(degrees);
+  while(angle>currentHeading){
+    LM.spin(fwd, 10, pct);
+    RM.spin(fwd,-10,pct);
+    currentHeading = Gyro.rotation(degrees);
+ }
+}
+void gyroLeft(double angle){
+  Gyro.resetHeading();
+  double currentHeading = Gyro.heading(degrees);
+  angle = -angle;
+  while(angle>currentHeading){
+    LM.spin(fwd,-10,pct);
+    RM.spin(fwd,10,pct);
+    currentHeading = Gyro.heading(degrees);
+  }
+}
+void gyroRight2(double angle){
+  double currentHeading = Gyro.heading(degrees);
+  while(angle>currentHeading){
+    LM.spin(fwd, 10, pct);
+    RM.spin(fwd,-10,pct);
+    currentHeading = Gyro.rotation(degrees);
+ }
+}
+void gyroLeft2(double angle){
+  double currentHeading = Gyro.heading(degrees);
+  angle = -angle;
+  while(angle>currentHeading){
+    LM.spin(fwd,-10,pct);
+    RM.spin(fwd,10,pct);
+    currentHeading = Gyro.heading(degrees);
+  }
+}
+void center90L(void){
+  double currentHeading = Gyro.heading(degrees);
+  while(90<currentHeading){
+    LM.spin(fwd,0, pct);
+    RM.spin(fwd,10,pct);
+    currentHeading = Gyro.rotation(degrees);
+ }
+}
+void center90R(void){
+  double currentHeading = Gyro.heading(degrees);
+  while(90>currentHeading){
+    LM.spin(fwd,10, pct);
+    RM.spin(fwd,0,pct);
+    currentHeading = Gyro.rotation(degrees);
+ }
+}
 void autonomous(void) {
-  Brain.Screen.printAt(10,20, "Autonomous Stage");
-  drive(1,50);
-  leftTurn(1.25,50);
-  drive(0.75,50);
-  rightOrbit(7.5,50);
-  leftTurn(1.15,50);
-  drive(1,50);
+  Brain.Screen.clearScreen();
+  inDrive(10,50);
+  gyroRight(90);
+  center90L();
+  center90R();
+  inDrive(50,75);
+  inRevDrive(-1.25,10);
+  gyroRight2(180);
+  center90L();
+  center90R();
+  inRevDrive(-15,50);
+  belt.spin(fwd,50,pct);
+  wait(5,sec);
+  stopAll();
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
@@ -92,19 +229,275 @@ void autonomous(void) {
 
 void usercontrol(void) {
   // User control code here, inside the loop
-  Brain.Screen.printAt(10,50,"User Control Stage");
+  stopAll();
+  Brain.Screen.clearScreen();
   while (1) {
-    
+  //Motor Speed values  
     int Lspeed = Controller.Axis3.position(pct);
     int Rspeed = Controller.Axis3.position(pct);
+    int IntakeSpeed = 100;
 
+
+//Turning mechanism
     Lspeed = Lspeed + Controller.Axis1.position(pct);  
     Rspeed = Rspeed - Controller.Axis1.position(pct);
 
-    
 
+  
+//DRIVE
     LM.spin(fwd,Lspeed,pct);
     RM.spin(fwd,Rspeed,pct);
+//Intake
+    if(Controller.ButtonR1.pressing()){
+    IN.spin(fwd,IntakeSpeed,pct);
+}
+    else
+      if(Controller.ButtonL1.pressing()){
+      IN.spin(fwd,-IntakeSpeed,pct);
+      }
+    else
+      IN.stop();
+
+//Lights
+if(Controller.ButtonX.pressing()){
+  Brain.Screen.setFillColor(red);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(green);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+}
+//Lights
+if(Controller.ButtonY.pressing()){
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(white);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+}
+//Lights
+if(Controller.ButtonB.pressing()){
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+}
+//Lights
+if(Controller.ButtonA.pressing()){
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(purple);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(orange);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+}
+//Lights
+if(Controller.ButtonUp.pressing()){
+  Brain.Screen.setFillColor(red);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(green);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(white);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(purple);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.setFillColor(orange);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+}
+//Lights
+if(Controller.ButtonLeft.pressing()){
+  Brain.Screen.setFillColor(red);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(orange);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(green);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(purple);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+}
+//Lights
+if(Controller.ButtonDown.pressing()){
+  Brain.Screen.setFillColor(red);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(green);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(white);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(purple);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(orange);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+}
+//Lights
+if(Controller.ButtonRight.pressing()){
+  Brain.Screen.setFillColor(red);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(green);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(white);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(yellow);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFillColor(purple);
+  Brain.Screen.drawRectangle(0,0,480,272);
+
+  Brain.Screen.setFillColor(orange);
+  Brain.Screen.drawRectangle(0,0,480,272);
+  Brain.Screen.clearScreen();
+}
+
+
+//Belt
+  if(Controller.ButtonR2.pressing()){
+    belt.spin(fwd,75,pct);
+  }
+  else
+  if(Controller.ButtonL2.pressing()){
+    belt.spin(fwd,-75,pct);
+}
+
+else
+    belt.stop();
+
+//Functions
+  //Stop All
+    if(Controller.ButtonRight.pressing()){
+      stopAll();
+    }
+
+  //In
+    if(Controller.ButtonA.pressing()){
+      IN.spin(fwd,100,pct);
+      wait(1,sec);
+      IN.spin(fwd,100,pct);
+      wait(200,msec);
+      IN.spin(fwd,100,pct);
+      wait(50,msec);
+      IN.spin(fwd,100,pct);
+      wait(50,msec);
+      IN.spin(fwd,100,pct);
+      wait(50,msec);
+      IN.spin(fwd,100,pct);
+      wait(50,msec);
+      IN.spin(fwd,100,pct);
+      wait(50,msec);
+      IN.spin(fwd,100,pct);
+      wait(0.25,sec);
+      IN.stop();
+      belt.spin(fwd,50,pct);
+      wait(1,sec);
+      IN.stop();
+      belt.stop();
+    }
+  //OutHigh
+      if(Controller.ButtonX.pressing()){
+      belt.spin(fwd,50,pct);
+      wait(2,sec);
+      belt.spin(fwd,-100,pct);
+      belt.stop();
+    }
+  //OutMid
+      if(Controller.ButtonY.pressing()){
+      belt.spin(fwd,50,pct);
+      wait(2,sec);
+      belt.stop();
+    }
+  //OutLow
+      if(Controller.ButtonB.pressing()){
+      IN.spin(fwd,-100,pct);
+      belt.spin(fwd,-50,pct);
+      wait(2,sec);
+      IN.stop();
+      belt.stop();
+    
+
+
+
+
+
 
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
@@ -118,6 +511,7 @@ void usercontrol(void) {
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
+}
 }
 
 //

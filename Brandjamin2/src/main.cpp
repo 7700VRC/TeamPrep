@@ -2,30 +2,24 @@
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
 /*    Author:       student                                                   */
-/*    Created:      6/16/2025, 1:10:06 PM                                     */
+/*    Created:      6/16/2025, 1:08:42 PM                                     */
 /*    Description:  V5 project                                                */
 /*                                                                            */
-/*--------------------------;l///--------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
-#include "vex.h";
+#include "vex.h"
 
 using namespace vex;
 
 // A global instance of competition
 competition Competition;
 
-// define your global instances of motors and other devices here 
+// define your global instances of motors and other devices here
 brain Brain;
-controller Controller; 
-float pi = 3.14;
-float dia = 4.00;
-motor LM (PORT19, ratio18_1, false);
-motor RM (PORT18, ratio18_1, true);
-motor intake (PORT20, ratio6_1, true);
-motor outake (PORT17, ratio18_1, true);
-
-
-
+controller Controller;
+motor LM (PORT20, ratio18_1, false);
+motor RM (PORT11, ratio18_1, true);
+motor IN (PORT9, ratio36_1, false);
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -37,26 +31,13 @@ motor outake (PORT17, ratio18_1, true);
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
- 
+  Brain.Screen.setFillColor(white);
+  Brain.Screen.drawRectangle(50,50,30,200);
+  Brain.Screen.drawRectangle(80,210,150,30);
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
 
-/*void usercontrol(void) {
-  // User control code here, inside the loop
-  while (1) {
-
-  int Lspeed = Controller.Axis3.position(pct);
-  int Rspeed = Controller.Axis3.position(pct);
-
-  Lspeed = Lspeed + Controller.Axis1.position(pct);
-  Rspeed = Rspeed - Controller.Axis1.position(pct);
-
-  
-  LM.spin(forward, Lspeed, pct);
-  RM.spin(forward, Rspeed, pct);
-  }
-}*/
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -64,34 +45,41 @@ void pre_auton(void) {
 /*  This task is used to control your robot during the autonomous phase of   */
 /*  a VEX Competition.                                                       */
 /*                                                                           */
-/*  You must modify the code to add your own robot specific commands here.*/
+/*  You must modify the code to add your own robot specific commands here.   */
+/*---------------------------------------------------------------------------*/
+void drive(double time,int speed){
 
-void drive(float time, float speed) {
-  LM.spin(forward, speed, pct);
-  RM.spin(forward, speed, pct);
+  LM.spin(fwd,speed,pct);
+  RM.spin(fwd,speed,pct);
   wait(time, sec);
   LM.stop();
   RM.stop();
 }
+void leftTurn(double time,int speed){
 
-void inchDrive(float target) {
-  float x = 0;
-  LM.setPosition(0, rev);
-  x = LM.position(rev) * dia * pi;
-  while (x <= target) {
-    drive(.1, 25);
-    x = LM.position(rev) * dia * pi;
-    Brain.Screen.printAt(10, 20, "inches = %0.2f", x);
-  }
+  RM.spin(fwd,speed,pct);
+  wait(time, sec);
+  RM.stop();
+
+}
+void rightOrbit(double time,int speed){
+  RM.spin(fwd,speed*0.6,pct);
+  LM.spin(fwd,speed,pct);
+  wait(time, sec);
   LM.stop();
   RM.stop();
-  }
 
-/*---------------------------------------------------------------------------*/
-
+}
 void autonomous(void) {
+  
+  drive(1,50);
+  leftTurn(1.25,50);
+  drive(0.75,50);
+  rightOrbit(7.5,50);
+  leftTurn(1.15,50);
+  drive(1,50);
   // ..........................................................................
-  inchDrive(12);
+  // Insert autonomous user code here.
   // ..........................................................................
 }
 
@@ -107,45 +95,50 @@ void autonomous(void) {
 
 void usercontrol(void) {
   // User control code here, inside the loop
+ 
   while (1) {
+  //Motor Speed values  
+    int Lspeed = Controller.Axis3.position(pct);
+    int Rspeed = Controller.Axis3.position(pct);
+    int IntakeSpeed = 100;
+//L2, R2
+int Speed2;
+if(Controller.ButtonR2.pressing()){
+  Speed2 = 100;
+}
+else
+if(Controller.ButtonL2.pressing()){
+  Speed2 = -100;
+  }
+  else{
+  Speed2 = 0;
+}
+    Lspeed = Lspeed + Speed2;
+    Rspeed = Rspeed + Speed2;
 
-  int Lspeed = Controller.Axis3.position(pct);
-  int Rspeed = Controller.Axis3.position(pct);
+//Turning mechanism
+    Lspeed = Lspeed + Controller.Axis4.position(pct);  
+    Rspeed = Rspeed - Controller.Axis4.position(pct);
 
-  if (Controller.ButtonR1.pressing()) {
-    intake.spin(forward, 100, pct);
-  }
-else if (Controller.ButtonR2.pressing()) {
-    intake.spin(reverse, 100, pct);
-  }
-  else {
-    intake.stop();
-  }
-
-  if (Controller.ButtonUp.pressing()) {
-    outake.spin(forward, 100, pct);
-  }
-  else if (Controller.ButtonDown.pressing()) {
-    outake.spin(reverse, 100, pct);
-  }
-  else {
-    outake.stop();
-  }
-
-  Lspeed = Lspeed + Controller.Axis1.position(pct);
-  Rspeed = Rspeed - Controller.Axis1.position(pct);
 
   
-  LM.spin(forward, Lspeed, pct);
-  RM.spin(forward, Rspeed, pct);
-  
+//DRIVE
+    LM.spin(fwd,Lspeed,pct);
+    RM.spin(fwd,Rspeed,pct);
+//Intake
+    if(Controller.ButtonR1.pressing()){
+    IN.spin(fwd,IntakeSpeed,pct);
+}
+    else
+      if(Controller.ButtonL1.pressing()){
+      IN.spin(fwd,-IntakeSpeed,pct);
+      }
+    else
+      IN.stop();
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
     // values based on feedback from the joysticks.
 
-
-
-}
     // ........................................................................
     // Insert user code here. This is where you use the joystick values to
     // update your motors, etc.
@@ -153,10 +146,8 @@ else if (Controller.ButtonR2.pressing()) {
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
-
-
+  }
 }
-
 
 //
 // Main will set up the competition functions and callbacks.
@@ -174,3 +165,4 @@ int main() {
     wait(100, msec);
   }
 }
+
