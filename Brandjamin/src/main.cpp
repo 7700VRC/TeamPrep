@@ -19,8 +19,9 @@ brain Brain;
 controller Controller;
 motor LM (PORT20, ratio18_1, false);
 motor RM (PORT11, ratio18_1, true);
-motor IN (PORT9, ratio36_1, false);
+motor IN (PORT9, ratio18_1, false);
 motor belt (PORT2,ratio18_1,false);
+inertial Gyro (PORT5);
 double pi = 3.14;
 float diameter = 4.0;
 /*---------------------------------------------------------------------------*/
@@ -50,6 +51,29 @@ void pre_auton(void) {
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
+void stopAll(){
+  LM.stop();
+  RM.stop();
+  IN.stop();
+  belt.stop();
+}
+void inRevDrive(double dist, int speed){
+  double circ = pi*diameter;
+  RM.resetPosition();
+  double rotations = RM.position(rev);
+  double x = circ*rotations;
+  while(x>dist){
+    Brain.Screen.print("Loop running");
+    LM.spin(fwd, -speed, pct);
+    RM.spin(fwd, -speed, pct);
+    rotations = RM.position(rev);
+    x = circ*rotations;
+  }
+
+  LM.stop();
+  RM.stop();
+  Brain.Screen.print("Stopped");
+  }
 void inDrive(double dist, int speed){
   double circ = pi*diameter;
   RM.resetPosition();
@@ -77,25 +101,117 @@ void drive(double time,int speed){
   LM.stop();
   RM.stop();
 }
-void leftTurn(double time,int speed){
-
+void leftTurn(double time,int speed,int xLspeed){
+  LM.spin(fwd,speed*xLspeed,pct);
   RM.spin(fwd,speed,pct);
   wait(time, sec);
   RM.stop();
-
+  LM.stop();
 }
-void rightOrbit(double time,int speed){
-  RM.spin(fwd,speed*0.6,pct);
+void rightTurn(double time,int speed,int xRspeed){
+  RM.spin(fwd,speed*xRspeed,pct);
   LM.spin(fwd,speed,pct);
   wait(time, sec);
   LM.stop();
   RM.stop();
+}
 
+void inLeftDrive(int speed,double angle,int xLspeed){
+  double circ = pi*diameter;
+  RM.resetPosition();
+  double rotations = RM.position(rev);
+  double x = -circ*rotations;
+  double angleOutOf1 = angle/360;
+  while(x<circ*angleOutOf1){
+    Brain.Screen.print("Loop running");
+    LM.spin(fwd, speed*xLspeed, pct);
+    RM.spin(fwd, speed, pct);
+    rotations = RM.position(rev);
+    x = circ*rotations;
+  }
+}
+void inRightDrive(int speed,double angle,int xRspeed){
+  double circ = pi*diameter;
+  RM.resetPosition();
+  double rotations = LM.position(rev);
+  double x = circ*rotations;
+  double angleOutOf1 = angle/360;
+  while(x<circ*angleOutOf1){
+    Brain.Screen.print("Loop running");
+    LM.spin(fwd, speed, pct);
+    RM.spin(fwd, speed*xRspeed, pct);
+    rotations = LM.position(rev);
+    x = circ*rotations;
+  }
+
+}
+void gyroRight(double angle){
+  Gyro.resetHeading();
+  double currentHeading = Gyro.rotation(degrees);
+  while(angle>currentHeading){
+    LM.spin(fwd, 10, pct);
+    RM.spin(fwd,-10,pct);
+    currentHeading = Gyro.rotation(degrees);
+ }
+}
+void gyroLeft(double angle){
+  Gyro.resetHeading();
+  double currentHeading = Gyro.heading(degrees);
+  angle = -angle;
+  while(angle>currentHeading){
+    LM.spin(fwd,-10,pct);
+    RM.spin(fwd,10,pct);
+    currentHeading = Gyro.heading(degrees);
+  }
+}
+void gyroRight2(double angle){
+  double currentHeading = Gyro.heading(degrees);
+  while(angle>currentHeading){
+    LM.spin(fwd, 10, pct);
+    RM.spin(fwd,-10,pct);
+    currentHeading = Gyro.rotation(degrees);
+ }
+}
+void gyroLeft2(double angle){
+  double currentHeading = Gyro.heading(degrees);
+  angle = -angle;
+  while(angle>currentHeading){
+    LM.spin(fwd,-10,pct);
+    RM.spin(fwd,10,pct);
+    currentHeading = Gyro.heading(degrees);
+  }
+}
+void center90L(void){
+  double currentHeading = Gyro.heading(degrees);
+  while(90<currentHeading){
+    LM.spin(fwd,0, pct);
+    RM.spin(fwd,10,pct);
+    currentHeading = Gyro.rotation(degrees);
+ }
+}
+void center90R(void){
+  double currentHeading = Gyro.heading(degrees);
+  while(90>currentHeading){
+    LM.spin(fwd,10, pct);
+    RM.spin(fwd,0,pct);
+    currentHeading = Gyro.rotation(degrees);
+ }
 }
 void autonomous(void) {
   Brain.Screen.clearScreen();
-  inDrive(24,50);
-  
+  inDrive(10,50);
+  gyroRight(90);
+  center90L();
+  center90R();
+  inDrive(50,75);
+  inRevDrive(-1.25,10);
+  gyroRight2(180);
+  center90L();
+  center90R();
+  inRevDrive(-15,50);
+  belt.spin(fwd,50,pct);
+  wait(5,sec);
+  stopAll();
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
@@ -113,8 +229,8 @@ void autonomous(void) {
 
 void usercontrol(void) {
   // User control code here, inside the loop
-  
- Brain.Screen.clearScreen();
+  stopAll();
+  Brain.Screen.clearScreen();
   while (1) {
   //Motor Speed values  
     int Lspeed = Controller.Axis3.position(pct);
@@ -315,16 +431,70 @@ if(Controller.ButtonRight.pressing()){
 
 
 //Belt
-  if(Controller.ButtonUp.pressing()){
-    belt.spin(fwd,50,pct);
+  if(Controller.ButtonR2.pressing()){
+    belt.spin(fwd,75,pct);
   }
-  if(Controller.ButtonDown.pressing()){
-    belt.spin(fwd,-50,pct);
-  }
-  if(Controller.ButtonLeft.pressing()){
-    belt.spin(fwd,0,pct);
-  }
+  else
+  if(Controller.ButtonL2.pressing()){
+    belt.spin(fwd,-75,pct);
 }
+
+else
+    belt.stop();
+
+//Functions
+  //Stop All
+    if(Controller.ButtonRight.pressing()){
+      stopAll();
+    }
+
+  //In
+    if(Controller.ButtonA.pressing()){
+      IN.spin(fwd,100,pct);
+      wait(1,sec);
+      IN.spin(fwd,100,pct);
+      wait(200,msec);
+      IN.spin(fwd,100,pct);
+      wait(50,msec);
+      IN.spin(fwd,100,pct);
+      wait(50,msec);
+      IN.spin(fwd,100,pct);
+      wait(50,msec);
+      IN.spin(fwd,100,pct);
+      wait(50,msec);
+      IN.spin(fwd,100,pct);
+      wait(50,msec);
+      IN.spin(fwd,100,pct);
+      wait(0.25,sec);
+      IN.stop();
+      belt.spin(fwd,50,pct);
+      wait(1,sec);
+      IN.stop();
+      belt.stop();
+    }
+  //OutHigh
+      if(Controller.ButtonX.pressing()){
+      belt.spin(fwd,50,pct);
+      wait(2,sec);
+      belt.spin(fwd,-100,pct);
+      belt.stop();
+    }
+  //OutMid
+      if(Controller.ButtonY.pressing()){
+      belt.spin(fwd,50,pct);
+      wait(2,sec);
+      belt.stop();
+    }
+  //OutLow
+      if(Controller.ButtonB.pressing()){
+      IN.spin(fwd,-100,pct);
+      belt.spin(fwd,-50,pct);
+      wait(2,sec);
+      IN.stop();
+      belt.stop();
+    
+
+
 
 
 
@@ -341,7 +511,8 @@ if(Controller.ButtonRight.pressing()){
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
-
+}
+}
 
 //
 // Main will set up the competition functions and callbacks.
