@@ -17,8 +17,9 @@ competition Competition;
 // define your global instances of motors and other devices here 
 brain Brain;
 controller Controller; 
-motor LM (PORT11, ratio18_1, false);
-motor RM (PORT20, ratio18_1, true);
+motor LM (PORT19, ratio18_1, false);
+motor RM (PORT18, ratio18_1, true);
+motor intake (PORT20, ratio6_1, true);
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -67,6 +68,7 @@ void drive(int time, float speed) {
   LM.stop();
   RM.stop();
 }
+
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
@@ -91,6 +93,12 @@ void usercontrol(void) {
 
   int Lspeed = Controller.Axis3.position(pct);
   int Rspeed = Controller.Axis3.position(pct);
+  if (Controller.ButtonX.pressing()) {
+    intake.spin(forward, 100, pct);
+  }
+  else {
+    intake.stop();
+  }
 
   Lspeed = Lspeed + Controller.Axis1.position(pct);
   Rspeed = Rspeed - Controller.Axis1.position(pct);
