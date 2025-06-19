@@ -2,7 +2,7 @@
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
 /*    Author:       student                                                   */
-/*    Created:      6/16/2025, 1:09:55 PM                                     */
+/*    Created:      6/16/2025, 1:08:42 PM                                     */
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
@@ -17,12 +17,9 @@ competition Competition;
 // define your global instances of motors and other devices here
 brain Brain;
 controller Controller;
-motor LM (PORT10, ratio18_1, false);
-motor RM (PORT1, ratio18_1, true);
-motor intake (PORT7, ratio18_1, false);
-float pi = 3.14;
-float dia = 4.00;
-inertial Gyro = inertial(PORT5);
+motor LM (PORT20, ratio18_1, false);
+motor RM (PORT11, ratio18_1, true);
+motor IN (PORT9, ratio36_1, false);
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -33,46 +30,10 @@ inertial Gyro = inertial(PORT5);
 /*  not every time that the robot is disabled.                               */
 /*---------------------------------------------------------------------------*/
 
-
-void drive(float time, double speed ){
-  LM.spin(forward, speed, pct);
-  RM.spin(forward, speed-2, pct);
-  wait(time, sec);
-  LM.stop();
-  RM.stop();
-  
-}
-void inchDrive(float target){
-  float x = 0;
-  LM.setPosition(0, rev);
-  x = LM.position(rev)*dia*pi;
-  while (x<= target) {
-    drive(.05, 50);
-    x = LM.position(rev)*dia*pi;
-    Brain.Screen.printAt(10, 20, "inches = %0.2f", x);
-
-  }
-  LM.setBrake(hold);
-  RM.setBrake(hold);
-  LM.stop();
-  RM.stop();
-}
-
-void gyroturn(int target){
-float heading =0;
-Gyro.setRotation(0, deg);
-while (heading<target) {
-  LM.spin(forward, 50, pct);
-  RM.spin(reverse, 50, pct);
-  wait(5, msec);
-  heading = Gyro.rotation(deg);
-}
-LM.stop();
-RM.stop();
-}
-
 void pre_auton(void) {
-
+  Brain.Screen.setFillColor(white);
+  Brain.Screen.drawRectangle(50,50,30,200);
+  Brain.Screen.drawRectangle(80,210,150,30);
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -86,22 +47,41 @@ void pre_auton(void) {
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
+void drive(double time,int speed){
 
+  LM.spin(fwd,speed,pct);
+  RM.spin(fwd,speed,pct);
+  wait(time, sec);
+  LM.stop();
+  RM.stop();
+}
+void leftTurn(double time,int speed){
+
+  RM.spin(fwd,speed,pct);
+  wait(time, sec);
+  RM.stop();
+
+}
+void rightOrbit(double time,int speed){
+  RM.spin(fwd,speed*0.6,pct);
+  LM.spin(fwd,speed,pct);
+  wait(time, sec);
+  LM.stop();
+  RM.stop();
+
+}
 void autonomous(void) {
+  
+  drive(1,50);
+  leftTurn(1.25,50);
+  drive(0.75,50);
+  rightOrbit(7.5,50);
+  leftTurn(1.15,50);
+  drive(1,50);
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-
-inchDrive(20);
-gyroturn(80);
-intake.spin(reverse, 75, pct);
-inchDrive(26);
-intake.stop();
-gyroturn(80);
-inchDrive(32);
-intake.spin(fwd, 75,pct);
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -115,30 +95,46 @@ intake.spin(fwd, 75,pct);
 
 void usercontrol(void) {
   // User control code here, inside the loop
+ 
   while (1) {
-
-Brain.Screen.printAt(10,10, "Logan ");
-Brain.Screen.printAt(9,60, "Hates");
-Brain.Screen.setFillColor(tan);
-Brain.Screen.drawCircle(240,136,20);
-int Lspeed = Controller.Axis3.position(pct);
-int Rspeed = Controller.Axis2.position(pct)-2;
-LM.spin(fwd, Lspeed, pct);
-RM.spin(fwd, Rspeed, pct);
-
-if(Controller.ButtonR1.pressing()){
-  intake.spin(reverse, 75, pct);
+  //Motor Speed values  
+    int Lspeed = Controller.Axis3.position(pct);
+    int Rspeed = Controller.Axis3.position(pct);
+    int IntakeSpeed = 100;
+//L2, R2
+int Speed2;
+if(Controller.ButtonR2.pressing()){
+  Speed2 = 100;
 }
-else if(Controller.ButtonR2.pressing()){
-  intake.spin(fwd, 75, pct);
-
+else
+if(Controller.ButtonL2.pressing()){
+  Speed2 = -100;
+  }
+  else{
+  Speed2 = 0;
 }
+    Lspeed = Lspeed + Speed2;
+    Rspeed = Rspeed + Speed2;
 
-else{
-  intake.stop();
+//Turning mechanism
+    Lspeed = Lspeed + Controller.Axis4.position(pct);  
+    Rspeed = Rspeed - Controller.Axis4.position(pct);
+
+
+  
+//DRIVE
+    LM.spin(fwd,Lspeed,pct);
+    RM.spin(fwd,Rspeed,pct);
+//Intake
+    if(Controller.ButtonR1.pressing()){
+    IN.spin(fwd,IntakeSpeed,pct);
 }
-
-
+    else
+      if(Controller.ButtonL1.pressing()){
+      IN.spin(fwd,-IntakeSpeed,pct);
+      }
+    else
+      IN.stop();
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
     // values based on feedback from the joysticks.
@@ -148,10 +144,9 @@ else{
     // update your motors, etc.
     // ........................................................................
 
-    
-  }
-  wait(20, msec); // Sleep the task for a short amount of time to
+    wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
+  }
 }
 
 //
@@ -170,3 +165,4 @@ int main() {
     wait(100, msec);
   }
 }
+
