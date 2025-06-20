@@ -17,8 +17,11 @@ competition Competition;
 // define your global instances of motors and other devices here
 brain Brain;
 controller Controller;
-motor LM(PORT10, ratio18_1, true);
-motor RM(PORT14, ratio18_1, false);
+motor LM(PORT14, ratio18_1, true);
+motor RM(PORT19, ratio18_1, false);
+motor SPINNER1(PORT17, ratio18_1, false);
+float pi = 3.14;
+float dia = 4.00;
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -30,13 +33,28 @@ motor RM(PORT14, ratio18_1, false);
 /*  not every time that the robot is disabled.                               */
 /*---------------------------------------------------------------------------*/
 
-void test(int time, double speed)
+/// @brief 
+/// @param time 
+/// @param speed 
+void drive(float time, double speed)
 {
   LM.spin(forward, speed, pct);
   RM.spin(forward, speed, pct);
   wait(time, msec);
   LM.stop();
   RM.stop();
+}
+
+void inchDrive(float target){
+float x = 0;
+LM.setPosition(0, rev);
+x = LM.position(rev)*dia*pi;
+while (x <= target ) {
+drive(10, 50);
+x = LM.position(rev)*pi*dia;
+Brain.Screen.printAt(10, 20, "inches = %0.2f", x);
+
+}
 }
 
 void pre_auton(void)
@@ -49,8 +67,16 @@ void pre_auton(void)
 
 void autonomous(void)
 {
-  test(2000, 100.0);
-  test(2000, 50.0);
+  
+  
+
+
+
+
+
+
+
+
 }
 
 
@@ -61,20 +87,61 @@ void usercontrol(void)
   // User control code here, inside the loop
   while (1)
   {
-    Brain.Screen.printAt(10, 25, "I dont care about berings and stuff.-Brady");
-    Brain.Screen.printAt(10, 50, "Thats crazy.-Logan");
+    Brain.Screen.printAt(10, 70, "I don't want to undo 600 nylocks.-Brady");
+    Brain.Screen.printAt(10, 85, "Thats crazy.-Logan");
     Brain.Screen.setFillColor(blue);
     Brain.Screen.drawCircle(240, 136, 20);
-    int Lspeed1 = Controller.Axis2.position(pct);
-    int Rspeed1 = Controller.Axis3.position(pct);
+    int Lspeed1 = 0;
+    int Rspeed1 = 0;
+    Controller.Screen.setCursor(1, 1);
+    if (Controller.ButtonY.pressing()){
+      SPINNER1.spin(fwd, 100, pct);
+    }
+    else if (Controller.ButtonRight.pressing()){
+      SPINNER1.spin(reverse, 100, pct);
+    }
+    else {
+      SPINNER1.stop();
+    }
+    if (Controller.ButtonR2.pressing()){
+      Lspeed1 = -40;
+      Rspeed1 = -40;
+      }
+    else{
+      Lspeed1 = Controller.Axis2.position(pct);
+      Rspeed1 = Controller.Axis3.position(pct);
+      }
     LM.spin(fwd, Lspeed1, pct);
     RM.spin(fwd, Rspeed1, pct);
+    if (Controller.ButtonR2.pressing()){
+
+      Controller.Screen.print("Low Speed Enabled");
+     }
+    else{
+      Controller.Screen.print("Axis Speed Enabled");}
+      if (Controller.ButtonR1.pressing()){
+      Lspeed1 = 40;
+      Rspeed1 = 40;
+      }
+    else{
+      Lspeed1 = Controller.Axis2.position(pct);
+      Rspeed1 = Controller.Axis3.position(pct);
+      }
+    LM.spin(fwd, Lspeed1, pct);
+    RM.spin(fwd, Rspeed1, pct);
+    if (Controller.ButtonR1.pressing()){
+
+      Controller.Screen.print("Low Speed Enabled");
+     }
+    else{
+      Controller.Screen.print("Axis Speed Enabled");}
+    }
 
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
-}
+
 
 
 //
