@@ -36,7 +36,7 @@ inertial Gyro = inertial(PORT5);
 
 void drive(float time, double speed ){
   LM.spin(forward, speed, pct);
-  RM.spin(forward, speed-2, pct);
+  RM.spin(forward, speed, pct);
   wait(time, sec);
   LM.stop();
   RM.stop();
@@ -92,14 +92,16 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
 
-inchDrive(20);
-gyroturn(80);
-intake.spin(reverse, 75, pct);
-inchDrive(26);
+inchDrive(25);
+
+intake.spin(reverse, 60, pct);
+inchDrive(30);
 intake.stop();
-gyroturn(80);
-inchDrive(32);
-intake.spin(fwd, 75,pct);
+gyroturn(-63);
+inchDrive(40);
+gyroturn(-71);
+wait(150, msec);
+inchDrive(15);
 }
 
 
@@ -121,10 +123,10 @@ Brain.Screen.printAt(10,10, "Logan ");
 Brain.Screen.printAt(9,60, "Hates");
 Brain.Screen.setFillColor(tan);
 Brain.Screen.drawCircle(240,136,20);
-int Lspeed = Controller.Axis3.position(pct);
-int Rspeed = Controller.Axis2.position(pct)-2;
-LM.spin(fwd, Lspeed, pct);
-RM.spin(fwd, Rspeed, pct);
+double Lspeed = Controller.Axis3.position(pct);
+int Rspeed = Controller.Axis2.position(pct);
+LM.spin(fwd, (Lspeed), pct);
+RM.spin(fwd, (Rspeed/1.2), pct);
 
 if(Controller.ButtonR1.pressing()){
   intake.spin(reverse, 75, pct);
