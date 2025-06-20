@@ -76,17 +76,17 @@ void inRevDrive(double dist, int speed){
   }
 void inDrive(double dist, int speed){
   double circ = pi*diameter;
-  RM.resetPosition();
-  double rotations = RM.position(rev);
+  LM.resetPosition();
+  double rotations = LM.position(rev);
   double x = circ*rotations;
   while(x<dist){
     Brain.Screen.print("Loop running");
     LM.spin(fwd, speed, pct);
     RM.spin(fwd, speed, pct);
-    rotations = RM.position(rev);
+    rotations = LM.position(rev);
     x = circ*rotations;
   }
-
+Brain.Screen.clearLine();
   LM.stop();
   RM.stop();
   Brain.Screen.print("Stopped");
@@ -116,52 +116,24 @@ void rightTurn(double time,int speed,int xRspeed){
   RM.stop();
 }
 
-void inLeftDrive(int speed,double angle,int xLspeed){
-  double circ = pi*diameter;
-  RM.resetPosition();
-  double rotations = RM.position(rev);
-  double x = -circ*rotations;
-  double angleOutOf1 = angle/360;
-  while(x<circ*angleOutOf1){
-    Brain.Screen.print("Loop running");
-    LM.spin(fwd, speed*xLspeed, pct);
-    RM.spin(fwd, speed, pct);
-    rotations = RM.position(rev);
-    x = circ*rotations;
-  }
-}
-void inRightDrive(int speed,double angle,int xRspeed){
-  double circ = pi*diameter;
-  RM.resetPosition();
-  double rotations = LM.position(rev);
-  double x = circ*rotations;
-  double angleOutOf1 = angle/360;
-  while(x<circ*angleOutOf1){
-    Brain.Screen.print("Loop running");
-    LM.spin(fwd, speed, pct);
-    RM.spin(fwd, speed*xRspeed, pct);
-    rotations = LM.position(rev);
-    x = circ*rotations;
-  }
-
-}
 void gyroRight(double angle){
   Gyro.resetHeading();
   double currentHeading = Gyro.rotation(degrees);
   while(angle>currentHeading){
-    LM.spin(fwd, 10, pct);
-    RM.spin(fwd,-10,pct);
+    LM.spin(fwd, 20, pct);
+    RM.spin(fwd,-20,pct);
     currentHeading = Gyro.rotation(degrees);
  }
 }
 void gyroLeft(double angle){
+  Gyro.resetRotation();
   Gyro.resetHeading();
-  double currentHeading = Gyro.heading(degrees);
+  double currentHeading = Gyro.rotation(degrees);
   angle = -angle;
-  while(angle>currentHeading){
-    LM.spin(fwd,-10,pct);
-    RM.spin(fwd,10,pct);
-    currentHeading = Gyro.heading(degrees);
+  while(angle<currentHeading){
+    LM.spin(fwd,-20,pct);
+    RM.spin(fwd,20,pct);
+    currentHeading = Gyro.rotation(degrees);
   }
 }
 void gyroRight2(double angle){
@@ -173,45 +145,117 @@ void gyroRight2(double angle){
  }
 }
 void gyroLeft2(double angle){
-  double currentHeading = Gyro.heading(degrees);
+  double currentHeading = Gyro.rotation(degrees);
   angle = -angle;
   while(angle>currentHeading){
+    Brain.Screen.print("Turning");
     LM.spin(fwd,-10,pct);
     RM.spin(fwd,10,pct);
-    currentHeading = Gyro.heading(degrees);
+    currentHeading = Gyro.rotation(degrees);
   }
+  Brain.Screen.clearLine();
 }
-void center90L(void){
+//
+void centerL2(int heading){
   double currentHeading = Gyro.heading(degrees);
-  while(90<currentHeading){
+  while(heading<currentHeading){
     LM.spin(fwd,0, pct);
     RM.spin(fwd,10,pct);
     currentHeading = Gyro.rotation(degrees);
  }
 }
-void center90R(void){
+void centerR2(int heading){
   double currentHeading = Gyro.heading(degrees);
-  while(90>currentHeading){
+  while(heading>currentHeading){
     LM.spin(fwd,10, pct);
+    RM.spin(fwd,0,pct);
+    currentHeading = Gyro.rotation(degrees);
+ }
+}
+void centerRL2(int heading){
+  double currentHeading = Gyro.heading(degrees);
+  while(heading>currentHeading){
+    LM.spin(fwd,0, pct);
+    RM.spin(fwd,-10,pct);
+    currentHeading = Gyro.rotation(degrees);
+ }
+}
+void centerRR2(int heading){
+  double currentHeading = Gyro.heading(degrees);
+  while(heading<currentHeading){
+    LM.spin(fwd,10, pct);
+    RM.spin(fwd,0,pct);
+    currentHeading = Gyro.rotation(degrees);
+ }
+}
+//
+void centerL(int heading){
+  double currentHeading = Gyro.heading(degrees);
+  while(heading<currentHeading){
+    LM.spin(fwd,-20, pct);
+    RM.spin(fwd,20,pct);
+    currentHeading = Gyro.rotation(degrees);
+ }
+}
+void centerR(int heading){
+  double currentHeading = Gyro.heading(degrees);
+  while(heading>currentHeading){
+    LM.spin(fwd,20, pct);
+    RM.spin(fwd,0,pct);
+    currentHeading = Gyro.rotation(degrees);
+ }
+}
+void centerRL(int heading){
+  double currentHeading = Gyro.heading(degrees);
+  while(heading>currentHeading){
+    LM.spin(fwd,0, pct);
+    RM.spin(fwd,-20,pct);
+    currentHeading = Gyro.rotation(degrees);
+ }
+}
+void centerRR(int heading){
+  double currentHeading = Gyro.heading(degrees);
+  while(heading<currentHeading){
+    LM.spin(fwd,-20, pct);
     RM.spin(fwd,0,pct);
     currentHeading = Gyro.rotation(degrees);
  }
 }
 void autonomous(void) {
   Brain.Screen.clearScreen();
-  inDrive(10,50);
-  gyroRight(90);
-  center90L();
-  center90R();
-  inDrive(50,75);
-  inRevDrive(-1.25,10);
-  gyroRight2(180);
-  center90L();
-  center90R();
+  int auton = 1; 
+  //Auton 1
+  while(auton == 1){
+  inDrive(10,85);
+  gyroRight(80);
+  centerL(90);
+  centerR(90);
+  inDrive(45,100);
+  inRevDrive(-1.65,30);
+  gyroRight2(170);
+  centerRL(180);
+  centerRR(180);
   inRevDrive(-15,50);
   belt.spin(fwd,50,pct);
   wait(5,sec);
   stopAll();
+  }
+  //Auton 2
+  while(auton == 2){
+  inDrive(10,85);
+  gyroLeft(75);
+  centerL2(-90);
+  centerR2(-90);
+  inDrive(45,100);
+  inRevDrive(-1.75,30);
+  gyroLeft2(170);
+  centerRL2(-180);
+  centerRR2(-180);
+  inRevDrive(-15,50);
+  belt.spin(fwd,50,pct);
+  wait(5,sec);
+  stopAll();
+  }
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
