@@ -20,6 +20,9 @@ controller Controller;
 motor LM (PORT10, ratio18_1, false);
 motor RM (PORT1, ratio18_1, true);
 motor intake (PORT7, ratio18_1, false);
+float pi = 3.14;
+float dia = 4.00;
+inertial Gyro = inertial(PORT5);
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -31,12 +34,41 @@ motor intake (PORT7, ratio18_1, false);
 /*---------------------------------------------------------------------------*/
 
 
-void drive(int time, double speed ){
+void drive(float time, double speed ){
   LM.spin(forward, speed, pct);
   RM.spin(forward, speed, pct);
   wait(time, sec);
   LM.stop();
   RM.stop();
+  
+}
+void inchDrive(float target){
+  float x = 0;
+  LM.setPosition(0, rev);
+  x = LM.position(rev)*dia*pi;
+  while (x<= target) {
+    drive(.05, 50);
+    x = LM.position(rev)*dia*pi;
+    Brain.Screen.printAt(10, 20, "inches = %0.2f", x);
+
+  }
+  LM.setBrake(hold);
+  RM.setBrake(hold);
+  LM.stop();
+  RM.stop();
+}
+
+void gyroturn(int target){
+float heading =0;
+Gyro.setRotation(0, deg);
+while (heading<target) {
+  LM.spin(forward, 50, pct);
+  RM.spin(reverse, 50, pct);
+  wait(5, msec);
+  heading = Gyro.rotation(deg);
+}
+LM.stop();
+RM.stop();
 }
 
 void pre_auton(void) {
@@ -60,10 +92,18 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
 
-drive(4, 50);
+inchDrive(25);
 
-
+intake.spin(reverse, 60, pct);
+inchDrive(30);
+intake.stop();
+gyroturn(-63);
+inchDrive(40);
+gyroturn(-71);
+wait(150, msec);
+inchDrive(15);
 }
+
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -79,14 +119,14 @@ void usercontrol(void) {
   // User control code here, inside the loop
   while (1) {
 
-    Brain.Screen.printAt(10,10, "Logan ");
+Brain.Screen.printAt(10,10, "Logan ");
 Brain.Screen.printAt(9,60, "Hates");
 Brain.Screen.setFillColor(tan);
 Brain.Screen.drawCircle(240,136,20);
-int Lspeed = Controller.Axis3.position(pct);
+double Lspeed = Controller.Axis3.position(pct);
 int Rspeed = Controller.Axis2.position(pct);
-LM.spin(fwd, Lspeed, pct);
-RM.spin(fwd, Rspeed, pct);
+LM.spin(fwd, (Lspeed), pct);
+RM.spin(fwd, (Rspeed/1.2), pct);
 
 if(Controller.ButtonR1.pressing()){
   intake.spin(reverse, 75, pct);

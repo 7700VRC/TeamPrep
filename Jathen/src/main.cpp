@@ -5,7 +5,7 @@
 /*    Created:      6/16/2025, 1:10:06 PM                                     */
 /*    Description:  V5 project                                                */
 /*                                                                            */
-/*----------------------------------------------------------------------------*/
+/*--------------------------;l///--------------------------------------------------*/
 
 #include "vex.h";
 
@@ -17,9 +17,14 @@ competition Competition;
 // define your global instances of motors and other devices here 
 brain Brain;
 controller Controller; 
+float pi = 3.14;
+float dia = 4.00;
 motor LM (PORT19, ratio18_1, false);
 motor RM (PORT18, ratio18_1, true);
 motor intake (PORT20, ratio6_1, true);
+motor outake (PORT17, ratio18_1, true);
+
+
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -61,7 +66,7 @@ void pre_auton(void) {
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.*/
 
-void drive(int time, float speed) {
+void drive(float time, float speed) {
   LM.spin(forward, speed, pct);
   RM.spin(forward, speed, pct);
   wait(time, sec);
@@ -69,11 +74,24 @@ void drive(int time, float speed) {
   RM.stop();
 }
 
+void inchDrive(float target) {
+  float x = 0;
+  LM.setPosition(0, rev);
+  x = LM.position(rev) * dia * pi;
+  while (x <= target) {
+    drive(.1, 25);
+    x = LM.position(rev) * dia * pi;
+    Brain.Screen.printAt(10, 20, "inches = %0.2f", x);
+  }
+  LM.stop();
+  RM.stop();
+  }
+
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
   // ..........................................................................
-  drive(2, 100);
+  inchDrive(12);
   // ..........................................................................
 }
 
@@ -93,11 +111,25 @@ void usercontrol(void) {
 
   int Lspeed = Controller.Axis3.position(pct);
   int Rspeed = Controller.Axis3.position(pct);
-  if (Controller.ButtonX.pressing()) {
+
+  if (Controller.ButtonR1.pressing()) {
     intake.spin(forward, 100, pct);
+  }
+else if (Controller.ButtonR2.pressing()) {
+    intake.spin(reverse, 100, pct);
   }
   else {
     intake.stop();
+  }
+
+  if (Controller.ButtonUp.pressing()) {
+    outake.spin(forward, 100, pct);
+  }
+  else if (Controller.ButtonDown.pressing()) {
+    outake.spin(reverse, 100, pct);
+  }
+  else {
+    outake.stop();
   }
 
   Lspeed = Lspeed + Controller.Axis1.position(pct);
@@ -111,6 +143,9 @@ void usercontrol(void) {
     // Each time through the loop your program should update motor + servo
     // values based on feedback from the joysticks.
 
+
+
+}
     // ........................................................................
     // Insert user code here. This is where you use the joystick values to
     // update your motors, etc.
@@ -118,7 +153,6 @@ void usercontrol(void) {
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
-  }
 
 
 }
