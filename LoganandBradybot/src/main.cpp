@@ -45,6 +45,12 @@ void drive(float time, double speed)
   RM.stop();
 }
 
+
+void turn(float time, int speed){
+  LM.spin(forward, speed, pct);
+  RM.spin(reverse, speed, percent);
+  wait(time, msec);
+}
 void inchDrive(float target){
 float x = 0;
 LM.setPosition(0, rev);
@@ -55,11 +61,17 @@ x = LM.position(rev)*pi*dia;
 Brain.Screen.printAt(10, 20, "inches = %0.2f", x);
 
 }
+
+
+
+
+
+
+
 }
 
 void pre_auton(void)
 {
-
 
 }
 
@@ -67,8 +79,9 @@ void pre_auton(void)
 
 void autonomous(void)
 {
-  
-  
+inchDrive(-1.5);
+turn(500, 100);
+inchDrive(7.5);
 
 
 
@@ -89,8 +102,6 @@ void usercontrol(void)
   {
     Brain.Screen.printAt(10, 70, "I don't want to undo 600 nylocks.-Brady");
     Brain.Screen.printAt(10, 85, "Thats crazy.-Logan");
-    Brain.Screen.setFillColor(blue);
-    Brain.Screen.drawCircle(240, 136, 20);
     int Lspeed1 = 0;
     int Rspeed1 = 0;
     Controller.Screen.setCursor(1, 1);
@@ -114,11 +125,11 @@ void usercontrol(void)
     LM.spin(fwd, Lspeed1, pct);
     RM.spin(fwd, Rspeed1, pct);
     if (Controller.ButtonR2.pressing()){
-
+      
       Controller.Screen.print("Low Speed Enabled");
      }
     else{
-      Controller.Screen.print("Axis Speed Enabled");}
+      Controller.Screen.print("Max Speed Enabled");}
       if (Controller.ButtonR1.pressing()){
       Lspeed1 = 40;
       Rspeed1 = 40;
@@ -134,7 +145,7 @@ void usercontrol(void)
       Controller.Screen.print("Low Speed Enabled");
      }
     else{
-      Controller.Screen.print("Axis Speed Enabled");}
+      Controller.Screen.print("Max Speed Enabled");}
     }
 
 
