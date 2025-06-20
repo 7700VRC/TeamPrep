@@ -66,7 +66,7 @@ void pre_auton(void) {
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.*/
 
-void drive(float time, float speed) {
+void fTurn(float time, float speed) {
   LM.spin(forward, speed, pct);
   RM.spin(forward, speed, pct);
   wait(time, sec);
@@ -74,12 +74,49 @@ void drive(float time, float speed) {
   RM.stop();
 }
 
+void bTurn(float time, float speed) {
+  LM.spin(reverse, speed, pct);
+  RM.spin(reverse, speed, pct);
+  wait(time, sec);
+  LM.stop();
+  RM.stop();
+}
+
+void rTurn(float time, float speed) {
+  LM.spin(forward, speed, pct);
+  RM.spin(reverse, speed, pct);
+  wait(time, sec);
+  LM.stop();
+  RM.stop();
+}
+
+void lTurn(float time, float speed) {
+  LM.spin(reverse, speed, pct);
+  RM.spin(forward, speed, pct);
+  wait(time, sec);
+  LM.stop();
+  RM.stop();
+}
+
+void outTurn(float time) {
+  outake.spin(forward, 75, pct);
+  wait(time, sec);
+  outake.stop();
+}
+
+void inTurn(float time) {
+  intake.spin(forward, 100, pct);
+  wait(time, sec);
+  intake.stop();
+}
+
+
 void inchDrive(float target) {
   float x = 0;
   LM.setPosition(0, rev);
   x = LM.position(rev) * dia * pi;
   while (x <= target) {
-    drive(.1, 25);
+    fTurn(.1, 25);
     x = LM.position(rev) * dia * pi;
     Brain.Screen.printAt(10, 20, "inches = %0.2f", x);
   }
@@ -91,7 +128,15 @@ void inchDrive(float target) {
 
 void autonomous(void) {
   // ..........................................................................
-  inchDrive(12);
+  bTurn(1, 80);
+  rTurn(0.5, 30);
+  bTurn(0.5, 40);
+  outTurn(3);
+  fTurn(1, 80);
+  inTurn(1);
+  outTurn(0.5);
+  bTurn(1, 80);
+  outTurn(0.5);
   // ..........................................................................
 }
 
