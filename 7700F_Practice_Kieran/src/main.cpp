@@ -3,8 +3,8 @@
 /*    Module:       main.cpp                                                  */
 /*    Author:       Kieran Paramasivum                                        */
 /*    Created:      4/14/2025, 4:47:20 PM                                     */
-/*    Description:  7700F practice                                            */
-/*    I am using team prep robot.                                             */
+/*    Description:  7700F practice coding                                     */
+/*    I am using 7700F robot.                                                 */
 /*----------------------------------------------------------------------------*/
 
 #include "vex.h"
@@ -17,10 +17,12 @@ competition Competition;
 // define your global instances of motors and other devices here
 brain Brain;
 
-motor LF (PORT7, ratio18_1, false);
-motor LB (PORT18, ratio18_1, false);
-motor RF (PORT20, ratio18_1, true);
-motor RB (PORT9, ratio18_1, true);
+motor LF (PORT20, ratio18_1, true);
+motor LB (PORT19, ratio18_1, true);
+motor RF (PORT11, ratio18_1, false);
+motor RB (PORT12, ratio18_1, false);
+
+inertial gyrosense (PORT15);
 
 float dia = 4.00;
 float gear_Rtio = 1.00;
@@ -62,13 +64,52 @@ float gear_Rtio = 1.00;
     stopRobot();
     Brain.Screen.printAt(10, 20, "distance = %0.1f", x);
   }
+
+  void gyroPrint() {
+    float heading = gyrosense.heading(deg);
+    float rotation = gyrosense.rotation(deg);
+    Brain.Screen.clearScreen();
+    Brain.Screen.printAt(10,20,"Heading = %0.1f", heading);
+    Brain.Screen.printAt(10,40,"Rotation = %0.1f", rotation);
+    Brain.Screen.printAt(10,60,"Pitch  =  %0.1f", gyrosense.pitch());
+  }
+
+
+  void gyroTurn(float degrees){
+    while(gyrosense.rotation()<degrees) {
+      moveRobot(-50, 50, 30);
+
+    }
+    stopRobot();
+
+  }
+
+  void Pturn(float degrees){
+    float heading = gyrosense.rotation(deg);
+    float error = degrees - heading;
+    float Kp = 2.0;
+    float speed = error * Kp;
+    gyrosense.resetRotation();
+   
+    while(fabs(error)>=2){ 
+      moveRobot(speed, -speed, 30);
+      heading = gyrosense.rotation(deg);
+      error = heading - degrees;
+      speed = error * Kp;
+    
+
+    }
+  
+    stopRobot();
+  }
 /*---------------------------------------------------------------------------*/
 
 //Part of Pre-Auton
 void pre_auton(void) {
 
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
+  while(gyrosense.isCalibrating()) wait(200, msec);
+
+
 }
 
 /*---------------------------------------------------------------------------*/
@@ -83,12 +124,10 @@ void pre_auton(void) {
 
 void autonomous(void) {
 
-  inchDrive(12);
-  //moveRobot(50, -50, 950);
-  //inchDrive(12);
-  
-  stopRobot();
-
+  Pturn(90);
+  wait(1, sec);
+  Pturn(-90);
+  gyroPrint();
 
 }
 
@@ -104,9 +143,10 @@ void autonomous(void) {
 
 void usercontrol(void) {
   while (1) {
-   
 
-    
+   gyroPrint(); 
+   wait(200, msec); 
+
   }
 }
 
