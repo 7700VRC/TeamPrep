@@ -16,29 +16,94 @@ competition Competition;
 
 // define your global instances of motors and other devices here
 brain Brain;
-motor LF(PORT10, ratio18_1, false );
-motor LB(PORT20, ratio18_1, false );
-motor RF(PORT1, ratio18_1, true );
-motor RB(PORT3, ratio18_1, true );
+motor LF(PORT10, ratio18_1, false);
+motor LB(PORT20, ratio18_1, false);
 
+motor RF(PORT1, ratio18_1, true);
+motor RB(PORT3, ratio18_1, true);
 
+inertial gyro (PORT5);
 
-float WD = 3.25;
-float GR = 0.6
+brain Brain;
+
+controller Controller1;
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
-/*
-     
-/*  not every time that the robot is disabled*/
 
-//return type: int, float,void                      */
-void drawOnScreen  () {
+void robotDrive (int Lspeed, int Rspeed, int duration){
+RF.spin(fwd, Rspeed, pct);
+RB.spin(fwd, Rspeed, pct);
+
+wait (duration, msec);
+
+}
+
+
+
+void robotStop(){
+LF.stop(brake);
+LB.stop(brake);
+RF.stop(brake);
+RB.stop(brake);
+
+}
+
+void turntoAngle(float targetAngle) {
+float error = 0;
+float Kp = 2.0;
+float Ki = 0.5;
+float totalError = 0;
+float Kd = 0.5;
+float derivative = 0;
+float lastError = 0;
+float speed = 0;
+
+while (true) {
+float currentAngle = gyro.heading();
+error = targetAngle - current Angle;
+
+speed = (Kp * error) + (Ki * totalError) + (Kd * derivative);
+
+totalError = +error; 
+derivative = error - lastError;
+ robotDrive(speed, -speed, 30);
+
+if(error>180) + Ki * totalError;
+if(error < -180) error +=360;
+
+if (fabs(error)<1,0) break; 
+ lastError = error;
+}
+
+robotStop();
+
+}
+
+
+
+/*---------------------------------------------------------------------------*/
+
+while (gyro.iscalibrating())wait(200,msec);
+
+
+
+
+
+ LF.spin(forward, lspeed, pct );
+  LB.spin(forward, lspeed, pct );
+  RB.spin(forward, rspeed, pct );
+  RF.spin(forward, rspeed, pct );
+
+
+void stopRobot () {
+  LF.stop(brake);
+  LB.stop(brake);
+LB.stop(brake);
+LB.stop(brake);
+}
   
   
-  
-  
-  }
 
 int drawShapes () {
   Brain.Screen.setPenColor(white);
@@ -53,28 +118,18 @@ Brain.Screen.setFillColor(yellow);
 
 void moverobot (int rspeed, int lspeed, int duration) {
 
-  LF.spin(forward, lspeed, pct );
-  LB.spin(forward, lspeed, pct );
-  RB.spin(forward, rspeed, pct );
-  RF.spin(forward, rspeed, pct );
-
+  
 wait(duration, msec);
 }
 
-void stopRobot() {
-  LF.stop(brake);
-  LB.stop(brake);
-LB.stop(brake);
-LB.stop(brake);
-}
 
 
 
-void inchDrive(float inches){
- float x = 0;
-float error = 24
 
-}
+
+
+
+
 
 
 /*not every time the robot is disabled
@@ -100,10 +155,8 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-   drawOnScreen();
-  wait (1,sec);
-Brain.Screen.clearScreen();
-drawShapes();
+   
+  
 
 
 
