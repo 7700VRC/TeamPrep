@@ -85,9 +85,15 @@ void usercontrol(void) {
     // Insert user code here. This is where you use the joystick values to
     // update your motors, etc.
     // ........................................................................
+    double forward = Controller.Axis3.position(pct); 
+    double turn = Controller.Axis1.position(pct); 
+    
 
-    drive(Controller.Axis3.position(pct),
-          Controller.Axis2.position(pct));
+    double left_power = forward + turn ; 
+  
+    double right_power =  forward - turn; 
+    
+    drive(left_power,right_power );
 
         
     wait(20, msec); // Sleep the task for a short amount of time to
