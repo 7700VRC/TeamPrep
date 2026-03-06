@@ -16,7 +16,13 @@ competition Competition;
 
 // define your global instances of motors and other devices here
 brain Brain; 
+motor LFM (PORT16, ratio18_1, false);
+motor LBM (PORT19, ratio18_1, false);
 
+motor RFM (PORT12, ratio18_1, true);
+motor RBM (PORT18, ratio18_1, true);
+
+inertial imu (PORT21);
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -30,11 +36,65 @@ Brain.Screen.drawRectangle(35, 140, 41, 41);
 
 }
 
+void gyroprint() {
+
+  float heading = imu.heading(deg);
+  float rotation = imu.rotation(deg);
+  Brain.Screen.clearScreen();
+  Brain.Screen.printAt(10, 20, "Heading = %0.1f", heading);
+  Brain.Screen.printAt(10, 40, "Rotation = %0.1f", rotation);
+  Brain.Screen.printAt(10, 60, "Pitch = %0.1f", imu.pitch(deg));
+  Brain.Screen.printAt(10, 80, "Yaw = %0.1f", imu.yaw(deg));
+  Brain.Screen.printAt(10, 100, "Roll = %0.1f", imu.roll(deg));
+
+}
+
+void gyroTurn(float degrees) {
+
+  while (imu.rotation()<degrees) {
+    RFM.spin(reverse, 25, pct);
+    RBM.spin(reverse, 25, pct);
+    LFM.spin(forward, 25, pct);
+    LBM.spin(forward, 25, pct);
+    wait(30, msec);
+  }
+  RFM.stop(brake);
+  RBM.stop(brake);
+
+
+  LFM.stop(brake);
+  LBM.stop(brake);
+
+
+}
+
+void Pturn(float degrees) {
+  float heading = imu.rotation(deg);
+  float error = degrees - heading;
+  float Kp = 0.5; //constant does not change
+  float speed = error * Kp;
+
+ while (fabs(error)>=5){  
+   RFM.spin(reverse, speed, pct);
+   RBM.spin(reverse, speed, pct);
+   LFM.spin(forward, speed, pct);
+   LBM.spin(forward, speed, pct);
+   wait(30, msec);
+   heading = imu.rotation(deg);
+   error =  heading - degrees;
+   speed = error * Kp;
+
+
+
+  }
+}
+
 
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
 
+  while(imu.isCalibrating())wait(200, msec); 
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -50,9 +110,12 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  // ..........................................................................
-  // Insert autonomous user code here.
-  // ..........................................................................
+  Pturn (90);
+  wait(1, sec);
+  Pturn(-90);
+  gyroprint();
+
+  
 }
 
 /*---------------------------------------------------------------------------*/
