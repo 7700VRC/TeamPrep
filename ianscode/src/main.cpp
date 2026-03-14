@@ -13,10 +13,10 @@ using namespace vex;
 
 // A global instance of competition
 competition Competition;
-motor RFM(PORT15, ratio18_1, false);
-motor RBM(PORT2, ratio18_1, false);
-motor LFM(PORT1, ratio18_1, true);
-motor LBM(PORT14, ratio18_1, true);
+motor RFM(PORT14, ratio18_1, false);
+motor RBM(PORT5  , ratio18_1, false);
+motor LFM(PORT16, ratio18_1, true);
+motor LBM(PORT15, ratio18_1, true);
 brain Brain;
 controller Controller;
 // define your global instances of motors and other devices here
