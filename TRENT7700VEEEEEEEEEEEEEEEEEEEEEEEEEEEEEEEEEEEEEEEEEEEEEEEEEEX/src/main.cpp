@@ -90,9 +90,9 @@ void pre_auton(void) {
 void autonomous(void) {
   inchDrive(12);
   wait(100, msec);
-  Drive(-10, 10, 500);
+  Drive(-100, 100, 500);
   wait(100, msec);
-  Drive(10, 10, 500);
+  inchDrive(12);
   wait(100, msec);
   // ..........................................................................
   // Insert autonomous user code here.
