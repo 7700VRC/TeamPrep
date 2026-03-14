@@ -18,10 +18,10 @@ competition Competition;
 brain Brain;
 
 
-motor LF (PORT10, ratio18_1, true);
-motor LB (PORT9, ratio18_1, true);
-motor RF (PORT20, ratio18_1, false);
-motor RB (PORT16, ratio18_1, false);
+motor LF (PORT11, ratio18_1, true);
+motor LB (PORT20, ratio18_1, true);
+motor RF (PORT19, ratio18_1, false);
+motor RB (PORT6, ratio18_1, false);
 
 controller RC; 
 
@@ -110,10 +110,10 @@ void usercontrol(void) {
     
     // drawonBrain();
     
-    int Lspeed = RC.Axis2.position(pct);
-    int Rspeed = RC.Axis3.position(pct);
+    int Lspeed1 = RC.Axis2.position(pct);
+    int Rspeed1 = RC.Axis3.position(pct);
     
-    RobotDrive(Rspeed, Lspeed, 30);
+    RobotDrive(Rspeed1, Lspeed1, 30);
 
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
@@ -139,6 +139,9 @@ int main() {
 
   // Run the pre-autonomous function.
   pre_auton();
+
+
+  
 
   // Prevent main from exiting with an infinite loop.
   while (true) {
