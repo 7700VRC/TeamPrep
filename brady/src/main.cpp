@@ -93,9 +93,13 @@ void gyroturn(float target)
 }
 void pgyroturn(float target)
 {
+<<<<<<< Updated upstream
     float kp = 0.5;
     float ki = 0.05;
     float kd = 0.25;
+=======
+    float kp = 1000;
+>>>>>>> Stashed changes
     float error = target - gyro1.yaw();
     float accuracy = 2;
     float totalerror = 0;
@@ -112,6 +116,7 @@ void pgyroturn(float target)
     }
     brakeDrive(brake);
 }
+<<<<<<< Updated upstream
 void drivercontrol() {
     int maxSpeed = 100;
     while (true) {
@@ -131,6 +136,43 @@ void drivercontrol() {
 void auton() {
     inchDrive(24);
     pgyroturn(90);
+=======
+float pi = 3.1415926;
+float dia = 4;
+
+
+void pinchdrive(float target){
+    float pinchdrive = avgRev * dia * pi;
+    
+    }
+
+
+void obstaclecourse()
+{
+
+    inchDrive(45);
+    wait(1, sec);
+    turn(90);
+    wait(1, sec);
+    inchDrive(33.5);
+    wait(1, sec);
+    turn(-45);
+    inchDrive(32);
+    turn(110);
+    inchDrive(31);
+    turn(-45);
+    inchDrive(14);
+    turn(90);
+    inchDrive(26);
+    turn(-95);
+    inchDrive(23.5);
+    turn(35);
+    inchDrive(28);
+    turn(-35);
+    inchDrive(27.5);
+    turn(-95);
+    inchDrive(45);
+>>>>>>> Stashed changes
 }
 int main()
 {
