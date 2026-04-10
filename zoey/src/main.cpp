@@ -34,9 +34,9 @@ motor Conveyor (PORT18, ratio18_1,false);
 void drive (int left,int right){
 
   LB.spin(fwd,left,pct);
-LF.spin(fwd,left,pct);
-RB.spin(fwd,right,pct);
-RF.spin(fwd,right,pct);
+  LF.spin(fwd,left,pct);
+  RB.spin(fwd,right,pct);
+  RF.spin(fwd,right,pct);
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
