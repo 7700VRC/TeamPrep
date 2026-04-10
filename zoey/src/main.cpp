@@ -12,6 +12,7 @@ rgrg
 gukt
 tgtg
 */
+
 #include "vex.h"
 
 using namespace vex;
@@ -40,7 +41,7 @@ RF.spin(fwd,right,pct);
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
-void drive (int Lspeed, int Rspeed, int WT){
+void driveRobot (int Lspeed, int Rspeed, int WT){
 
 LF.spin(fwd, 100, pct);
 RF.spin(fwd, 100, pct);
@@ -84,10 +85,10 @@ void pre_auton(void) {
 void autonomous(void) {
   // ..........................................................................
   
-  drive(100, 100, 400);
-  drive(50, 100, 400);
-  drive(100, 100, 500);
-  drive(100, -100, 300);
+  driveRobot(100, 100, 400);
+  driveRobot(50, 100, 400);
+  driveRobot(100, 100, 500);
+  driveRobot(100, -100, 300);
   // ..........................................................................
 }
 
