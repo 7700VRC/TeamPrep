@@ -20,10 +20,13 @@ using namespace vex;
 competition Competition;
 brain Brain;
 controller Controller;
-motor LB (PORT12, ratio18_1,true);
-motor RB (PORT20,ratio18_1,false);
+motor LB (PORT12,ratio18_1,true);
+motor RB (PORT14,ratio18_1,false);
 motor LF (PORT11,ratio18_1,true);
 motor RF (PORT19,ratio18_1,false);
+motor Intake (PORT13, ratio18_1, false );
+motor Outtake (PORT15, ratio18_1, false);
+motor Conveyor (PORT18, ratio18_1,false);
 
 // define your global instances of motors and other devices here
 
@@ -37,11 +40,29 @@ RF.spin(fwd,right,pct);
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
-/*  You may want to perform some actions before the competition starts.      */
-/*  Do them in the following function.  You must return from this function   */
-/*  or the autonomous and usercontrol tasks will not be started.  This       */
-/*  function is only called once after the V5 has been powered on and        */
-/*  not every time that the robot is disabled.                               */
+void drive (int Lspeed, int Rspeed, int WT){
+
+LF.spin(fwd, 100, pct);
+RF.spin(fwd, 100, pct);
+LB.spin(fwd, 100, pct);
+RB.spin(fwd, 100, pct);
+wait(WaitTime, msec); 
+LF.stop(brake); //coast //brake //hold
+LB.stop(brake); 
+RF.stop(brake); 
+RB.stop(brake); 
+}
+
+void intake(int IntakeSpeed){
+
+Intake.spin(fwd, 100, pct);
+}
+
+void Outtake(int OuttakeSpeed){
+
+Outtake.spin(fwd, 100 ,pct);
+}
+
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
@@ -62,7 +83,11 @@ void pre_auton(void) {
 
 void autonomous(void) {
   // ..........................................................................
-  // Insert autonomous user code here.
+  
+  drive(100, 100, 400);
+  drive(50, 100, 400);
+  drive(100, 100, 500);
+  drive(100, -100, 300);
   // ..........................................................................
 }
 
@@ -79,23 +104,32 @@ void autonomous(void) {
 void usercontrol(void) {
   // User control code here, inside the loop
   while (1) {
-    int lstick=Controller.Axis4.position();
-    int rstick=Controller.Axis2.position();
-    drive (rstick + lstick,rstick - lstick);
-
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
-
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
+    int lspeed=Controller.Axis3.position(pct);
+    int rspeed=Controller.Axis2.position();
+    drive(lspeed, rspeed, 10);
+    
+    if(Controller.ButtonL1.pressing()){
+      Brain.Screen.printAt(10, 10, "hi");
+      intake(100);
+    }
+  
+    else if (Controller.ButtonL2.pressing()){
+     
+     Brain.Screen.printAt(10, 35, "Screw you");
+     intake(-100);
+    }
+    else {
+      Brain.Screen.printAt(10, 45, "Hi there");
+      intake(0);
+    }
+     
+   }
     // ........................................................................
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
-}
+
 
 //
 // Main will set up the competition functions and callbacks.
