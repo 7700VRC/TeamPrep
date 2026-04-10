@@ -1,17 +1,11 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       student                                                   */
-/*    Created:      3/5/2026, 4:33:39 PM                                      */
+/*    Author:       Student                                                   */
+/*    Created:      4/9/2026, 4:02:40 PM                                      */
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-//jryf ryfrhthtre
-/*
-rgrg
-gukt
-tgtg
-*/
 
 #include "vex.h"
 
@@ -19,50 +13,44 @@ using namespace vex;
 
 // A global instance of competition
 competition Competition;
-brain Brain;
-controller Controller;
-motor LB (PORT12,ratio18_1,true);
-motor RB (PORT14,ratio18_1,false);
-motor LF (PORT11,ratio18_1,true);
-motor RF (PORT19,ratio18_1,false);
-motor Intake (PORT13, ratio18_1, false );
-motor Outtake (PORT15, ratio18_1, false);
-motor Conveyor (PORT18, ratio18_1,false);
 
 // define your global instances of motors and other devices here
+motor RBM (PORT1, ratio18_1, true);
+motor RFM (PORT2, ratio18_1, true);
+motor LBM (PORT3, ratio18_1, false);
+motor LFM (PORT4, ratio18_1, false);
 
-void drive (int left,int right){
 
-  LB.spin(fwd,left,pct);
-LF.spin(fwd,left,pct);
-RB.spin(fwd,right,pct);
-RF.spin(fwd,right,pct);
-}
+controller Controller;
+brain Brain;
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
-void driveRobot (int Lspeed, int Rspeed, int WT){
+ 
+void drivebot (int Lspeed, int Rspeed, int WaitTime) {
 
-LF.spin(fwd, 100, pct);
-RF.spin(fwd, 100, pct);
-LB.spin(fwd, 100, pct);
-RB.spin(fwd, 100, pct);
-wait(WaitTime, msec); 
-LF.stop(brake); //coast //brake //hold
-LB.stop(brake); 
-RF.stop(brake); 
-RB.stop(brake); 
+LFM.spin(forward, Lspeed, pct );
+LBM.spin(fwd, Lspeed, pct);
+RBM.spin(fwd, Rspeed, pct);
+RFM.spin(fwd, Rspeed, pct);
+wait(WaitTime, msec);
+LFM.stop(brake); //coast // brake //hold
+LBM.stop(brake);
+RFM.stop(brake);
+RBM.stop(brake);
 }
 
-void intake(int IntakeSpeed){
+void intake(int IntakeSpeed) {
 
-Intake.spin(fwd, 100, pct);
+
+
+
 }
 
-void Outtake(int OuttakeSpeed){
+void Scoring(int ScoringSpeed);
 
-Outtake.spin(fwd, 100 ,pct);
-}
+
+
 
 /*---------------------------------------------------------------------------*/
 
@@ -84,11 +72,13 @@ void pre_auton(void) {
 
 void autonomous(void) {
   // ..........................................................................
-  
-  driveRobot(100, 100, 400);
-  driveRobot(50, 100, 400);
-  driveRobot(100, 100, 500);
-  driveRobot(100, -100, 300);
+  drivebot(100, 100, 400);
+  drivebot(50, 100, 400); //curved turn
+  drivebot(100, 100, 500);
+  drivebot(100, -100, 300);
+
+
+
   // ..........................................................................
 }
 
@@ -105,32 +95,41 @@ void autonomous(void) {
 void usercontrol(void) {
   // User control code here, inside the loop
   while (1) {
-    int lspeed=Controller.Axis3.position(pct);
-    int rspeed=Controller.Axis2.position();
-    drive(lspeed, rspeed, 10);
+    
+    int Lspeed = Controller.Axis3.position(pct);
+    int Rspeed = Controller.Axis2.position(pct);
+    drivebot(Lspeed, Rspeed, 10);
     
     if(Controller.ButtonL1.pressing()){
-      Brain.Screen.printAt(10, 10, "hi");
-      intake(100);
+      Brain.Screen. printAt(10, 10, "I pressed the Left 1 Button");
+      
     }
-  
     else if (Controller.ButtonL2.pressing()){
-     
-     Brain.Screen.printAt(10, 35, "Screw you");
-     intake(-100);
+
+      Brain.Screen.printAt(10, 30, "I am pressing L2 button this time");
+    
     }
+
     else {
-      Brain.Screen.printAt(10, 45, "Hi there");
-      intake(0);
+      Brain.Screen.printAt(10, 50, "not pressing anything");
+      
+
+
     }
-     
-   }
-    // ........................................................................
+    
+
+    
+    
+
+
+
+
+
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
-
+}
 
 //
 // Main will set up the competition functions and callbacks.
@@ -139,7 +138,6 @@ int main() {
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
-  
 
   // Run the pre-autonomous function.
   pre_auton();
