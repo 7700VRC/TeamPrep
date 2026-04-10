@@ -17,13 +17,17 @@ competition Competition;
 // define your global instances of motors and other devices here
 motor FL = motor(PORT10, ratio18_1, true);
 motor BL = motor(PORT9,ratio18_1,true);
-motor BR = motor(PORT16,ratio18_1,false );
+motor BR = motor(PORT6,ratio18_1,false );
 motor FR = motor(PORT20,ratio18_1,false );
+motor intake = motor(PORT15,ratio6_1,false);
+motor outake = motor(PORT1,ratio6_1, false);
+motor conveyor = motor (PORT3,ratio6_1, false);
 controller Controller = controller();
 brain Brain = brain();
 
 /*---------------------------------------------------------------------------*/
-/*                          Pre-Autonomous Functions                         */
+/*                          
+/*                                                                           */
 /*                                                                           */
 /*  You may want to perform some actions before the competition starts.      */
 /*  Do them in the following function.  You must return from this function   */
@@ -37,8 +41,26 @@ void drive(int lspeed, int rspeed){
   BL.spin(fwd, lspeed, pct);
   FR.spin(fwd, rspeed, pct);
   BR.spin(fwd, rspeed, pct);
+ 
 }
 
+void driveRobot (int Lspeed, int Rspeed, int waitTtime) {
+  
+FL.spin(fwd, Lspeed, pct);
+BL.spin(fwd, Lspeed, pct);
+FR.spin(fwd, Lspeed, pct);
+BR.spin(fwd, Lspeed, pct);
+wait(waitTtime, msec);
+FL.stop(brake); //coast //brake // hold 
+BL.stop(brake);
+FR.stop(brake);
+BR.stop(brake);
+}
+
+void Intake(int IntakeSpeed){
+  intake.spin(fwd, IntakeSpeed, pct);
+  conveyor.spin(fwd,IntakeSpeed, pct ); 
+}
 
 
 
@@ -59,11 +81,16 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
+
+  /*driveRobot(100, 100, 400);
+  driveRobot(50, 100, 500);
+  driveRobot(100, 100, 500);
+  driveRobot(100, -100, 300);*/
+
+
   // ..........................................................................
   // Insert autonomous user code here.
-  // ..........................................................................
-}
-
+  // ........................................................................
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              User Control Task                            */
@@ -73,6 +100,11 @@ void autonomous(void) {
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
+} 
+
+
+
+
 
 void usercontrol(void) {
   // User control code here, inside the loop
@@ -86,7 +118,8 @@ void usercontrol(void) {
     // update your motors, etc.
     // ........................................................................
     double forward = Controller.Axis3.position(pct); 
-    double turn = Controller.Axis1.position(pct); 
+    double turn = Controller.Axis1.position(pct);  
+    
     
 
     double left_power = forward + turn ; 
@@ -95,7 +128,16 @@ void usercontrol(void) {
     
     drive(left_power,right_power );
 
-        
+    if(Controller.ButtonL1.pressing()) {
+    Intake(100);
+    }
+    else if (Controller.ButtonL2.pressing()){ 
+      Intake(-100); 
+    }
+
+       else { 
+        Intake(0); 
+       } 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
