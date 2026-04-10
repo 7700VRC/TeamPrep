@@ -130,6 +130,7 @@ void usercontrol(void) {
 
     if(Controller.ButtonL1.pressing()) {
     Intake(100);
+    Brain.Screen.printAt(10, 10, "Hi ItsAme Mario");
     }
     else if (Controller.ButtonL2.pressing()){ 
       Intake(-100); 
