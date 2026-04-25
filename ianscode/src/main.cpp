@@ -17,6 +17,9 @@ motor RFM(PORT14, ratio18_1, false);
 motor RBM(PORT5  , ratio18_1, false);
 motor LFM(PORT16, ratio18_1, true);
 motor LBM(PORT15, ratio18_1, true);
+motor INTAKE(PORT16, ratio6_1, true);
+motor CONVEYOR(PORT13, ratio18_1, false);
+motor OUTTAKE(PORT18, ratio6_1, true); 
 brain Brain;
 controller Controller;
 // define your global instances of motors and other devices here
@@ -89,9 +92,29 @@ void usercontrol(void) {
     int Rspeed = Controller.Axis2.position(pct);
     driveRobot(Rspeed, Lspeed, 10);
     
+    if (Controller.ButtonR1.pressing()){
+      INTAKE.spin(fwd, 100, pct); 
+      CONVEYOR.spin(fwd, 100, pct);
+    }
+    else if (Controller.ButtonR2.pressing()){ 
+      INTAKE.spin(fwd, 100, pct);
+      CONVEYOR.spin(fwd, 100, pct);
+    }
+    else { 
+      INTAKE.stop(brake);
+      CONVEYOR.stop(brake);
 
-
-
+    }
+    if (Controller.ButtonL1.pressing()){ 
+      CONVEYOR.spin(fwd, 100, pct);
+      OUTTAKE.spin(fwd, 100, pct);
+      
+    }
+    else 
+    { 
+      CONVEYOR.stop(brake);
+      OUTTAKE.stop(brake);
+    }
 
 
     wait(20, msec); // Sleep the task for a short amount of time to
