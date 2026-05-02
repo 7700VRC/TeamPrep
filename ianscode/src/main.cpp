@@ -13,13 +13,13 @@ using namespace vex;
 
 // A global instance of competition
 competition Competition;
-motor RFM(PORT14, ratio18_1, false);
-motor RBM(PORT5  , ratio18_1, false);
-motor LFM(PORT16, ratio18_1, true);
-motor LBM(PORT15, ratio18_1, true);
-motor INTAKE(PORT16, ratio6_1, true);
-motor CONVEYOR(PORT13, ratio18_1, false);
-motor OUTTAKE(PORT18, ratio6_1, true); 
+motor RFM(PORT5, ratio18_1, true);
+motor RBM(PORT14  , ratio18_1, true);
+motor LFM(PORT15, ratio18_1, false);
+motor LBM(PORT20, ratio18_1, false);
+motor INTAKE(PORT9, ratio6_1, false);
+motor CONVEYOR(PORT13, ratio18_1, true);
+motor OUTTAKE(PORT19, ratio6_1, false); 
 brain Brain;
 controller Controller;
 // define your global instances of motors and other devices here
@@ -103,7 +103,6 @@ void usercontrol(void) {
     else { 
       INTAKE.stop(brake);
       CONVEYOR.stop(brake);
-
     }
     if (Controller.ButtonL1.pressing()){ 
       CONVEYOR.spin(fwd, 100, pct);
