@@ -92,11 +92,11 @@ void usercontrol(void) {
     int Rspeed = Controller.Axis2.position(pct);
     driveRobot(Rspeed, Lspeed, 10);
     
-    if (Controller.ButtonR1.pressing()){
+    if (Controller.ButtonR1.pressing(){
       INTAKE.spin(fwd, 100, pct); 
       CONVEYOR.spin(fwd, 100, pct);
     }
-    else if (Controller.ButtonR2.pressing()){ 
+    else if (Controller.ButtonR2.pressing(){ 
       INTAKE.spin(fwd, 100, pct);
       CONVEYOR.spin(fwd, 100, pct);
     }
@@ -104,7 +104,7 @@ void usercontrol(void) {
       INTAKE.stop(brake);
       CONVEYOR.stop(brake);
     }
-    if (Controller.ButtonL1.pressing()){ 
+    if (Controller.ButtonL1.pressing(){ 
       CONVEYOR.spin(fwd, 100, pct);
       OUTTAKE.spin(fwd, 100, pct);
       
