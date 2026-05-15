@@ -60,6 +60,18 @@ void pre_auton(void) {
   // Example: clearing encoders, setting servo positions, ...
 }
 
+int sign (int a){
+if(a<-0){
+  return -1;
+
+}
+return 1;
+
+
+
+
+
+}
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -69,6 +81,23 @@ void pre_auton(void) {
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
+
+void inchDrive (int inches){ 
+LFM .resetPosition();
+  float c = M_PI * 3.25;
+  float distance = LFM.position(turns) * c * 5.0/3;
+  while(fabs(distance)<fabs(inches)){
+  distance= LFM.position(turns) * c * 5.0/3;
+  drivebot(50*sign(inches),50*sign(inches),10);
+
+  }
+}
+
+
+
+
+
+
 
 void autonomous(void) {
   // ..........................................................................
