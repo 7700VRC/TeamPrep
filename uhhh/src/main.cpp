@@ -15,9 +15,10 @@ using namespace vex;
 competition Competition;
 
 // define your global instances of motors and other devices here
-motor RF (PORT11, ratio18_1, true);
-motor RB (PORT12, ratio18_1, true);
-motor LF (PORT1); 
+motor RF (PORT9, ratio18_1, true);
+motor RB (PORT17, ratio18_1, true);
+motor LF (PORT2); 
+motor LB (PORT1);
 
 
 
@@ -72,10 +73,6 @@ void usercontrol(void) {
     
     int lstick=Controller1.Axis3.position();
 		int rstick=Controller1.Axis2.position();
-	
-			driveRobot(rstick, lstick, 10);
-    wait(20, msec); // Sleep the task for a short amount of time to
-                    // prevent wasted resources.
   }
 }
 

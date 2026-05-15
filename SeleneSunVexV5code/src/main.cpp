@@ -18,11 +18,12 @@ competition Competition;
 brain Brain;
 
 
-motor LF (PORT10, ratio18_1, true);
-motor LB (PORT9, ratio18_1, true);
-motor RF (PORT20, ratio18_1, false);
-motor RB (PORT16, ratio18_1, false);
-
+motor LF (PORT9, ratio18_1, true);
+motor LB (PORT19, ratio18_1, true);
+motor RF (PORT12, ratio18_1, false);
+motor RB (PORT6, ratio18_1, false);
+motor outtake (PORT8, ratio6_1, false);
+motor belt(PORT13,ratio6_1, true);
 controller RC; 
 
 /*---------------------------------------------------------------------------*/
@@ -108,21 +109,24 @@ void usercontrol(void) {
   // User control code here, inside the loop
   while (1) {
     
-    // drawonBrain();
+    drawonBrain();
     
     int Lspeed = RC.Axis2.position(pct);
     int Rspeed = RC.Axis3.position(pct);
     
     RobotDrive(Rspeed, Lspeed, 30);
 
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
+    if (RC.ButtonL1.pressing()){
+      outtake.spin(fwd, 100, pct); 
+    }
+    else if (RC.ButtonL2.pressing()){
+      belt.spin(fwd,100,pct);
 
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
-    // ........................................................................
+    }
+    else { 
+      outtake.stop();
+      belt.stop();
+    }
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
