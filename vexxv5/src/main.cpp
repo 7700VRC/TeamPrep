@@ -2,7 +2,7 @@
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
 /*    Author:       student                                                   */
-/*    Created:      1/30/2026, 4:17:10 PM                                     */
+/*    Created:      4/9/2026, 4:19:40 PM                                      */
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
@@ -15,54 +15,74 @@ using namespace vex;
 competition Competition;
 
 // define your global instances of motors and other devices here
-brain Brain;
-controller RC;
-motor LB (PORT16, ratio18_1, true);
-motor RB (PORT15, ratio18_1, false );
-motor LF (PORT17, ratio18_1, true);
-motor RF (PORT14, ratio18_1, false );
+motor RBM (PORT1,  ratio18_1, true);
+motor RFM (PORT2, ratio18_1, true);
+motor LBM (PORT3, ratio18_1, false);
+motor LFM (PORT4, ratio18_1, false);
 
+
+controller Controller;
+brain Brain;
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
-   
+/*                                                                           */
+int sign(int a){
+  if(a<0){
+returnt -1;
 
-//retu
-
-void drawOnBrain () {
-
-Brain.Screen.printAt (20, 40, "hello world ");
- 
-Brain.Screen.setPenWidth(5);
-Brain.Screen.setPenColor(purple);
-Brain.Screen.setFillColor(yellow);
-Brain.Screen.drawCircle(240, 135, 50);
-
+  }
+  return1;
 }
+while(fabs(distance)<fabs(inches)){
+distance = LF.position(turns) * c * 5.0/3;
+drive(50*sign(inches),50*sign(inches),10);
 
-void driveRobot (int Rspeed, int Lspeed, int waitTime){
-LB.spin(fwd, Lspeed, pct);
-LF.spin(fwd, Lspeed, pct);
-RB.spin(fwd, Rspeed, pct);
-RF.spin(fwd, Rspeed, pct);
-
-
-wait(waitTime, msec );
-}
-void stopRobot(){
-LF.stop();
-LB.stop();
-RB.stop();
-RF.stop();
 
 }
 
 
+void drive (int Lspeed, int Rspeed, int WT) {
+while()
 
-/*  You may want to perform some actions before the competition starts.      */
-/*  Do them in the following function.  You must return from this function   */
-/*  or the autonomous and usercontrol tasks will not be started.  This       */
-/*  function is only called once after the V5 has been powered on and        */
-/*  not every time that the robot is disabled.                               */
+
+
+LFM.spin(fwd, Lspeed, pct);
+LBM.spin(fwd, Lspeed, pct);
+RBM.spin(fwd, Rspeed, pct);
+RFM.spin(fwd, Rspeed, pct);
+wait(WT, msec);
+LFM.stop(brake); //coast //brake //hold
+LBM.stop(brake);
+RFM.stop(brake);
+RBM.stop(brake);
+
+void inchdrive (int inches){
+LF.resetPosition();
+float c = M_PI * 3.25;
+float distance = LFM.position(turns) * c 5.0/3;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+}
+void intake(int IntakeSpeed) {
+
+
+}
+
+void Scoring (int ScoringSpeed){}
+
+
+  
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
@@ -81,33 +101,16 @@ void pre_auton(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
-void autonomous(void) {
+void autonomous(void) 
   // ..........................................................................
-  
-  driveRobot(50, 50, 4250);
-
- driveRobot(50, -50, 475);
-
- driveRobot(50, 50, 3000);
-
-driveRobot(50, -50, 475);
-
-driveRobot(50, 50, 2350);
-
-driveRobot(50, -50, 475);
-
-driveRobot(50, 50, 4050);
-
-driveRobot(50, -50, 475);
-
-  stopRobot();
+{
+drive(100,100, 400);
+drive(50, 100, 400); // curved turn 
+drive(100,100, 500);
+drive(100, -100, 300);
 
 
-
-
-  // ..........................................................................
 }
-
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              User Control Task                            */
@@ -121,21 +124,30 @@ driveRobot(50, -50, 475);
 void usercontrol(void) {
   // User control code here, inside the loop
   while (1) {
-    drawOnBrain();
+    
+int Lspeed = Controller.Axis3.position(pct);
+int Rspeed = Controller.Axis2.position(pct);
+drive(Lspeed, Rspeed, 10);
+
+if(Controller.ButtonL1.pressing()){
+Brain.Screen.printAt(10,10, "I pressed the Left 1 button");
+intake(100);
+}
+else if (Controller.ButtonL2.pressing()) {
+
+Brain.Screen.printAt(10, 10, "I am pressing L2 Button this Time");
+
+}
 
 
-int Lspeed = RC.Axis2.position(pct);
-int Rspeed = RC.Axis3.position(pct);
 
- driveRobot(Rspeed, Lspeed, 30);
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
+else{
+Brain.Screen.printAt(10, 50, "not pressing anything");
+//intake(0); 
 
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
-    // ........................................................................
+}
+
+
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.

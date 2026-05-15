@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       Student                                                   */
-/*    Created:      1/30/2026, 4:16:59 PM                                     */
+/*    Author:       student                                                   */
+/*    Created:      5/8/2026, 4:24:55 PM                                      */
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
@@ -13,58 +13,37 @@ using namespace vex;
 
 // A global instance of competition
 competition Competition;
-
+motor RBM (PORT15, ratio18_1, true); 
+motor LBM (PORT9, ratio18_1, false);
+motor RFM (PORT8, ratio18_1, true);
+motor LFM (PORT1, ratio18_1, false);
+motor intakeM(PORT10, ratio6_1, true);
+motor conveyorM(PORT4, ratio6_1, false);
+motor outakeM(PORT17, ratio6_1, true);
+brain Brain; 
+controller Controller; 
 // define your global instances of motors and other devices here
-brain Brain;
-
-
-motor LF (PORT9, ratio18_1, true);
-motor LB (PORT19, ratio18_1, true);
-motor RF (PORT12, ratio18_1, false);
-motor RB (PORT6, ratio18_1, false);
-motor outtake (PORT8, ratio6_1, false);
-motor belt(PORT13,ratio6_1, true);
-controller RC; 
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
-/*  You may want to perform some actions before the competition starts.      */
-/*  Do them in the following function.  You must return from this function   */
-/*  or the autonomous and usercontrol tasks will not be started.  This       */
-/*  function is only called once after the V5 has been powered on and        */
-/*  not every time that the robot is disabled.                               */
+
+void driveRobot(int Rspeed, int Lspeed, int WaitTime){ 
+
+  RBM.spin(forward, Rspeed, pct); 
+  RFM.spin(forward, Rspeed, pct);
+  LFM.spin(forward, Lspeed, pct);
+  LBM.spin(forward, Lspeed, pct);
+  wait(WaitTime, msec); 
+  RBM.stop();
+  RFM.stop();
+  LFM.stop();
+  LBM.stop();
+
+}
+
+
 /*---------------------------------------------------------------------------*/
-
-void drawonBrain () {
-  
-  Brain.Screen.printAt(20, 20, "Hello, World!");
-  Brain.Screen.setPenWidth(10);
-  Brain.Screen.setPenColor(blue);
-  Brain.Screen.setFillColor(yellow);
-  Brain.Screen.drawCircle(240, 135, 50);
-
-}
-
-void RobotDrive (int Rspeed, int Lspeed, int waitTime) {
-
-  LF.spin(forward, Lspeed, pct);
-  LB.spin(forward, Lspeed, pct);
-  RF.spin(forward, Rspeed, pct);
-  RB.spin(forward, Rspeed, pct);
-  
-  wait(waitTime, msec);
-}
-
-void StopRobot (){
-
-  LF.stop();
-  LB.stop();
-  RF.stop();
-  RB.stop();
-
-}
-
 
 void pre_auton(void) {
 
@@ -82,13 +61,37 @@ void pre_auton(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
+
+
+
+
+
+
+
+
+int sign (int a){
+  if (a<0){
+    return -1;
+  }
+return 1;
+}
+void inchDrive (int inches){
+float c= M_PI * 3.25;
+float distance = LFM.position(turns) * c * 5.0/3;
+while(fabs(distance)<fabs(inches)){
+distance = LFM.position(turns) * c * 5.0/3;
+driveRobot(50*sign(inches), 50*sign(inches),10);
+
+}
+
+}
+
+
+
+
+
 void autonomous(void) {
-
-  RobotDrive(50, 50, 2100);
-  RobotDrive(-25, 25, 550);
-  StopRobot();
-  RobotDrive(50, 50, 500);
-
+inchDrive(5);
 
   // ..........................................................................
   // Insert autonomous user code here.
@@ -108,27 +111,57 @@ void autonomous(void) {
 void usercontrol(void) {
   // User control code here, inside the loop
   while (1) {
-    
-    drawonBrain();
-    
-    int Lspeed1 = RC.Axis2.position(pct);
-    int Rspeed1 = RC.Axis3.position(pct);
-    
-    RobotDrive(Rspeed1, Lspeed1, 30);
 
-    if (RC.ButtonL1.pressing()){
-      outtake.spin(fwd, 100, pct); 
+    Brain.Screen.printAt(10, 20, "Hi"); 
+    
+    int Rspeed = Controller.Axis3.position(pct); 
+    int Lspeed = Controller.Axis2.position(pct); 
+
+    driveRobot(Rspeed, Lspeed, 10); 
+
+    if(Controller.ButtonR1.pressing()) { //taking blocks in to hold 
+      intakeM.spin(fwd, 100, pct); 
+      conveyorM.spin(fwd, 100, pct); 
+      outakeM.spin(reverse, 5, pct);
+    
     }
-    else if (RC.ButtonL2.pressing()){
-      belt.spin(fwd,100,pct);
+    else if (Controller.ButtonR2.pressing()) {           //score
+
+      intakeM.spin(fwd, 100, pct);
+      conveyorM.spin(fwd, 100, pct);
+      outakeM.spin(fwd, 100, pct);
 
     }
-    else { 
-      outtake.stop();
-      belt.stop();
+    else if(Controller.ButtonL1.pressing()){
+      intakeM.spin(reverse, 100, pct);
+      conveyorM.spin(reverse, 100, pct);
+      outakeM.spin(reverse, 100, pct);
+    }
+    else {         
+             //stop motors
+      intakeM.stop(); 
+      conveyorM.stop(); 
+      outakeM.stop();
+
     }
 
-    wait(20, msec); // Sleep the task for a short amount of time to
+    // if (Controller.ButtonL1.pressing()){
+    //   conveyorM.spin(fwd, 100, pct);
+    //   outakeM.spin(fwd, 100, pct);
+
+
+
+    // }
+    
+    // else { 
+
+    //   conveyorM.stop();
+    //   outakeM.stop();
+
+    // }
+
+
+    //wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
 }
@@ -143,9 +176,6 @@ int main() {
 
   // Run the pre-autonomous function.
   pre_auton();
-
-
-  
 
   // Prevent main from exiting with an infinite loop.
   while (true) {

@@ -1,9 +1,9 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       daniel bahng                                                   */
-/*    Created:      4/14/2025, 4:44:34 PM                                     */
-/*    Description:  V5 project training                                               */
+/*    Author:       student                                                   */
+/*    Created:      4/9/2026, 4:01:03 PM                                      */
+/*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
@@ -15,86 +15,66 @@ using namespace vex;
 competition Competition;
 
 // define your global instances of motors and other devices here
-brain Brain; 
-motor LFM (PORT16, ratio18_1, false);
-motor LBM (PORT19, ratio18_1, false);
+motor LFM (PORT20,ratio18_1, true);
+motor LBM (PORT15,ratio18_1, true);
+motor RFM (PORT11,ratio18_1, false);
+motor RBM (PORT5,ratio18_1, false);
 
-motor RFM (PORT12, ratio18_1, true);
-motor RBM (PORT18, ratio18_1, true);
+motor Intake (PORT5,ratio18_1, true);
+motor Outake (PORT6,ratio18_1, true);
+motor Conveyor (PORT7,ratio18_1, true);
 
-inertial imu (PORT21);
+controller Controller;
+brain Brain;
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
-void screenPrinting () {
-Brain.Screen.printAt(242, 136, "hey this took too long to print one line of code");
 
-Brain.Screen.printAt(405, 30, "this took forever");
+void drive (int Lspeed, int Rspeed, int Wt) {
 
-Brain.Screen.drawRectangle(35, 140, 41, 41);
+LFM.spin(fwd, Lspeed, pct);
+LBM.spin(fwd, Lspeed, pct);
+RFM.spin(fwd, Rspeed, pct);
+RBM.spin(fwd, Rspeed, pct);
 
-}
-
-void gyroprint() {
-
-  float heading = imu.heading(deg);
-  float rotation = imu.rotation(deg);
-  Brain.Screen.clearScreen();
-  Brain.Screen.printAt(10, 20, "Heading = %0.1f", heading);
-  Brain.Screen.printAt(10, 40, "Rotation = %0.1f", rotation);
-  Brain.Screen.printAt(10, 60, "Pitch = %0.1f", imu.pitch(deg));
-  Brain.Screen.printAt(10, 80, "Yaw = %0.1f", imu.yaw(deg));
-  Brain.Screen.printAt(10, 100, "Roll = %0.1f", imu.roll(deg));
-
-}
-
-void gyroTurn(float degrees) {
-
-  while (imu.rotation()<degrees) {
-    RFM.spin(reverse, 25, pct);
-    RBM.spin(reverse, 25, pct);
-    LFM.spin(forward, 25, pct);
-    LBM.spin(forward, 25, pct);
-    wait(30, msec);
-  }
-  RFM.stop(brake);
-  RBM.stop(brake);
+wait(Wt, msec);
+LFM.stop(brake);
+LBM.stop(brake);
+RFM.stop(brake);
+RBM.stop(brake);
 
 
-  LFM.stop(brake);
-  LBM.stop(brake);
+
+
 
 
 }
 
-void Pturn(float degrees) {
-  float heading = imu.rotation(deg);
-  float error = degrees - heading;
-  float Kp = 0.5; //constant does not change
-  float speed = error * Kp;
 
- while (fabs(error)>=5){  
-   RFM.spin(reverse, speed, pct);
-   RBM.spin(reverse, speed, pct);
-   LFM.spin(forward, speed, pct);
-   LBM.spin(forward, speed, pct);
-   wait(30, msec);
-   heading = imu.rotation(deg);
-   error =  heading - degrees;
-   speed = error * Kp;
+void intake (int ISpeed){
 
 
 
-  }
+}
+
+void Scoring(int Sspeed){
+
+
 }
 
 
+
+
+
+
+
+
+                            
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
 
-  while(imu.isCalibrating())wait(200, msec); 
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -110,12 +90,17 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  Pturn (90);
-  wait(1, sec);
-  Pturn(-90);
-  gyroprint();
-
+  // ..........................................................................
   
+drive(100, 100, 400);
+drive(50, 100, 400); // curved turn
+drive(100,100, 500);
+drive(100,-100, 300);
+
+
+
+
+  // ..........................................................................
 }
 
 /*---------------------------------------------------------------------------*/
@@ -129,18 +114,28 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-
-
+  // User control code here, inside the loop
   while (1) {
+   
+  int Lspeed = Controller.Axis3.position(pct);
+  int Rspeed = Controller.Axis2.position(pct);
+  drive(Lspeed, Rspeed, 10);
 
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
+  if(Controller.ButtonL1.pressing()){
+  Brain.Screen.printAt(10, 10, "I pressed the Left 1 button");
+  intake(100);
 
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
-    // ........................................................................
+
+  }
+  else if (Controller.ButtonL2.pressing()) {
+
+    Brain.Screen.printAt(10,30, "I am pressing Left 2 button");
+    intake(-100);
+  }
+
+  else {
+    Brain.Screen.printAt(10,50, "I am not pressing anything");
+  }
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
@@ -151,8 +146,6 @@ void usercontrol(void) {
 // Main will set up the competition functions and callbacks.
 //
 int main() {
-  screenPrinting();
-
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);

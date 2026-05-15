@@ -1,15 +1,15 @@
 {
 	"extension": {
-		"version": "0.7.2025041600",
+		"version": "0.8.2026020401",
 		"json": 2
 	},
 	"project": {
-		"name": "v5_bot_code_griffin",
+		"name": "vexmar",
 		"description": "",
-		"creationDate": "12/23/2025, 5:33:57 PM",
+		"creationDate": "4/9/2026, 4:02:40 PM",
 		"platform": "V5",
 		"language": "cpp",
-		"slot": 2,
+		"slot": 1,
 		"sdkVersion": "V5_20240802_15_00_00",
 		"cpp": {
 			"includePath": [],
