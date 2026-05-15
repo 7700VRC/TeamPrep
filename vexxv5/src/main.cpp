@@ -26,8 +26,24 @@ brain Brain;
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
+int sign(int a){
+  if(a<0){
+returnt -1;
+
+  }
+  return1;
+}
+while(fabs(distance)<fabs(inches)){
+distance = LF.position(turns) * c * 5.0/3;
+drive(50*sign(inches),50*sign(inches),10);
+
+
+}
+
 
 void drive (int Lspeed, int Rspeed, int WT) {
+while()
+
 
 
 LFM.spin(fwd, Lspeed, pct);
@@ -39,6 +55,22 @@ LFM.stop(brake); //coast //brake //hold
 LBM.stop(brake);
 RFM.stop(brake);
 RBM.stop(brake);
+
+void inchdrive (int inches){
+LF.resetPosition();
+float c = M_PI * 3.25;
+float distance = LFM.position(turns) * c 5.0/3;
+
+}
+
+
+
+
+
+
+
+
+
 
 
 }
