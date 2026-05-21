@@ -22,6 +22,7 @@ motor conveyorM(PORT4, ratio6_1, false);
 motor outakeM(PORT17, ratio6_1, true);
 brain Brain; 
 controller Controller; 
+pneumatics descore(Brain.ThreeWirePort.A);
 // define your global instances of motors and other devices here
 
 /*---------------------------------------------------------------------------*/
@@ -144,6 +145,10 @@ void usercontrol(void) {
       outakeM.stop();
 
     }
+    if(Controller.ButtonA.PRESSED){
+      descore.set(!descore.value());
+    }
+
 
     // if (Controller.ButtonL1.pressing()){
     //   conveyorM.spin(fwd, 100, pct);
