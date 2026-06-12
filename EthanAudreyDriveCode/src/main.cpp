@@ -78,6 +78,7 @@ return 1;
 }
 void inchDrive (int inches){
 float c= M_PI * 3.25;
+LFM.resetPosition();
 float distance = LFM.position(turns) * c * 5.0/3;
 while(fabs(distance)<fabs(inches)){
 distance = LFM.position(turns) * c * 5.0/3;
@@ -92,7 +93,20 @@ driveRobot(50*sign(inches), 50*sign(inches),10);
 
 
 void autonomous(void) {
-inchDrive(5);
+inchDrive(12);
+wait(1000,msec);
+intakeM.spin(fwd, 100, pct);
+wait(1000, msec);
+driveRobot(-40, 40, 350);
+wait(1000, msec);
+inchDrive(22);
+wait(1000, msec);
+driveRobot(-40, 40, 350);
+wait(1000, msec);
+inchDrive(-9);
+wait(1000, msec);
+outakeM.spin(fwd, 100, pct);
+driveRobot(0, 0, 0);
 
   // ..........................................................................
   // Insert autonomous user code here.
